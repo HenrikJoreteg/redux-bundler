@@ -33,11 +33,12 @@ module.exports = (opts) => ({
         })
     }
 
-    store.subscribe(() => {
+    const callback = () => {
       runChecks()
       idleDispatcher()
-    })
+    }
 
-    runChecks()
+    store.subscribe(callback)
+    callback()
   }
 })
