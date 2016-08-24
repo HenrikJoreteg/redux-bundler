@@ -1,0 +1,22 @@
+{
+  "name": "@henrikjoreteg/redux-app",
+  "version": "0.0.1",
+  "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
+  "dependencies": {
+    "component-raf": "1.2.0",
+    "redux": "3.5.2",
+    "ric-shim": "1.0.0",
+    "tap-spec": "4.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "1.10.2",
+    "tape": "4.6.0"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "node test",
+    "test-watch": "nodemon test"
+  }
+}
