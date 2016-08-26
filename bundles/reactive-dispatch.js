@@ -19,6 +19,16 @@ module.exports = (opts) => ({
       raf(() => store.dispatch({type: idleAction}))
     }, idleTimeout)
 
+    // convert any string refereces into real functions
+    effects.forEach(effect => {
+      effect.actionCreators = typeof effect.actionCreators === 'string'
+        ? store[effect.actionCreators]
+        : effect.actionCreators
+      effect.selector = typeof effect.selector === 'string'
+        ? store[effect.selector]
+        : effect.selector
+    })
+
     const runChecks = () => {
       effects
         .filter(item => item.selector(store.getState()) !== null)
