@@ -1,6 +1,6 @@
 {
   "name": "@henrikjoreteg/redux-app",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "component-raf": "1.2.0",
