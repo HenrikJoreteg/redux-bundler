@@ -11,6 +11,7 @@ const defaults = {
 }
 
 module.exports = (opts) => ({
+  name: 'reactiveDispatch',
   extract: 'effects',
   init: (store, effects = []) => {
     Object.assign(opts, defaults)
