@@ -10,15 +10,19 @@ const defaults = {
   idleAction: 'APP_IDLE'
 }
 
-module.exports = (opts) => ({
+const createBundle = (opts) => ({
   name: 'reactiveDispatch',
   extract: 'effects',
   init: (store, effects = []) => {
+    opts || (opts = {})
     Object.assign(opts, defaults)
     const { idleAction, idleTimeout } = opts
     const idleDispatcher = debounce(() => {
       raf(() => store.dispatch({type: idleAction}))
     }, idleTimeout)
+
+    // flatten
+    effects = effects.reduce((acc, effectArr) => acc.concat(effectArr), [])
 
     // convert any string refereces into real functions
     effects.forEach(effect => {
@@ -53,3 +57,6 @@ module.exports = (opts) => ({
     callback()
   }
 })
+
+module.exports = createBundle()
+module.exports.createBundle = createBundle
