@@ -1,6 +1,6 @@
 {
   "name": "@henrikjoreteg/redux-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "component-raf": "1.2.0",
@@ -19,6 +19,9 @@
     "test-watch": "nodemon test"
   },
   "standard": {
-    "globals": ["window", "self"]
+    "globals": [
+      "window",
+      "self"
+    ]
   }
 }
