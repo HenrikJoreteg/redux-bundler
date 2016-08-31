@@ -17,5 +17,8 @@
   "scripts": {
     "test": "node test",
     "test-watch": "nodemon test"
+  },
+  "standard": {
+    "globals": ["window", "self"]
   }
 }
