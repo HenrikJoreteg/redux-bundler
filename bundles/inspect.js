@@ -60,7 +60,15 @@ module.exports = {
           const selectorName = activeEffectQueue[0]
           const actionCreatorName = store.effects[selectorName]
           const result = store[selectorName]()
-          console.log(`%cnext effect:\n  %c%s() -> %c${actionCreatorName}(%c${JSON.stringify(result)}%c)`, colorOrange, black, selectorName, colorRed, black, colorRed)
+          console.log(
+            `%cnext effect:\n  %c%s() -> %c${actionCreatorName}(%c${JSON.stringify(result)}%c)`,
+            colorOrange,
+            black,
+            selectorName,
+            colorRed,
+            black,
+            colorRed
+          )
           if (activeEffectQueue.length > 1) {
             console.log('%cqueued effects:', colorRed, activeEffectQueue.slice(1).join(', '))
           }
@@ -79,8 +87,8 @@ module.exports = {
       console.log(`%cattached to window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
       store.listSelectors()
       store.listEffects()
-      store.listActiveEffects()
       console.groupEnd()
+      store.listActiveEffects()
     }
   }
 }
