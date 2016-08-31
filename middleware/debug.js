@@ -11,6 +11,7 @@ module.exports = store => next => action => {
 
   if (debug) {
     console.debug('state:', store.getState())
+    window.listActiveEffects && window.listActiveEffects()
     console.groupEnd(action.type)
   }
 

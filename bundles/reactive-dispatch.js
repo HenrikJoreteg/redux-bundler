@@ -22,34 +22,58 @@ const createBundle = (opts) => ({
     }, idleTimeout)
 
     // flatten
-    effects = effects.reduce((acc, effectArr) => acc.concat(effectArr), [])
+    const effectObj = effects.reduce((acc, effectObj) => {
+      for (const item in effectObj) {
+        // helpful development errors
+        if (process.env.NODE_ENV !== 'production') {
+          const actionName = effectObj[item]
+          if (!store[item]) {
+            throw Error(`Effect key '${item}' does not exist on the store. Make sure you're defining as selector by that name.`)
+          }
+          if (!store[actionName]) {
+            throw Error(`Effect value '${actionName}' does not exist on the store. Make sure you're defining an action creator by that name.`)
+          }
+          if (acc[item]) {
+            throw Error(`effect keys must be unique. An effect ${item} is already defined`)
+          }
+          if (typeof actionName !== 'string') {
+            throw Error(`Effect values must be strings. The effect ${item} has a value that is: ${typeof actionName}`)
+          }
+        }
+        acc[item] = effectObj[item]
+      }
+      return acc
+    }, {})
 
-    // convert any string refereces into real functions
-    effects.forEach(effect => {
-      effect.actionCreators = typeof effect.actionCreators === 'string'
-        ? store[effect.actionCreators]
-        : effect.actionCreators
-      effect.selector = typeof effect.selector === 'string'
-        ? store[effect.selector]
-        : effect.selector
-    })
+    store.effects = effectObj
+    store.activeEffectQueue = []
 
-    const runChecks = () => {
-      effects
-        .filter(item => item.selector(store.getState()) !== null)
-        .forEach(item => {
-          requestIdleCallback(() => {
-            // make sure it's still relevant
-            const result = item.selector(store.getState())
-            if (result !== null) {
-              store.dispatch(item.actionCreator(result))
-            }
-          })
+    const buildActiveEffectQueue = () => {
+      for (const selectorName in store.effects) {
+        const result = store[selectorName]()
+        if (result !== null && store.activeEffectQueue.indexOf(selectorName) === -1) {
+          store.activeEffectQueue.push(selectorName)
+        }
+      }
+    }
+
+    const dispatchNext = () => {
+      const next = store.activeEffectQueue.shift()
+      if (next) {
+        requestIdleCallback(() => {
+          // make sure it's still relevant
+          const result = store[next]()
+          if (result !== null) {
+            const actionCreatorName = store.effects[next]
+            store[actionCreatorName](result)
+          }
         })
+      }
     }
 
     const callback = () => {
-      runChecks()
+      buildActiveEffectQueue()
+      dispatchNext()
       idleDispatcher()
     }
 
