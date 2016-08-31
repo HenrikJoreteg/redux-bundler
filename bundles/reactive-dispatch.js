@@ -58,17 +58,17 @@ const createBundle = (opts) => ({
     }
 
     const dispatchNext = () => {
-      const next = store.activeEffectQueue.shift()
-      if (next) {
-        requestIdleCallback(() => {
+      requestIdleCallback(() => {
+        const next = store.activeEffectQueue.shift()
+        if (next) {
           // make sure it's still relevant
           const result = store[next]()
           if (result !== null) {
             const actionCreatorName = store.effects[next]
             store[actionCreatorName](result)
           }
-        })
-      }
+        }
+      })
     }
 
     const callback = () => {
