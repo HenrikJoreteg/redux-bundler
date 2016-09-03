@@ -4,6 +4,7 @@
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "component-raf": "1.2.0",
+    "create-selector": "^2.0.0",
     "redux": "3.5.2",
     "ric-shim": "1.0.0"
   },
