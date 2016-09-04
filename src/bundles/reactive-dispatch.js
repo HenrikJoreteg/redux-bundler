@@ -10,7 +10,7 @@ const defaults = {
   idleAction: 'APP_IDLE'
 }
 
-const createBundle = (opts) => ({
+export const createBundle = (opts) => ({
   name: 'reactiveDispatch',
   extract: 'effects',
   init: (store, effects = []) => {
@@ -82,5 +82,4 @@ const createBundle = (opts) => ({
   }
 })
 
-module.exports = createBundle()
-module.exports.createBundle = createBundle
+export default createBundle()

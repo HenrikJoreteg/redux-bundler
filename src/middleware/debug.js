@@ -1,7 +1,7 @@
 let debug
 try { debug = window.localStorage.debug } catch (e) {}
 
-module.exports = store => next => action => {
+export default store => next => action => {
   if (debug) {
     console.group(action.type)
     console.info('action:', action)

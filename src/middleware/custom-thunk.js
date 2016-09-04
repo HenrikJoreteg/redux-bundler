@@ -10,4 +10,4 @@ function createThunkMiddleware (extra) {
 const thunk = createThunkMiddleware()
 thunk.withExtraArgs = createThunkMiddleware
 
-module.exports = thunk
+export default thunk

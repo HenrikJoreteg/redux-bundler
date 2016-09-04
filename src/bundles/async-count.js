@@ -4,7 +4,7 @@ const changes = {
   'ERROR': -1
 }
 
-module.exports = {
+export default {
   name: 'asyncCount',
   reducer: (state = 0, { type }) => {
     const last = type.split('_').slice(-1)[0]

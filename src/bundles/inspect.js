@@ -1,9 +1,11 @@
+import { version } from '../../package.json'
+
 let debug
 try {
   debug = !!(window.localStorage.debug)
 } catch (e) {}
 
-module.exports = {
+export default {
   name: 'inspect',
   extract: 'name',
   init: (store, names) => {
@@ -75,7 +77,7 @@ module.exports = {
         }
       }
 
-      console.groupCollapsed('%credux bundler', colorTitle)
+      console.groupCollapsed('%credux bundler v%s', colorTitle, version)
       store.listBundles()
       const exported = []
       for (const key in store) {

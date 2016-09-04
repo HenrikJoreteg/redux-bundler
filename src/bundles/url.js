@@ -1,5 +1,5 @@
-import { createSelector } from 'reselect'
-import qs from 'query-string'
+const { createSelector } = require('reselect')
+const qs = require('query-string')
 
 // declarations
 const IS_BROWSER = typeof window !== 'undefined' || typeof self !== 'undefined'
@@ -74,7 +74,7 @@ const selectPathname = createSelector(selectUrlState, urlState => urlState.pathn
 const selectHash = createSelector(selectUrlState, urlState => urlState.hash)
 const selectHashObject = createSelector(selectUrlState, urlState => qs.parse(urlState.hash))
 
-module.exports = {
+export default {
   name: 'url',
   actions: { UPDATE_URL },
   getReducer: () => {
