@@ -1,8 +1,7 @@
 import debugMiddleware from '../middleware/debug'
 import thunkMiddleware from '../middleware/custom-thunk'
-
-const { createStore, combineReducers, applyMiddleware, bindActionCreators } = require('redux')
-const { resolveSelectors } = require('create-selector')
+import { createStore, combineReducers, applyMiddleware, bindActionCreators } from 'redux'
+import { resolveSelectors } from 'create-selector'
 
 export default (...bundles) => {
   const reducers = {}

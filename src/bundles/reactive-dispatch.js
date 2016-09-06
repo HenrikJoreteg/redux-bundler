@@ -1,6 +1,6 @@
-const debounce = require('lodash/debounce')
-const requestIdleCallback = require('ric-shim')
-const IS_BROWSER = typeof window !== 'undefined'
+import debounce from 'lodash/debounce'
+import requestIdleCallback from 'ric-shim'
+import IS_BROWSER from '../utils/is-browser'
 const raf =
   (IS_BROWSER && require('component-raf')) ||
   ((func) => { setTimeout(func, 0) })

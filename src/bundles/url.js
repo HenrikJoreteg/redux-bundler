@@ -1,8 +1,8 @@
-const { createSelector } = require('reselect')
-const qs = require('query-string')
+import { createSelector } from 'reselect'
+import qs from 'query-string'
+import IS_BROWSER from '../utils/is-browser'
 
 // declarations
-const IS_BROWSER = typeof window !== 'undefined' || typeof self !== 'undefined'
 const UPDATE_URL = 'UPDATE_URL'
 const IPRE = /^[0-9\.]+$/
 
