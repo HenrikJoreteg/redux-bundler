@@ -2,7 +2,6 @@ import appTime from './bundles/app-time'
 import asyncCount from './bundles/async-count'
 import compose from './lib/compose-bundles'
 import inspect from './bundles/inspect'
-//import localCaching from './bundles/local-caching'
 import effects from './bundles/reactive-dispatch'
 import url from './bundles/url'
 
