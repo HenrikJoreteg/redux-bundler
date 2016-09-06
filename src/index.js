@@ -3,7 +3,7 @@ import asyncCount from './bundles/async-count'
 import compose from './lib/compose-bundles'
 import inspect from './bundles/inspect'
 import createRoutingBundle from './bundles/create-route-bundle'
-import effects from './bundles/reactive-dispatch'
+import effects from './bundles/effects'
 import url from './bundles/url'
 
 export const appTimeBundle = appTime
