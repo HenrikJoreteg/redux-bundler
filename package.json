@@ -22,15 +22,13 @@
     "tape": "4.6.0"
   },
   "files": [
-    "lib/index.js"
+    "index.js"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "rollup -c > tmp.js && buble tmp.js > lib/index.js && rm tmp.js",
-    "prebuild": "rm -rf lib && mkdir lib",
+    "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
     "prepublish": "npm run build",
-    "stuff": "buble tmp.js > lib/index.js",
     "test": "npm run build && tape test/*",
     "watch": "npm-watch"
   },
