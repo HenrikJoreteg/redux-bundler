@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundles, appTimeBundle } = require('../')
+const { composeBundles, appTimeBundle } = require('../lib')
 
 test('composeBundles', (t) => {
   const createStore = composeBundles(appTimeBundle)

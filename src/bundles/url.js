@@ -1,116 +1,129 @@
-import { createSelector } from 'reselect'
-import qs from 'query-string'
+import URL from 'url-parse'
+import qs from 'querystringify'
+import { createSelector } from 'create-selector'
 import IS_BROWSER from '../utils/is-browser'
 
-// declarations
-const UPDATE_URL = 'UPDATE_URL'
+export const isDefined = thing => typeof thing !== 'undefined'
+export const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)
 const IPRE = /^[0-9\.]+$/
-
-// utils
-const isDefined = thing => typeof thing !== 'undefined'
-const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)
-const parseSubdomains = (hostname) => {
+export const parseSubdomains = (hostname) => {
   if (IPRE.test(hostname)) return []
   return hostname.split('.').slice(0, -2)
 }
-const removeLeading = (char, string) =>
+export const removeLeading = (char, string) =>
   string.charAt(0) === char ? string.slice(1) : string
+export const ensureLeading = (char, string) => {
+  if (string === char || string === '') {
+    return ''
+  }
+  return string.charAt(0) !== char ? char + string : string
+}
 const loc = (() => {
   if (!IS_BROWSER) return {}
   return window.location || self.location
 })()
-const buildNewString = ({pathname, search, hash}) => {
-  search = search ? `?${search}` : ''
-  hash = hash ? `#${hash}` : ''
-  return `${pathname}${search}${hash}`
-}
-
-// action creators
-const doUpdateUrl = (newState, opts = {replace: false}) => {
-  const state = (typeof newState === 'string') ? { pathname: newState, hash: '', search: '' } : newState
-  if (isDefined(state.hash)) state.hash = ensureString(state.hash)
-  if (isDefined(state.search)) state.search = ensureString(state.search)
-  return { type: UPDATE_URL, payload: { state, opts } }
-}
-const doReplaceUrl = (arg) => doUpdateUrl(arg, {replace: true})
-const doUpdateQuery = (search, opts = {replace: true}) =>
-  doUpdateUrl({ search: ensureString(search) }, opts)
-const doUpdateHash = (hash, opts = {replace: false}) =>
-  doUpdateUrl({ hash: ensureString(hash) }, opts)
-
-// browser interactions
-const initialData = {
-  pathname: '/',
-  search: '',
-  hash: '',
-  hostname: IS_BROWSER && loc.hostname || '',
-  subdomains: IS_BROWSER && parseSubdomains(loc.hostname) || []
-}
-const updateBrowser = (state, replace) => {
-  const current = loc.href.replace(loc.origin, '')
-  const newString = buildNewString(state)
-  if (current !== newString) {
-    window.history[replace ? 'replaceState' : 'pushState'](
-      {}, null, buildNewString(state)
-    )
-  }
-}
-const readUrl = () => {
-  if (!IS_BROWSER) return initialData
-  return {
-    pathname: loc.pathname,
-    search: removeLeading('?', loc.search),
-    hash: removeLeading('#', loc.hash),
-    hostname: initialData.hostname,
-    subdomains: initialData.subdomains
-  }
-}
-
-// selectors
-const selectUrlState = state => state.url
-const selectQueryString = createSelector(selectUrlState, urlState => urlState.search)
-const selectQueryObject = createSelector(selectQueryString, string => qs.parse(string))
-const selectPathname = createSelector(selectUrlState, urlState => urlState.pathname)
-const selectHash = createSelector(selectUrlState, urlState => urlState.hash)
-const selectHashObject = createSelector(selectUrlState, urlState => qs.parse(urlState.hash))
-
-export default {
+const defaults = {
   name: 'url',
-  actions: { UPDATE_URL },
-  getReducer: () => {
-    return (state = readUrl(), {type, payload}) => {
-      if (type === UPDATE_URL) {
-        const payloadState = payload.state
-        const newPathname = payloadState.pathname
-        const newHash = payloadState.hash
-        const newSearch = payloadState.search
-        const actual = readUrl()
-        const newState = {
-          pathname: isDefined(newPathname) ? newPathname : actual.pathname,
-          hash: isDefined(newHash) ? newHash : actual.hash,
-          search: isDefined(newSearch) ? newSearch : actual.search
-        }
-        updateBrowser(newState, payload.opts.replace)
-        return Object.assign({}, state, newState)
+  inert: !IS_BROWSER,
+  actionType: 'UPDATE_URL'
+}
+
+export default (opts) => {
+  const config = Object.assign({}, defaults, opts)
+  const actionType = config.actionType
+
+  const selectUrlRaw = state => state[config.name]
+  const selectUrlObject = createSelector(selectUrlRaw, urlState => new URL(urlState.url, true))
+  const selectQueryObject = createSelector(selectUrlObject, urlObj => urlObj.query)
+  const selectQueryString = createSelector(selectQueryObject, queryObj => qs.stringify(queryObj))
+  const selectPathname = createSelector(selectUrlObject, urlObj => urlObj.pathname)
+  const selectHash = createSelector(selectUrlObject, urlObj => removeLeading('#', urlObj.hash))
+  const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
+  const selectSubdomains = createSelector(selectUrlObject, urlObj => parseSubdomains(urlObj.hostname))
+
+  const doUpdateUrl = (newState, opts = {replace: false}) => ({dispatch, getState}) => {
+    const state = (typeof newState === 'string') ? { pathname: newState, hash: '', query: '' } : newState
+    const url = new URL(selectUrlRaw(getState()).url, true)
+    if (isDefined(state.pathname)) url.set('pathname', state.pathname)
+    if (isDefined(state.hash)) url.set('hash', ensureString(state.hash))
+    if (isDefined(state.query)) url.set('query', ensureString(state.query))
+    dispatch({ type: actionType, payload: { url: url.href, replace: opts.replace } })
+  }
+  const doReplaceUrl = (url) => doUpdateUrl(url, {replace: true})
+  const doUpdateQuery = (query, opts = {replace: true}) =>
+    doUpdateUrl({ query: ensureString(query) }, opts)
+  const doUpdateHash = (hash, opts = {replace: false}) =>
+    doUpdateUrl({ hash: ensureLeading('#', ensureString(hash)) }, opts)
+
+  return {
+    name: config.name,
+    init: store => {
+      if (config.inert) {
+        return
       }
-      return state
-    }
-  },
-  init: (store) => {
-    if (!IS_BROWSER) return
-    const setCurrentUrl = () => {
-      store.doUpdateUrl(readUrl())
-    }
-    window.addEventListener('popstate', setCurrentUrl)
-  },
-  selectUrlState,
-  selectQueryString,
-  selectQueryObject,
-  selectPathname,
-  selectHash,
-  selectHashObject,
-  doReplaceUrl,
-  doUpdateUrl,
-  doUpdateQuery,
-  doUpdateHash
+
+      let lastState = store.selectUrlRaw()
+
+      const setCurrentUrl = () => {
+        store.doUpdateUrl({
+          pathname: loc.pathname,
+          hash: loc.hash,
+          query: loc.search
+        })
+      }
+
+      window.addEventListener('popstate', setCurrentUrl)
+
+      store.subscribe(() => {
+        const newState = store.selectUrlRaw()
+        const newUrl = newState.url
+        if (lastState !== newState && newUrl !== loc.href) {
+          try {
+            window.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
+          } catch (e) {
+            console.error(e)
+          }
+        }
+        lastState = newState
+      })
+
+      window.addEventListener('popstate', setCurrentUrl)
+    },
+    getReducer: () => {
+      const initialState = {
+        url: !config.inert && IS_BROWSER
+          ? loc.href
+          : '/',
+        replace: false
+      }
+
+      return (state = initialState, {type, payload}) => {
+        if (type === '@@redux/INIT' && typeof state === 'string') {
+          return {
+            url: state,
+            replace: false
+          }
+        }
+        if (type === actionType) {
+          return Object.assign({
+            url: payload.url || payload,
+            replace: !!payload.replace
+          })
+        }
+        return state
+      }
+    },
+    doUpdateUrl,
+    doReplaceUrl,
+    doUpdateQuery,
+    doUpdateHash,
+    selectUrlRaw,
+    selectUrlObject,
+    selectQueryObject,
+    selectQueryString,
+    selectPathname,
+    selectHash,
+    selectHashObject,
+    selectSubdomains
+  }
 }
