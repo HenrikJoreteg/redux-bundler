@@ -1,6 +1,6 @@
 {
   "name": "@henrikjoreteg/redux-app",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "component-raf": "^1.2.0",
@@ -29,6 +29,7 @@
   "scripts": {
     "build": "rollup -c > tmp.js && buble tmp.js > lib/index.js && rm tmp.js",
     "prebuild": "rm -rf lib && mkdir lib",
+    "prepublish": "npm run build",
     "stuff": "buble tmp.js > lib/index.js",
     "test": "npm run build && tape test/*",
     "watch": "npm-watch"
