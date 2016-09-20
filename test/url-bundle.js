@@ -1,9 +1,9 @@
 const test = require('tape')
-const { composeBundles, urlBundle } = require('../')
+const { composeBundlesRaw, urlBundle } = require('../')
 
 test('url-bundle selectors', (t) => {
   const startUrl = 'http://subdomain.something.com:3030/something#hi=there'
-  const store = composeBundles(urlBundle())({url: startUrl})
+  const store = composeBundlesRaw(urlBundle())({url: startUrl})
   t.deepEqual(store.selectUrlRaw(), {url: startUrl, replace: false}, 'returns basic start')
   t.equal(store.selectUrlObject().href, startUrl, 'returns href')
   t.deepEqual(store.selectQueryObject(), {}, 'returns parsed object')
@@ -13,7 +13,7 @@ test('url-bundle selectors', (t) => {
   t.deepEqual(store.selectHashObject(), {hi: 'there'}, 'returns parsed hash')
   t.deepEqual(store.selectSubdomains(), ['subdomain'], 'get subdomains')
 
-  const store2 = composeBundles(urlBundle())()
+  const store2 = composeBundlesRaw(urlBundle())()
   t.deepEqual(store2.selectUrlRaw(), {url: '/', replace: false})
   t.end()
 })
@@ -22,7 +22,7 @@ test('url-bundle actionCreators', (t) => {
   const start = 'http://something.com/something'
   let store
   const resetStore = (startUrl = start) =>
-    store = composeBundles(urlBundle())({url: startUrl})
+    store = composeBundlesRaw(urlBundle())({url: startUrl})
 
   resetStore()
   store.doUpdateUrl('/')

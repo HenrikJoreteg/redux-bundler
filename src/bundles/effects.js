@@ -1,16 +1,17 @@
 import debounce from 'lodash/debounce'
 import requestIdleCallback from 'ric-shim'
-import IS_BROWSER from '../utils/is-browser'
+import { IS_BROWSER } from '../utils'
 const raf =
   (IS_BROWSER && require('component-raf')) ||
   ((func) => { setTimeout(func, 0) })
 
 const defaults = {
   idleTimeout: 30000,
-  idleAction: 'APP_IDLE'
+  idleAction: 'APP_IDLE',
+  doneCallback: null
 }
 
-export const createBundle = (opts) => ({
+export default (opts) => ({
   name: 'reactiveDispatch',
   extract: 'effects',
   init: (store, effects = []) => {
@@ -68,6 +69,10 @@ export const createBundle = (opts) => ({
             store[actionCreatorName](result)
           }
         }
+        if (!IS_BROWSER && !next && (!store.selectAsyncActive || !store.selectAsyncActive())) {
+          idleDispatcher.cancel()
+          opts.doneCallback && opts.doneCallback()
+        }
       })
     }
 
@@ -81,5 +86,3 @@ export const createBundle = (opts) => ({
     callback()
   }
 })
-
-export default createBundle()

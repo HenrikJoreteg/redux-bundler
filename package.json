@@ -6,6 +6,7 @@
     "component-raf": "^1.2.0",
     "create-selector": "^2.0.0",
     "feather-route-matcher": "^2.0.1",
+    "idb-keyval": "^2.1.2",
     "lodash": "^4.0.0",
     "querystringify": "0.0.4",
     "redux": "^3.0.0",
@@ -29,7 +30,7 @@
   "scripts": {
     "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
     "prepublish": "npm run build",
-    "test": "npm run build && tape test/*",
+    "test": "npm run build && tape test/*.js",
     "watch": "npm-watch"
   },
   "standard": {

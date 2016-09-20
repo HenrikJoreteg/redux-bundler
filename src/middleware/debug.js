@@ -1,15 +1,14 @@
-let debug
-try { debug = window.localStorage.debug } catch (e) {}
+import { IS_DEBUG } from '../utils'
 
 export default store => next => action => {
-  if (debug) {
+  if (IS_DEBUG) {
     console.group(action.type)
     console.info('action:', action)
   }
 
   const result = next(action)
 
-  if (debug) {
+  if (IS_DEBUG) {
     console.debug('state:', store.getState())
     window.listSelectors && window.listSelectors()
     window.listActiveEffects && window.listActiveEffects()

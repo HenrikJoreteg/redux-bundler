@@ -1,7 +1,7 @@
 import URL from 'url-parse'
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import IS_BROWSER from '../utils/is-browser'
+import { IS_BROWSER } from '../utils'
 
 export const isDefined = thing => typeof thing !== 'undefined'
 export const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)

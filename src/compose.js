@@ -1,5 +1,5 @@
-import debugMiddleware from '../middleware/debug'
-import thunkMiddleware from '../middleware/custom-thunk'
+import debugMiddleware from './middleware/debug'
+import thunkMiddleware from './middleware/custom-thunk'
 import { createStore, combineReducers, applyMiddleware, bindActionCreators } from 'redux'
 import { resolveSelectors } from 'create-selector'
 
@@ -10,6 +10,7 @@ export default (...bundles) => {
   const actionCreators = {}
   const selectors = {}
   const itemsToExtract = {}
+  const extraMiddleware = {}
 
   // not real pretty, but it means we only have
   // to loop through everything once
@@ -23,6 +24,10 @@ export default (...bundles) => {
       }
       if (key === 'getReducer') {
         reducers[name] = value()
+        return
+      }
+      if (key === 'getMiddleware') {
+        extraMiddleware[name] = value
         return
       }
       if (key === 'init') {
@@ -54,13 +59,19 @@ export default (...bundles) => {
   })
 
   return (data, opts = {}) => {
+    const middleware = [
+      thunkMiddleware.withExtraArgs(extraArgs),
+      debugMiddleware
+    ]
+
+    for (const appName in extraMiddleware) {
+      middleware.push(extraMiddleware[appName](itemsToExtract[appName]))
+    }
+
     const store = createStore(
       combineReducers(reducers),
       data,
-      applyMiddleware(
-        thunkMiddleware.withExtraArgs(extraArgs),
-        debugMiddleware
-      )
+      applyMiddleware(...middleware)
     )
 
     const boundActionCreators = bindActionCreators(actionCreators, store.dispatch)

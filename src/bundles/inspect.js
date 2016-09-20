@@ -23,6 +23,8 @@ export default {
           actionCreators.push(key)
         }
       }
+      actionCreators.sort()
+      selectors.sort()
       const colorTitle = 'color: #1676D2;'
       const black = 'color: black;'
       const colorGreen = 'color: #4CAF50;'
