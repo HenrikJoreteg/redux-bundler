@@ -20,8 +20,8 @@ export default (spec) => {
 
       return ({getState}) => (next) => (action) => {
         const keys = combinedActions[action.type]
-        const state = getState()
         const res = next(action)
+        const state = getState()
         if (keys) {
           if (IS_BROWSER) {
             ric(() => {
