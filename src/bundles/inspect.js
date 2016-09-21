@@ -8,7 +8,6 @@ try {
 export default {
   name: 'inspect',
   init: (store) => {
-    console.log("RE-INITTED");
     if (debug) {
       const names = store.bundles.map(bundle => bundle.name)
       window.store = store
