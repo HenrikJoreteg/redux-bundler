@@ -7,10 +7,9 @@ try {
 
 export default {
   name: 'inspect',
-  extract: 'name',
-  init: (store, extracted) => {
+  init: (store) => {
     if (debug) {
-      const names = Object.keys(extracted)
+      const names = store.bundles.map(bundle => bundle.name)
       window.store = store
       const selectors = []
       const actionCreators = []

@@ -26,8 +26,8 @@ export const composeBundles = (...userBundles) => {
     url(),
     effects(),
     caching(),
-    ...userBundles,
-    inspect
+    inspect,
+    ...userBundles
   ]
   return compose(...bundles)
 }
