@@ -8,6 +8,7 @@ try {
 export default {
   name: 'inspect',
   init: (store) => {
+    console.log("RE-INITTED");
     if (debug) {
       const names = store.bundles.map(bundle => bundle.name)
       window.store = store
@@ -87,6 +88,7 @@ export default {
           exported.push(`${key}()`)
         }
       }
+      exported.sort()
       exported.unshift('store')
       console.log(`%cattached to window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
       store.listSelectors()

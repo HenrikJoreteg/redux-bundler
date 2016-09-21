@@ -112,7 +112,10 @@ const composeBundles = (...bundles) => {
 
     store.integrateBundles = (...bundlesToIntegrate) => {
       const { bundles } = store
-      const bundleMap = bundles.reduce((acc, bundle, index) => acc[bundle.name] = index, {})
+      const bundleMap = bundles.reduce((acc, bundle, index) => {
+        acc[bundle.name] = index
+        return acc
+      }, {})
       bundlesToIntegrate.forEach(newBundle => {
         const currentIndex = bundleMap[newBundle.name]
         if (currentIndex != null) {
