@@ -1,6 +1,6 @@
 import debounce from 'lodash/debounce'
 import requestIdleCallback from 'ric-shim'
-import { IS_BROWSER } from '../utils'
+import { IS_BROWSER, flattenExtractedToObject } from '../utils'
 const raf =
   (IS_BROWSER && require('component-raf')) ||
   ((func) => { setTimeout(func, 0) })
@@ -14,7 +14,7 @@ const defaults = {
 export default (opts) => ({
   name: 'reactiveDispatch',
   extract: 'effects',
-  init: (store, effects = []) => {
+  init: (store, extracted) => {
     opts || (opts = {})
     Object.assign(opts, defaults)
     const { idleAction, idleTimeout } = opts
@@ -22,29 +22,22 @@ export default (opts) => ({
       raf(() => store.dispatch({type: idleAction}))
     }, idleTimeout)
 
-    // flatten
-    const effectObj = effects.reduce((acc, effectObj) => {
-      for (const item in effectObj) {
-        // helpful development errors
-        if (process.env.NODE_ENV !== 'production') {
-          const actionName = effectObj[item]
-          if (!store[item]) {
-            throw Error(`Effect key '${item}' does not exist on the store. Make sure you're defining as selector by that name.`)
-          }
-          if (!store[actionName]) {
-            throw Error(`Effect value '${actionName}' does not exist on the store. Make sure you're defining an action creator by that name.`)
-          }
-          if (acc[item]) {
-            throw Error(`effect keys must be unique. An effect ${item} is already defined`)
-          }
-          if (typeof actionName !== 'string') {
-            throw Error(`Effect values must be strings. The effect ${item} has a value that is: ${typeof actionName}`)
-          }
+    const effectObj = flattenExtractedToObject(extracted)
+    for (const item in effectObj) {
+      // helpful development errors
+      if (process.env.NODE_ENV !== 'production') {
+        const actionName = effectObj[item]
+        if (!store[item]) {
+          throw Error(`Effect key '${item}' does not exist on the store. Make sure you're defining as selector by that name.`)
         }
-        acc[item] = effectObj[item]
+        if (!store[actionName]) {
+          throw Error(`Effect value '${actionName}' does not exist on the store. Make sure you're defining an action creator by that name.`)
+        }
+        if (typeof actionName !== 'string') {
+          throw Error(`Effect values must be strings. The effect ${item} has a value that is: ${typeof actionName}`)
+        }
       }
-      return acc
-    }, {})
+    }
 
     store.effects = effectObj
     store.activeEffectQueue = []

@@ -29,6 +29,5 @@ export const composeBundles = (...userBundles) => {
     ...userBundles,
     inspect
   ]
-  // console.log(bundles)
   return compose(...bundles)
 }

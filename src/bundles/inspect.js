@@ -8,8 +8,9 @@ try {
 export default {
   name: 'inspect',
   extract: 'name',
-  init: (store, names) => {
+  init: (store, extracted) => {
     if (debug) {
+      const names = Object.keys(extracted)
       window.store = store
       const selectors = []
       const actionCreators = []

@@ -21,11 +21,12 @@ export default (spec) => {
       return ({getState}) => (next) => (action) => {
         const keys = combinedActions[action.type]
         const state = getState()
+        const res = next(action)
         if (keys) {
           if (IS_BROWSER) {
             ric(() => {
               Promise.all(keys.map(key =>
-                cacheItem(key, JSON.stringify(state[key]), {version: opts.version})
+                cacheItem(key, state[key], {version: opts.version})
               )).then(() => {
                 if (IS_DEBUG) {
                   console.info(`persisted ${keys.join(', ')} because of action ${action.type}`)
@@ -34,7 +35,7 @@ export default (spec) => {
             })
           }
         }
-        next(action)
+        return res
       }
     }
   }

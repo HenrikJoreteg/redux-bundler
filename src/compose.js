@@ -39,9 +39,14 @@ export default (...bundles) => {
         return
       }
       if (key === 'extract') {
-        itemsToExtract[name] = bundles
-          .map(bundle => bundle[value])
-          .filter(item => item)
+        itemsToExtract[name] = bundles.reduce((accum, bundle) => {
+          const extracted = bundle[value]
+          if (extracted) {
+            accum[bundle.name] || (accum[bundle.name] = [])
+            accum[bundle.name].push(extracted)
+          }
+          return accum
+        }, {})
       }
       if (key.indexOf('do') === 0) {
         const obj = {}

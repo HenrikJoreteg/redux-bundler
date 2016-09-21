@@ -27,11 +27,17 @@ export const getAllCached = opts => {
   return opts.lib.keys()
     .then(retrivedKeys => {
       keys = retrivedKeys
-      return Promise.all(keys.map(key => getCachedItem(key, opts)))
+      return Promise.all(keys.map(key =>
+        getCachedItem(key, opts)
+          .then(res => res.data)
+      ))
     })
-    .then(data => data.reduce((accum, result, index) =>
-      result ? accum[keys[index]] = result : accum
-    , {}))
+    .then(data => data.reduce((acc, bundleData, index) => {
+      if (bundleData) {
+        acc[keys[index]] = bundleData
+      }
+      return acc
+    }, {}))
 }
 
 export const clearAllCached = (opts = defaultOpts) => opts.lib.clear()
