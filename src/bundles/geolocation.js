@@ -21,8 +21,9 @@ export default createAsyncResourceBundle({
     if (!IS_BROWSER || !navigator.geolocation) {
       reject(getError('Geolocation not supported', true))
     }
-    const success = () => {
-
+    const success = (position) => {
+      console.log(position);
+      resolve(position.toJSON())
     }
     const fail = ({code}) => {
       reject(getError(geoErrorArray[code], code === 1))
