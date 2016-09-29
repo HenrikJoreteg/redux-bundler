@@ -16,6 +16,8 @@ test('integrateBundles', t => {
   t.ok(!store.selectAsyncActive, `doesn't have async active yet`)
   store.integrateBundles(asyncCountBundle)
   t.ok(store.selectAppTime, `old selector is still there`)
+  t.ok(store.selectAppTime(), `old selector works`)
   t.ok(store.selectAsyncActive, `has new selector now too`)
+  t.ok(store.selectAsyncActive, `new selector works`)
   t.end()
 })
