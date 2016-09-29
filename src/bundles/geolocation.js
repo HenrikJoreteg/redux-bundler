@@ -22,8 +22,13 @@ export default createAsyncResourceBundle({
       reject(getError('Geolocation not supported', true))
     }
     const success = (position) => {
-      console.log(position);
-      resolve(position.toJSON())
+      const res = {}
+      const { coords } = position
+      for (const key in coords) {
+        res[key] = coords[key]
+      }
+      res.timestamp = position.timestamp
+      resolve(res)
     }
     const fail = ({code}) => {
       reject(getError(geoErrorArray[code], code === 1))

@@ -19,7 +19,8 @@ const defaultOpts = {
   actionBaseType: null,
   transform: item => item,
   staleAge: 900000, // fifteen minutes
-  retryAfter: 60000 // one minute
+  retryAfter: 60000,// one minute,
+  persist: true
 }
 
 export default (spec) => {
@@ -96,7 +97,7 @@ export default (spec) => {
       .catch(error => dispatch({type: actions.ERROR, error}))
   }
 
-  return {
+  const result = {
     name,
     reducer: (state = initialState, {type, payload, error}) => {
       if (type === actions.START) {
@@ -128,4 +129,10 @@ export default (spec) => {
     [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
     [`doFetch${ucaseName}`]: doFetchData
   }
+
+  if (opts.persist) {
+    result.persistActions = [ actions.SUCCESS ]
+  }
+
+  return result
 }
