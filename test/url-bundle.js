@@ -21,8 +21,9 @@ test('url-bundle selectors', (t) => {
 test('url-bundle actionCreators', (t) => {
   const start = 'http://something.com/something'
   let store
-  const resetStore = (startUrl = start) =>
+  const resetStore = (startUrl = start) => {
     store = composeBundlesRaw(urlBundle())({url: startUrl})
+  }
 
   resetStore()
   store.doUpdateUrl('/')

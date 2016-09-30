@@ -18,6 +18,7 @@
     "npm-watch": "0.1.6",
     "rollup": "0.34.13",
     "rollup-plugin-json": "2.0.1",
+    "standard": "8.3.0",
     "tap-spec": "4.1.1",
     "tape": "4.6.0"
   },
@@ -28,8 +29,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
-    "prepublish": "npm run build",
-    "test": "npm run build && tape test/*.js",
+    "prepublish": "standard && npm run build",
+    "test": "npm run build && tape test/*.js && standard --fix",
     "watch": "npm-watch"
   },
   "standard": {

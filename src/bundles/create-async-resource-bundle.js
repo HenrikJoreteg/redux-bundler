@@ -19,7 +19,7 @@ const defaultOpts = {
   actionBaseType: null,
   transform: item => item,
   staleAge: 900000, // fifteen minutes
-  retryAfter: 60000,// one minute,
+  retryAfter: 60000, // one minute,
   persist: true
 }
 

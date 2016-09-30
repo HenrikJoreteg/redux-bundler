@@ -1,5 +1,5 @@
 const test = require('tape')
-const { createAsyncResourceBundle, composeBundlesRaw } = require('../')
+const { createAsyncResourceBundle } = require('../')
 
 const getAsyncBundle = (result) =>
   createAsyncResourceBundle({
