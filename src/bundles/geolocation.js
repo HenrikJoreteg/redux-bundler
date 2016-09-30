@@ -46,6 +46,7 @@ export default spec => {
         enableHighAccuracy: opts.enableHighAccuracy
       }
       navigator.geolocation.getCurrentPosition(success, fail, geoOpts)
-    })
+    }),
+    persist: opts.persist
   })
 }
