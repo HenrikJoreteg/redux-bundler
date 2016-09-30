@@ -17,7 +17,9 @@ const geoErrorArray = [
 const defaultOpts = {
   timeout: 60000,
   enableHighAccuracy: false,
-  persist: true
+  persist: true,
+  staleAge: 900000, // fifteen minutes
+  retryAfter: 60000 // one minute,
 }
 
 export default spec => {
@@ -47,6 +49,8 @@ export default spec => {
       }
       navigator.geolocation.getCurrentPosition(success, fail, geoOpts)
     }),
-    persist: opts.persist
+    persist: opts.persist,
+    staleAge: opts.staleAge,
+    retryAfter: opts.retryAfter
   })
 }

@@ -17,7 +17,6 @@ const defaultOpts = {
   name: null,
   getPromise: null,
   actionBaseType: null,
-  transform: item => item,
   staleAge: 900000, // fifteen minutes
   retryAfter: 60000, // one minute,
   persist: true
