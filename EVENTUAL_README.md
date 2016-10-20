@@ -25,22 +25,14 @@ A bundle that simply time-stamps every single action could be as simple as:
 `app-time-bundle.js`:
 
 ```js
-export const name = 'appTime'
-export const reducer = Date.now
-export const selectAppTime = state => state.appTime
-```
-
-or written in node.js style
-
-```js
-module.exports = {
+export default {
   name: 'appTime',
   reducer: Date.now,
   selectAppTime: state => state.appTime
 }
 ```
 
-or be configured dynamically:
+or you can make it a function that takes options to configured behavior dynamically.
 
 ```js
 export default (name = 'appTime') => ({

@@ -43,8 +43,7 @@ const consumeBundle = (bundle, accum = {}, bundles) => {
       accum.itemsToExtract[name] = bundles.reduce((accum, bundle) => {
         const extracted = bundle[value]
         if (extracted) {
-          accum[bundle.name] || (accum[bundle.name] = [])
-          accum[bundle.name].push(extracted)
+          accum[bundle.name] = extracted
         }
         return accum
       }, {})

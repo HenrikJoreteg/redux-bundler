@@ -10,8 +10,8 @@ export default store => next => action => {
 
   if (IS_DEBUG) {
     console.debug('state:', store.getState())
-    window.listSelectors && window.listSelectors()
-    window.listActiveEffects && window.listActiveEffects()
+    window.logSelectors && window.logSelectors()
+    window.logNextReaction && window.logNextReaction()
     console.groupEnd(action.type)
   }
 

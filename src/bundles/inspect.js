@@ -29,10 +29,9 @@ export default {
       const black = 'color: black;'
       const colorGreen = 'color: #4CAF50;'
       const colorOrange = 'color: #F57C00;'
-      const colorRed = 'color: #F44336;'
       const normal = 'font-weight: normal;'
 
-      store.listSelectors = window.listSelectors = () => {
+      store.logSelectors = window.logSelectors = () => {
         const results = {}
         selectors.sort().forEach((selectorName) => {
           results[selectorName] = store[selectorName]()
@@ -40,47 +39,36 @@ export default {
         console.log('%cselectors:', colorGreen, results)
       }
 
-      store.listBundles = window.listBundles = () => {
+      store.logBundles = window.logBundles = () => {
         console.log('%cinstalled bundles:\n  %c%s', colorTitle, black, names.join('\n  '))
       }
 
-      store.listActionCreators = window.listActionCreators = () => {
+      store.logActionCreators = window.logActionCreators = () => {
         console.groupCollapsed('%caction creators', colorOrange)
         actionCreators.forEach(name => console.log(name))
         console.groupEnd()
       }
 
-      store.listEffects = window.listEffects = () => {
-        let string = ''
-        for (const selectorName in store.effects) {
-          string += `\n  ${selectorName} -> ${store.effects[selectorName]}`
-        }
-        console.log('%ceffects:%c%s', colorOrange, black, string)
+      store.logReactors = window.logReactors = () => {
+        console.groupCollapsed('%creactors', colorOrange)
+        store.reactors && store.reactors.forEach(name => console.log(name))
+        console.groupEnd()
       }
 
-      store.listActiveEffects = window.listActiveEffects = () => {
-        const { activeEffectQueue } = store
-        if (activeEffectQueue.length) {
-          const selectorName = activeEffectQueue[0]
-          const actionCreatorName = store.effects[selectorName]
-          const result = store[selectorName]()
+      store.logNextReaction = window.logNextReaction = () => {
+        const { nextReaction, activeReactor } = store
+        if (nextReaction) {
           console.log(
-            `%cnext effect:\n  %c%s() -> %c${actionCreatorName}(%c${JSON.stringify(result)}%c)`,
+            `%cnext reaction:\n  %c${activeReactor}`,
             colorOrange,
             black,
-            selectorName,
-            colorRed,
-            black,
-            colorRed
+            nextReaction
           )
-          if (activeEffectQueue.length > 1) {
-            console.log('%cqueued effects:', colorRed, activeEffectQueue.slice(1).join(', '))
-          }
         }
       }
 
       console.groupCollapsed('%credux bundler v%s', colorTitle, version)
-      store.listBundles()
+      store.logBundles()
       const exported = []
       for (const key in store) {
         if (key.indexOf('select') === 0 || key.indexOf('do') === 0) {
@@ -90,10 +78,10 @@ export default {
       exported.sort()
       exported.unshift('store')
       console.log(`%cattached to window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
-      store.listSelectors()
-      store.listEffects()
+      store.logSelectors()
+      store.logReactors()
       console.groupEnd()
-      store.listActiveEffects()
+      store.logNextReaction()
     }
   }
 }
