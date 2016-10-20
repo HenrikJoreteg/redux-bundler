@@ -1,6 +1,6 @@
 {
   "name": "redux-bundler",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "component-raf": "1.2.0",
