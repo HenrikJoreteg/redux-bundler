@@ -62,10 +62,19 @@ export default (opts) => ({
           const { nextReaction } = store
           store.activeReactor = null
           store.nextReaction = null
-          store.dispatch(nextReaction)
+          if (nextReaction.actionCreator) {
+            if (nextReaction.arg) {
+              store[nextReaction.actionCreator](nextReaction.arg)
+            } else if (nextReaction.args) {
+              store[nextReaction.actionCreator](...nextReaction.args)
+            } else {
+              store[nextReaction.actionCreator]()
+            }
+          } else {
+            store.dispatch(nextReaction)
+          }
           cancelIfDone()
         })
-        return
       }
     }
 
