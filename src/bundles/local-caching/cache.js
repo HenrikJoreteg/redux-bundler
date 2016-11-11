@@ -19,6 +19,7 @@ export const getCachedItem = (key, opts) => {
         data: parsed.data
       }
     })
+    .catch(() => null)
 }
 
 export const getAllCached = opts => {
@@ -38,9 +39,11 @@ export const getAllCached = opts => {
       }
       return acc
     }, {}))
+    .catch(() => {})
 }
 
-export const clearAllCached = (opts = defaultOpts) => opts.lib.clear()
+export const clearAllCached = (opts = defaultOpts) =>
+  opts.lib.clear().catch(() => null)
 
 export const cacheItem = (key, data, opts) => {
   Object.assign(opts, defaultOpts)
@@ -49,4 +52,5 @@ export const cacheItem = (key, data, opts) => {
     time: Date.now(),
     data: data
   }))
+  .catch(() => null)
 }
