@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect'
 import appTimeBundle from './app-time'
+import onlineBundle from './online'
 
 const createTimeCheckSelector = (timeSelector, age, invert = true) => createSelector(
   timeSelector,
@@ -23,12 +24,13 @@ const defaultOpts = {
   actionBaseType: null,
   staleAge: 900000, // fifteen minutes
   retryAfter: 60000, // one minute,
+  checkIfOnline: true,
   persist: true
 }
 
 export default (spec) => {
   const opts = Object.assign({}, defaultOpts, spec)
-  const { name, staleAge, retryAfter, actionBaseType } = opts
+  const { name, staleAge, retryAfter, actionBaseType, checkIfOnline } = opts
   const ucaseName = name.charAt(0).toUpperCase() + name.slice(1)
 
   if (process.env.NODE_ENV !== 'production') {
@@ -66,8 +68,14 @@ export default (spec) => {
     isWaitingToRetrySelector,
     dataSelector,
     isStaleSelector,
-    (isLoading, failedPermanantly, isWaitingToRetry, data, isStale) => {
-      if (isLoading || failedPermanantly || isWaitingToRetry) {
+    onlineBundle.selectIsOnline,
+    (isLoading, failedPermanantly, isWaitingToRetry, data, isStale, isOnline) => {
+      if (
+        (checkIfOnline && !isOnline) ||
+        isLoading ||
+        failedPermanantly ||
+        isWaitingToRetry
+      ) {
         return false
       }
       if (!data) {

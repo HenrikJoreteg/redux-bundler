@@ -8,6 +8,7 @@ import caching from './bundles/local-caching/index'
 import geolocation from './bundles/geolocation'
 import reactors from './bundles/reactors'
 import url from './bundles/url'
+import online from './bundles/online'
 export { createSelector, resolveSelectors } from 'create-selector'
 export * from './utils'
 export * from './bundles/local-caching/cache'
@@ -27,6 +28,7 @@ export const composeBundles = (...userBundles) => {
   const bundles = [
     appTime,
     asyncCount,
+    online,
     url(),
     reactors(),
     caching(),

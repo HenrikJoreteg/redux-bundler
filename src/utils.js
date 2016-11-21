@@ -18,3 +18,8 @@ export const flattenExtractedToArray = (extracted) => {
   }
   return accum
 }
+export const windowListen = (eventName, handler) => {
+  if (IS_BROWSER) {
+    window.addEventListener(eventName, handler)
+  }
+}
