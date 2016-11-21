@@ -62,3 +62,20 @@ test('createAsyncResourceBundle action creator error dispatches', t => {
     t.end()
   }, 0)
 })
+
+test('createAsyncResourceBundle handles waiting when errored properly', t => {
+  const err = new Error('boom')
+  const bundle = getAsyncBundle(err)
+  t.equal(bundle.selectUserLastError({user: {errorTimes: [12, 25]}}), 25, 'plucks out last error')
+  t.equal(
+    bundle.selectUserIsWaitingToRetry({appTime: 26, user: {errorTimes: [12, 25]}}),
+    true,
+    'is waiting to retry if within time'
+  )
+  t.equal(
+    bundle.selectUserIsWaitingToRetry({appTime: 60004, user: {errorTimes: [1, 2]}}),
+    false,
+    'is not waiting to retry if error has passed'
+  )
+  t.end()
+})

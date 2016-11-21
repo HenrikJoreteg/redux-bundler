@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
 import appTimeBundle from './app-time'
 
-const createTimeCheckSelector = (timeSelector, age) => createSelector(
+const createTimeCheckSelector = (timeSelector, age, invert = true) => createSelector(
   timeSelector,
   appTimeBundle.selectAppTime,
   (time, appTime) => {
@@ -9,7 +9,11 @@ const createTimeCheckSelector = (timeSelector, age) => createSelector(
       return false
     }
     const elapsed = appTime - time
-    return elapsed > age
+    if (invert) {
+      return elapsed > age
+    } else {
+      return elapsed < age
+    }
   }
 )
 
@@ -47,7 +51,7 @@ export default (spec) => {
     resource => resource.errorTimes.slice(-1)[0] || null
   )
   const isStaleSelector = createTimeCheckSelector(lastSuccessSelector, staleAge)
-  const isWaitingToRetrySelector = createTimeCheckSelector(lastErrorSelector, retryAfter)
+  const isWaitingToRetrySelector = createTimeCheckSelector(lastErrorSelector, retryAfter, false)
   const isLoadingSelector = createSelector(
     inputSelector,
     resourceState => resourceState.isLoading
@@ -123,6 +127,8 @@ export default (spec) => {
     [`select${ucaseName}Raw`]: inputSelector,
     [`select${ucaseName}`]: dataSelector,
     [`select${ucaseName}IsStale`]: isStaleSelector,
+    [`select${ucaseName}LastError`]: lastErrorSelector,
+    [`select${ucaseName}IsWaitingToRetry`]: isWaitingToRetrySelector,
     [`select${ucaseName}IsLoading`]: isLoadingSelector,
     [`select${ucaseName}FailedPermanantly`]: failedPermanentlySelector,
     [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
