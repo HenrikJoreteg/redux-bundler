@@ -110,14 +110,20 @@ export default (spec) => {
 
   const result = {
     name,
-    reducer: (state = initialState, {type, payload, error}) => {
+    reducer: (state = initialState, {type, payload, error, merge}) => {
       if (type === actions.START) {
         return Object.assign({}, state, { isLoading: true })
       }
       if (type === actions.SUCCESS) {
+        let updatedData
+        if (merge) {
+          updatedData = Object.assign({}, state.data, payload)
+        } else {
+          updatedData = payload
+        }
         return Object.assign({}, state, {
           isLoading: false,
-          data: payload,
+          data: updatedData,
           lastSuccess: Date.now(),
           errorTimes: [],
           failedPermanantly: false
