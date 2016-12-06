@@ -1,7 +1,7 @@
 import URL from 'url-parse'
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import { IS_BROWSER } from '../utils'
+import { HAS_WINDOW } from '../utils'
 
 export const isDefined = thing => typeof thing !== 'undefined'
 export const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)
@@ -19,12 +19,12 @@ export const ensureLeading = (char, string) => {
   return string.charAt(0) !== char ? char + string : string
 }
 const loc = (() => {
-  if (!IS_BROWSER) return {}
-  return self.location
+  if (!HAS_WINDOW) return {}
+  return window.location
 })()
 const defaults = {
   name: 'url',
-  inert: !IS_BROWSER,
+  inert: !HAS_WINDOW,
   actionType: 'UPDATE_URL'
 }
 
@@ -72,14 +72,14 @@ export default (opts) => {
         })
       }
 
-      self.addEventListener('popstate', setCurrentUrl)
+      window.addEventListener('popstate', setCurrentUrl)
 
       store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
         if (lastState !== newState && newUrl !== loc.href) {
           try {
-            self.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
+            window.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
           } catch (e) {
             console.error(e)
           }
@@ -87,11 +87,11 @@ export default (opts) => {
         lastState = newState
       })
 
-      self.addEventListener('popstate', setCurrentUrl)
+      window.addEventListener('popstate', setCurrentUrl)
     },
     getReducer: () => {
       const initialState = {
-        url: !config.inert && IS_BROWSER
+        url: !config.inert && HAS_WINDOW
           ? loc.href
           : '/',
         replace: false
