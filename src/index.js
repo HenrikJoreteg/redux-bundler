@@ -20,6 +20,7 @@ export const cachingBundle = caching
 export const createRouteBundle = createRoutingBundle
 export const createAsyncResourceBundle = createAsyncResource
 export const reactorsBundle = reactors
+export const onlineBundle = online
 export const urlBundle = url
 export const composeBundlesRaw = compose
 export const geolocationBundle = geolocation
