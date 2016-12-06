@@ -3,7 +3,6 @@
   "version": "7.1.1",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
-    "component-raf": "1.2.0",
     "create-selector": "2.0.2",
     "feather-route-matcher": "2.0.1",
     "idb-keyval": "2.1.2",

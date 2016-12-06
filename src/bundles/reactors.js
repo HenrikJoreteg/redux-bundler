@@ -2,7 +2,7 @@ import debounce from 'lodash/debounce'
 import requestIdleCallback from 'ric-shim'
 import { IS_BROWSER, flattenExtractedToArray } from '../utils'
 const raf =
-  (IS_BROWSER && require('component-raf')) ||
+  (IS_BROWSER && self.requestAnimationFrame) ||
   ((func) => { setTimeout(func, 0) })
 
 const defaults = {
