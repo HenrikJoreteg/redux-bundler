@@ -1,25 +1,21 @@
 import { version } from '../../package.json'
-
-let debug
-try {
-  debug = !!(window.localStorage.debug)
-} catch (e) {}
+import { IS_DEBUG } from '../utils'
 
 export default {
   name: 'inspect',
   init: (store) => {
-    if (debug) {
+    if (IS_DEBUG) {
       const names = store.bundles.map(bundle => bundle.name)
-      window.store = store
+      self.store = store
       const selectors = []
       const actionCreators = []
       for (const key in store) {
         const item = store[key]
         if (key.indexOf('select') === 0) {
-          window[key] = item
+          self[key] = item
           selectors.push(key)
         } else if (key.indexOf('do') === 0) {
-          window[key] = item
+          self[key] = item
           actionCreators.push(key)
         }
       }
@@ -31,7 +27,7 @@ export default {
       const colorOrange = 'color: #F57C00;'
       const normal = 'font-weight: normal;'
 
-      store.logSelectors = window.logSelectors = () => {
+      store.logSelectors = self.logSelectors = () => {
         const results = {}
         selectors.sort().forEach((selectorName) => {
           results[selectorName] = store[selectorName]()
@@ -39,23 +35,23 @@ export default {
         console.log('%cselectors:', colorGreen, results)
       }
 
-      store.logBundles = window.logBundles = () => {
+      store.logBundles = self.logBundles = () => {
         console.log('%cinstalled bundles:\n  %c%s', colorTitle, black, names.join('\n  '))
       }
 
-      store.logActionCreators = window.logActionCreators = () => {
+      store.logActionCreators = self.logActionCreators = () => {
         console.groupCollapsed('%caction creators', colorOrange)
         actionCreators.forEach(name => console.log(name))
         console.groupEnd()
       }
 
-      store.logReactors = window.logReactors = () => {
+      store.logReactors = self.logReactors = () => {
         console.groupCollapsed('%creactors', colorOrange)
         store.reactors && store.reactors.forEach(name => console.log(name))
         console.groupEnd()
       }
 
-      store.logNextReaction = window.logNextReaction = () => {
+      store.logNextReaction = self.logNextReaction = () => {
         const { nextReaction, activeReactor } = store
         if (nextReaction) {
           console.log(
@@ -77,7 +73,7 @@ export default {
       }
       exported.sort()
       exported.unshift('store')
-      console.log(`%cattached to window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
+      console.log(`%cattached to self/window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
       store.logSelectors()
       store.logReactors()
       console.groupEnd()

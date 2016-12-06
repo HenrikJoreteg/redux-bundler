@@ -20,7 +20,7 @@ export const ensureLeading = (char, string) => {
 }
 const loc = (() => {
   if (!IS_BROWSER) return {}
-  return window.location || self.location
+  return self.location
 })()
 const defaults = {
   name: 'url',
@@ -72,14 +72,14 @@ export default (opts) => {
         })
       }
 
-      window.addEventListener('popstate', setCurrentUrl)
+      self.addEventListener('popstate', setCurrentUrl)
 
       store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
         if (lastState !== newState && newUrl !== loc.href) {
           try {
-            window.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
+            self.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
           } catch (e) {
             console.error(e)
           }
@@ -87,7 +87,7 @@ export default (opts) => {
         lastState = newState
       })
 
-      window.addEventListener('popstate', setCurrentUrl)
+      self.addEventListener('popstate', setCurrentUrl)
     },
     getReducer: () => {
       const initialState = {
