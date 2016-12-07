@@ -16,6 +16,6 @@ export const flattenExtractedToArray = (extracted) => {
 }
 export const windowListen = (eventName, handler) => {
   if (IS_BROWSER) {
-    window.addEventListener(eventName, handler)
+    self.addEventListener(eventName, handler)
   }
 }
