@@ -1,10 +1,9 @@
 import { version } from '../../package.json'
-import { IS_DEBUG } from '../utils'
 
 export default {
   name: 'inspect',
   init: (store) => {
-    if (IS_DEBUG) {
+    if (store.selectIsDebug()) {
       const names = store.bundles.map(bundle => bundle.name)
       self.store = store
       const selectors = []

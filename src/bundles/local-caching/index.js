@@ -1,4 +1,4 @@
-import { IS_DEBUG, IS_BROWSER } from '../../utils'
+import { IS_BROWSER } from '../../utils'
 import { cacheItem } from './cache'
 import ric from 'ric-shim'
 
@@ -28,7 +28,7 @@ export default (spec) => {
               Promise.all(keys.map(key =>
                 cacheItem(key, state[key], {version: opts.version})
               )).then(() => {
-                if (IS_DEBUG) {
+                if (state.debug) {
                   console.info(`persisted ${keys.join(', ')} because of action ${action.type}`)
                 }
               })

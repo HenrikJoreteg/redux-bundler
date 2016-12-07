@@ -1,10 +1,5 @@
-let debug = false
-try { debug = !!window.localStorage.debug } catch (e) {}
-export default debug
-
 export const HAS_WINDOW = typeof window !== 'undefined'
 export const IS_BROWSER = HAS_WINDOW || typeof self !== 'undefined'
-export const IS_DEBUG = debug
 export const flattenExtractedToObject = (extracted) => {
   const result = {}
   for (const appName in extracted) {
@@ -21,6 +16,6 @@ export const flattenExtractedToArray = (extracted) => {
 }
 export const windowListen = (eventName, handler) => {
   if (IS_BROWSER) {
-    self.addEventListener(eventName, handler)
+    window.addEventListener(eventName, handler)
   }
 }

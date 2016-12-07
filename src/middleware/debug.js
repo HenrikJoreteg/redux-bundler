@@ -1,14 +1,14 @@
-import { IS_DEBUG } from '../utils'
-
 export default store => next => action => {
-  if (IS_DEBUG) {
+  const isDebug = store.getState().debug
+
+  if (isDebug) {
     console.group(action.type)
     console.info('action:', action)
   }
 
   const result = next(action)
 
-  if (IS_DEBUG) {
+  if (isDebug) {
     console.debug('state:', store.getState())
     window.logSelectors && window.logSelectors()
     window.logNextReaction && window.logNextReaction()
