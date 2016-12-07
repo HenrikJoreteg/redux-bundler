@@ -24,6 +24,7 @@
   "files": [
     "index.js"
   ],
+  "jsnext:main": "src/index.js",
   "license": "MIT",
   "main": "index.js",
   "scripts": {

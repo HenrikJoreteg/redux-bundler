@@ -1,9 +1,8 @@
-let debug = false
-try { debug = !!window.localStorage.debug } catch (e) {}
+import { HAS_DEBUG_FLAG } from '../utils'
 
 export default {
   name: 'debug',
-  reducer: (state = debug, {type}) => {
+  reducer: (state = HAS_DEBUG_FLAG, {type}) => {
     if (type === 'ENABLE_DEBUG') {
       return true
     }
