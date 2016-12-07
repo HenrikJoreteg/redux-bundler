@@ -1,4 +1,4 @@
-import { windowListen } from '../utils'
+import { addGlobalListener } from '../utils'
 
 const OFFLINE = 'OFFLINE'
 const ONLINE = 'ONLINE'
@@ -12,7 +12,7 @@ export default {
     return state
   },
   init: (store) => {
-    windowListen('online', () => store.dispatch({type: ONLINE}))
-    windowListen('offline', () => store.dispatch({type: OFFLINE}))
+    addGlobalListener('online', () => store.dispatch({type: ONLINE}))
+    addGlobalListener('offline', () => store.dispatch({type: OFFLINE}))
   }
 }
