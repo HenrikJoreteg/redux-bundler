@@ -22,3 +22,5 @@ export const addGlobalListener = (eventName, handler) => {
     self.addEventListener(eventName, handler)
   }
 }
+export const selectorNameToValueName = name =>
+  name.charAt(6).toLowerCase() + name.slice(7)

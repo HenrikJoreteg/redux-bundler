@@ -16,7 +16,7 @@ const consumeBundle = (bundle, accum = {}, bundles) => {
       selectors: {}
     })
   }
-  const name = bundle.name
+  const { name } = bundle
   Object.keys(bundle).forEach(key => {
     const value = bundle[key]
     if (key === 'reducer') {
