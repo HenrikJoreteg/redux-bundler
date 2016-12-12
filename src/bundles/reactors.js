@@ -11,6 +11,10 @@ const defaults = {
   doneCallback: null
 }
 
+export const getIdleDispatcher = (timeout, fn) => debounce(() => {
+  raf(fn)
+}, timeout)
+
 export default (opts) => ({
   name: 'reactors',
   extract: 'reactors',
@@ -18,9 +22,13 @@ export default (opts) => ({
     opts || (opts = {})
     Object.assign(opts, defaults)
     const { idleAction, idleTimeout } = opts
-    const idleDispatcher = debounce(() => {
-      raf(() => store.dispatch({type: idleAction}))
-    }, idleTimeout)
+    let idleDispatcher
+    if (idleTimeout) {
+      idleDispatcher = getIdleDispatcher(
+        idleTimeout,
+        () => store.dispatch({type: idleAction})
+      )
+    }
 
     const reactorNames = flattenExtractedToArray(extracted)
 
@@ -37,7 +45,7 @@ export default (opts) => ({
 
     const cancelIfDone = () => {
       if (!IS_BROWSER && !store.nextReaction && (!store.selectAsyncActive || !store.selectAsyncActive())) {
-        idleDispatcher.cancel()
+        idleDispatcher && idleDispatcher.cancel()
         opts.doneCallback && opts.doneCallback()
       }
     }
@@ -80,8 +88,10 @@ export default (opts) => ({
 
     const callback = () => {
       dispatchNext()
-      idleDispatcher()
-      cancelIfDone()
+      if (idleDispatcher) {
+        idleDispatcher()
+        cancelIfDone()
+      }
     }
 
     store.subscribe(callback)

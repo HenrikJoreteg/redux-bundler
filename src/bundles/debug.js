@@ -1,14 +1,22 @@
 import { version } from '../../package.json'
 import { HAS_DEBUG_FLAG } from '../utils'
 
+const ENABLE = 'ENABLE_DEBUG'
+const DISABLE = 'DISABLE_DEBUG'
+
 export default {
   name: 'debug',
   reducer: (state = HAS_DEBUG_FLAG, {type}) => {
-    if (type === 'ENABLE_DEBUG') {
+    if (type === ENABLE) {
       return true
+    }
+    if (type === DISABLE) {
+      return false
     }
     return state
   },
+  doEnableDebug: () => ({ type: ENABLE }),
+  doDisableDebug: () => ({ type: DISABLE }),
   selectIsDebug: state => state.debug,
   init: (store) => {
     if (store.selectIsDebug()) {

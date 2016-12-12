@@ -5,7 +5,7 @@ import createRoutingBundle from './bundles/create-route-bundle'
 import createAsyncResource from './bundles/create-async-resource-bundle'
 import caching from './bundles/local-caching/index'
 import geolocation from './bundles/geolocation'
-import reactors from './bundles/reactors'
+import reactors, { getIdleDispatcher as idle } from './bundles/reactors'
 import url from './bundles/url'
 import debug from './bundles/debug'
 import online from './bundles/online'
@@ -20,6 +20,7 @@ export const cachingBundle = caching
 export const createRouteBundle = createRoutingBundle
 export const createAsyncResourceBundle = createAsyncResource
 export const reactorsBundle = reactors
+export const getIdleDispatcher = idle
 export const onlineBundle = online
 export const urlBundle = url
 export const debugBundle = debug
