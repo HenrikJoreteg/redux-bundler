@@ -3,7 +3,7 @@
   "version": "9.1.1",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
-    "create-selector": "2.0.2",
+    "create-selector": "2.1.0",
     "feather-route-matcher": "2.0.1",
     "idb-keyval": "2.1.2",
     "querystringify": "0.0.4",
@@ -12,7 +12,7 @@
     "url-parse": "1.1.3"
   },
   "devDependencies": {
-    "buble": "^0.13.2",
+    "buble": "0.13.2",
     "nodemon": "1.10.2",
     "npm-watch": "0.1.6",
     "rollup": "0.34.13",
