@@ -22,7 +22,8 @@
     "tape": "4.6.0"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "src"
   ],
   "jsnext:main": "src/index.js",
   "license": "MIT",
