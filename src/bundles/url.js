@@ -86,8 +86,6 @@ export default (opts) => {
         }
         lastState = newState
       })
-
-      window.addEventListener('popstate', setCurrentUrl)
     },
     getReducer: () => {
       const initialState = {
