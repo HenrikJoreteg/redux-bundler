@@ -1,6 +1,7 @@
 import debugMiddleware from './middleware/debug'
 import thunkMiddleware from './middleware/custom-thunk'
-import { createStore, combineReducers, applyMiddleware, bindActionCreators } from 'redux'
+import customApplyMiddleware from './middleware/custom-apply-middleware'
+import { createStore, combineReducers, bindActionCreators } from 'redux'
 import { resolveSelectors } from 'create-selector'
 
 const consumeBundle = (bundle, accum = {}, bundles) => {
@@ -102,7 +103,7 @@ const composeBundles = (...bundles) => {
     const store = createStore(
       combineReducers(meta.reducers),
       data,
-      applyMiddleware(...middleware)
+      customApplyMiddleware(...middleware)
     )
 
     store.bundles = bundles

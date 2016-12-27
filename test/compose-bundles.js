@@ -7,3 +7,13 @@ test('composeBundles', (t) => {
   t.ok(createStore().getState, 'is a redux store')
   t.end()
 })
+
+test('makes selectors available to thunk actions', (t) => {
+  const store = composeBundles()()
+  store.dispatch(({dispatch, getState, selectUrlObject}) => {
+    t.ok(getState)
+    t.ok(dispatch)
+    t.ok(selectUrlObject().href)
+    t.end()
+  })
+})
