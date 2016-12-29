@@ -1,7 +1,7 @@
 function createThunkMiddleware (extra) {
   return ({ dispatch, getState, store }) => next => action => {
     if (typeof action === 'function') {
-      return action(Object.assign({}, store, extra))
+      return action(Object.assign({}, store, extra, {dispatch}))
     }
     return next(action)
   }
