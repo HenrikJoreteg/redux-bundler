@@ -102,7 +102,6 @@ export default (spec) => {
   const doFetchData = () => (args) => {
     const { dispatch } = args
     dispatch({type: actions.START})
-    delete args.dispatch
     return opts.getPromise(args)
       .then(payload => dispatch({type: actions.SUCCESS, payload}))
       .catch(error => dispatch({type: actions.ERROR, error}))
