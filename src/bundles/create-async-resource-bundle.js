@@ -150,8 +150,8 @@ export default (spec) => {
     [`select${ucaseName}FailedPermanantly`]: failedPermanentlySelector,
     [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
     [`doFetch${ucaseName}`]: doFetchData,
-    [`doFetchSuccess${ucaseName}`]: doFetchSuccess,
-    [`doFetchError${ucaseName}`]: doFetchError
+    [`doFetch${ucaseName}Success`]: doFetchSuccess,
+    [`doFetch${ucaseName}Error`]: doFetchError
   }
 
   if (opts.persist) {
