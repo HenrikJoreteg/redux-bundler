@@ -35,7 +35,6 @@ export const composeBundles = (...userBundles) => {
     online,
     url(),
     reactors(),
-    caching(),
     selectAll,
     debug,
     ...userBundles
