@@ -105,7 +105,10 @@ export default (spec) => {
     const { dispatch } = args
     dispatch({type: actions.START})
     return opts.getPromise(args)
-      .then(doFetchSuccess, doFetchError)
+      .then(
+        (payload) => { dispatch(doFetchSuccess(payload)) },
+        (error) => { dispatch(doFetchError(error)) }
+      )
   }
 
   const result = {
