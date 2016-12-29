@@ -99,12 +99,13 @@ export default (spec) => {
     failedPermanantly: false
   }
 
+  const doFetchError = (error) => ({type: actions.ERROR, error})
+  const doFetchSuccess = (payload) => ({type: actions.SUCCESS, payload})
   const doFetchData = () => (args) => {
     const { dispatch } = args
     dispatch({type: actions.START})
     return opts.getPromise(args)
-      .then(payload => dispatch({type: actions.SUCCESS, payload}))
-      .catch(error => dispatch({type: actions.ERROR, error}))
+      .then(doFetchSuccess, doFetchError)
   }
 
   const result = {
@@ -145,7 +146,9 @@ export default (spec) => {
     [`select${ucaseName}IsLoading`]: isLoadingSelector,
     [`select${ucaseName}FailedPermanantly`]: failedPermanentlySelector,
     [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
-    [`doFetch${ucaseName}`]: doFetchData
+    [`doFetch${ucaseName}`]: doFetchData,
+    [`doFetchSuccess${ucaseName}`]: doFetchSuccess,
+    [`doFetchError${ucaseName}`]: doFetchError
   }
 
   if (opts.persist) {
