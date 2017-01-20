@@ -24,11 +24,7 @@ export default {
       self.store = store
       const actionCreators = []
       for (const key in store) {
-        const item = store[key]
-        if (key.indexOf('select') === 0) {
-          self[key] = item
-        } else if (key.indexOf('do') === 0) {
-          self[key] = item
+        if (key.indexOf('do') === 0) {
           actionCreators.push(key)
         }
       }
