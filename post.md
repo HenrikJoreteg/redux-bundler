@@ -1,6 +1,6 @@
 # redux bundles
 
-**tl;dr: I've created a way to bundle up redux-related functionality to allow re-use of application functionality independent of UI. I've released it as [redux-bundle](https://www.npmjs.com/package/redux-bundler) on npm. It is in no way tied to react, nor does it assume a browser environment, oh and it packs and bundles a bunch of functionality into ~12kb.**
+**tl;dr: I've created a way to bundle up redux-related functionality to allow re-use of application functionality independent of UI. I've released it as [redux-bundle](https://www.npmjs.com/package/redux-bundler) on npm. It is in no way tied to react, nor does it assume a browser environment and bundles a a "complete" of functionality into ~12kb.**
 
 I <3 redux. It is, in my opinion, the most elegant state management system in the JS-world right now. It's tiny (2kb), minimalist, extensible, and very well-documented.
 
@@ -521,7 +521,7 @@ First, you don't necessary want to dispatch several actions at once. Because doi
 
 Secondly, if you fail to indicate in your state that you are currently trying to fetch something you'll keep dispatching over and over. And, since as discussed in the previous paragraph, we were so clever as to use `requestIdleCallback` it never stack overflows. So you just get an infinitely scrolling debug console and everlasting, but not enough to explode, code execution. These are tricky to debug. But 99% of the time you've got a selector returning something other than `null` because it's failing to track that something is currently in progress.
 
-But when it works, this is an *incredibly resilient* approach to data fetching. 
+But when it works, this is an *incredibly resilient* approach to data fetching.
 
 ### Can we do the same with redux?
 

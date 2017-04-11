@@ -12,6 +12,7 @@ test('url-bundle selectors', (t) => {
   t.equal(store.selectHash(), 'hi=there', 'returns hash')
   t.deepEqual(store.selectHashObject(), {hi: 'there'}, 'returns parsed hash')
   t.deepEqual(store.selectSubdomains(), ['subdomain'], 'get subdomains')
+  t.deepEqual(store.selectBareDomain(), 'something.com', 'get bare domain')
 
   const store2 = composeBundlesRaw(urlBundle())()
   t.deepEqual(store2.selectUrlRaw(), {url: '/', replace: false})

@@ -1,4 +1,4 @@
-# redux-app
+# redux-bundler
 
 Compose a larger redux app out of smaller bundles of redux functionality.
 
@@ -18,7 +18,7 @@ A redux bundle might have:
 4. some action creators
 5. some effects (selectors/action creator pairs)
 
-Bundles like these can be combined into a larger application with `redux-app`.
+Bundles like these can be combined into a larger application with `redux-bundler`.
 
 A bundle that simply time-stamps every single action could be as simple as:
 
@@ -45,7 +45,7 @@ export default (name = 'appTime') => ({
 Then to make an app of it:
 
 ```js
-import { composeBundles } from 'redux-app'
+import { composeBundles } from 'redux-bundler'
 import * as appTimeBundle from './app-time-bundle'
 
 // the `composeBundles` function takes a list of bundles and produces
@@ -81,7 +81,7 @@ Anything you attach that starts with `select` such as `selectUserData` will be a
 
 If you prefer to be more explicit, pass an object of selector functions (names should still start with `select`) but some people prefer to be more explicit.
 
-**important**: these selectors will be attached directly to, and "bound" to the store. For example if you create a selector called `selectSomeState` you'll be able to call `store.selectSomeState()` directly from anywhere you have access to the stroe (without needing to pass any arguments).
+**important**: these selectors will be attached directly to, and "bound" to the store. For example if you create a selector called `selectSomeState` you'll be able to call `store.selectSomeState()` directly from anywhere you have access to the store (without needing to pass any arguments).
 
 ### `bundle.doX` or `bundle.actionCreators`
 
@@ -104,21 +104,21 @@ Note that unlike standard thunk that uses positional arguments, this passes an o
 
 An object containing items you wish to make available to action creators of all bundles.
 
-Commonly this would be used for passing things like api wrappers, configs, etcs.
+Commonly this would be used for passing things like api wrappers, configs, etc.
 
 ### `bundle.extract`
 
-A string corresponding to a key to extract from other bundles. The extracted value will be passed as an object to the `init` method. This allows you to write a bundle that extends the API of other bundles. For example, the `effects` capability described below is implemented as a bundle via `extract`.
+A string corresponding to a key to extract from other bundles. The extracted value will be passed as an object to the `init` method. This allows you to write a bundle that extends the API of other bundles. For example, the `reactors` capability described below is implemented as a bundle via `extract`.
 
 ### `bundle.init(store, [extractedStuff])`
 
 This will be run *once* as a last step before the store is returned. It will be passed the `store` as an argument and any extracted items from other bundles (keyed by app name). This is useful for things like registering document level event handlers, or any other sort of initialization activity.
 
-###  `bundle.effects`
+###  `bundle.reactors`
 
-Effects are an object of strings. They key is the name of a selector, the value is the string name of an action creator.
+Reactors is an array of strings of selectors to run after each action in the app.
 
-At each even dispatch, the selectors defined here will be run. If they return anything other than `null` the result of the selector will be passed to the action creator and dispatched.
+At each even dispatch, the selectors defined here will be run. If the selectors returns an object action it will be dispatched as a reaction to the current state.
 
 This allows a simple, declarative way to ask questions of state, via selectors to trigger an effect via actionCreators without the need to introduce new approaches to deal with effects.
 
@@ -127,8 +127,8 @@ This allows a simple, declarative way to ask questions of state, via selectors t
 This ships with a handful of bundles, none of which are added by default, but many of which you'll likely want.
 
 - `appTimeBundle`: tracks current action cycle as part of state (useful for deterministic action creators)
-- `asyncCountBundle`: tracks how many outstanding async actions are occuring (by action type naming conventions).
+- `asyncCountBundle`: tracks how many outstanding async actions are occurring (by action type naming conventions).
 - `createRouteBundle`: returns a bundle when passed a route config.
 - `urlBundle`: tracks, updates, and provides action creators for urls in the browser.
 - `effects`: extracts effects and triggers them. Also triggers an `APP_IDLE` action every 30 seconds if no other action has occurred. This allows for discovery of stale data without user action.
-- `inspectBundle`: Add this bundle last, set `localStorage.debug = true` in your console and it will print out description of your bundle and expose all your selectors, actionCreators and the `store` iteself to `window` for easy debugging. Also shows you effects to be triggered based on current state after each action.
+- `inspectBundle`: Add this bundle last, set `localStorage.debug = true` in your console and it will print out description of your bundle and expose all your selectors, actionCreators and the `store` itself to `window` for easy debugging. Also shows you effects to be triggered based on current state after each action.

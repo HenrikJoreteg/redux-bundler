@@ -6,8 +6,12 @@ import { HAS_WINDOW } from '../utils'
 export const isDefined = thing => typeof thing !== 'undefined'
 export const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)
 const IPRE = /^[0-9\.]+$/
-export const parseSubdomains = (hostname) => {
+export const parseSubdomains = (hostname, getBareHost) => {
   if (IPRE.test(hostname)) return []
+  const parts = hostname.split('.')
+  if (getBareHost) {
+    return parts.slice(-2).join('.')
+  }
   return hostname.split('.').slice(0, -2)
 }
 export const removeLeading = (char, string) =>
@@ -40,6 +44,7 @@ export default (opts) => {
   const selectHash = createSelector(selectUrlObject, urlObj => removeLeading('#', urlObj.hash))
   const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
   const selectSubdomains = createSelector(selectUrlObject, urlObj => parseSubdomains(urlObj.hostname))
+  const selectBareDomain = createSelector(selectUrlObject, urlObj => parseSubdomains(urlObj.hostname, true))
 
   const doUpdateUrl = (newState, opts = {replace: false}) => ({dispatch, getState}) => {
     const state = (typeof newState === 'string') ? { pathname: newState, hash: '', query: '' } : newState
@@ -122,6 +127,7 @@ export default (opts) => {
     selectPathname,
     selectHash,
     selectHashObject,
-    selectSubdomains
+    selectSubdomains,
+    selectBareDomain
   }
 }
