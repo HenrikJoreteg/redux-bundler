@@ -43,8 +43,9 @@ export default (opts) => {
   const selectPathname = createSelector(selectUrlObject, urlObj => urlObj.pathname)
   const selectHash = createSelector(selectUrlObject, urlObj => removeLeading('#', urlObj.hash))
   const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
-  const selectSubdomains = createSelector(selectUrlObject, urlObj => parseSubdomains(urlObj.hostname))
-  const selectBareDomain = createSelector(selectUrlObject, urlObj => parseSubdomains(urlObj.hostname, true))
+  const selectHostname = createSelector(selectUrlObject, urlObj => urlObj.hostname)
+  const selectSubdomains = createSelector(selectHostname, hostname => parseSubdomains(hostname))
+  const selectBareHostname = createSelector(selectHostname, hostname => parseSubdomains(hostname, true))
 
   const doUpdateUrl = (newState, opts = {replace: false}) => ({dispatch, getState}) => {
     const state = (typeof newState === 'string') ? { pathname: newState, hash: '', query: '' } : newState
@@ -127,7 +128,8 @@ export default (opts) => {
     selectPathname,
     selectHash,
     selectHashObject,
-    selectSubdomains,
-    selectBareDomain
+    selectHostname,
+    selectBareHostname,
+    selectSubdomains
   }
 }
