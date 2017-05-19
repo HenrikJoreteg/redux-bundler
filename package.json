@@ -4,7 +4,7 @@
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "create-selector": "2.1.0",
-    "feather-route-matcher": "2.0.1",
+    "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.1.2",
     "querystringify": "0.0.4",
     "redux": "3.6.0",
