@@ -24,3 +24,20 @@ export const addGlobalListener = (eventName, handler) => {
 }
 export const selectorNameToValueName = name =>
   name.charAt(6).toLowerCase() + name.slice(7)
+export const debounce = (fn, wait) => {
+  let timeout
+  const debounced = function () {
+    let ctx = this
+    let args = arguments
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      fn.apply(ctx, args)
+    }, wait)
+  }
+
+  debounced.cancel = () => {
+    clearTimeout(timeout)
+  }
+
+  return debounced
+}
