@@ -10,10 +10,10 @@ test('composeBundles', (t) => {
 
 test('makes selectors available to thunk actions', (t) => {
   const store = composeBundles()()
-  store.dispatch(({dispatch, getState, selectUrlObject}) => {
+  store.dispatch(({dispatch, getState, selectAppTime}) => {
     t.ok(getState)
     t.ok(dispatch)
-    t.ok(selectUrlObject().href)
+    t.ok(selectAppTime())
     t.end()
   })
 })

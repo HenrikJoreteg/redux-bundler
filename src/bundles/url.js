@@ -1,4 +1,3 @@
-import URL from 'url-parse'
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
 import { HAS_WINDOW } from '../utils'
@@ -37,22 +36,21 @@ export default (opts) => {
   const actionType = config.actionType
 
   const selectUrlRaw = state => state[config.name]
-  const selectUrlObject = createSelector(selectUrlRaw, urlState => new URL(urlState.url, true))
-  const selectQueryObject = createSelector(selectUrlObject, urlObj => urlObj.query)
+  const selectUrlObject = createSelector(selectUrlRaw, urlState => new URL(urlState.url))
+  const selectQueryObject = createSelector(selectUrlObject, urlObj => qs.parse(urlObj.search))
   const selectQueryString = createSelector(selectQueryObject, queryObj => qs.stringify(queryObj))
   const selectPathname = createSelector(selectUrlObject, urlObj => urlObj.pathname)
   const selectHash = createSelector(selectUrlObject, urlObj => removeLeading('#', urlObj.hash))
   const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
   const selectHostname = createSelector(selectUrlObject, urlObj => urlObj.hostname)
   const selectSubdomains = createSelector(selectHostname, hostname => parseSubdomains(hostname))
-  const selectBareHostname = createSelector(selectHostname, hostname => parseSubdomains(hostname, true))
 
   const doUpdateUrl = (newState, opts = {replace: false}) => ({dispatch, getState}) => {
     const state = (typeof newState === 'string') ? { pathname: newState, hash: '', query: '' } : newState
-    const url = new URL(selectUrlRaw(getState()).url, true)
-    if (isDefined(state.pathname)) url.set('pathname', state.pathname)
-    if (isDefined(state.hash)) url.set('hash', ensureString(state.hash))
-    if (isDefined(state.query)) url.set('query', ensureString(state.query))
+    const url = new URL(selectUrlRaw(getState()).url)
+    if (isDefined(state.pathname)) url.pathname = state.pathname
+    if (isDefined(state.hash)) url.hash = ensureString(state.hash)
+    if (isDefined(state.query)) url.search = ensureString(state.query)
     dispatch({ type: actionType, payload: { url: url.href, replace: opts.replace } })
   }
   const doReplaceUrl = (url) => doUpdateUrl(url, {replace: true})
@@ -129,7 +127,6 @@ export default (opts) => {
     selectHash,
     selectHashObject,
     selectHostname,
-    selectBareHostname,
     selectSubdomains
   }
 }

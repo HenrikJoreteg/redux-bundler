@@ -1,3 +1,5 @@
+// polyfill URL for node
+global.URL = require('whatwg-url').URL
 const test = require('tape')
 const { composeBundlesRaw, urlBundle } = require('../')
 
@@ -12,7 +14,6 @@ test('url-bundle selectors', (t) => {
   t.equal(store.selectHash(), 'hi=there', 'returns hash')
   t.deepEqual(store.selectHashObject(), {hi: 'there'}, 'returns parsed hash')
   t.deepEqual(store.selectSubdomains(), ['subdomain'], 'get subdomains')
-  t.deepEqual(store.selectBareHostname(), 'something.com', 'get bare domain')
   t.deepEqual(store.selectHostname(), 'subdomain.something.com', 'get bare domain')
 
   const store2 = composeBundlesRaw(urlBundle())()
@@ -46,6 +47,7 @@ test('url-bundle actionCreators', (t) => {
   resetStore()
   store.doUpdateQuery('ok=hi')
   t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/something?ok=hi', replace: true})
+  t.deepEqual(store.selectQueryObject(), {ok: 'hi'})
 
   resetStore()
   store.doUpdateHash({ok: 'hi'})

@@ -86,6 +86,13 @@ const decorateStore = (store, meta) => {
   }
 }
 
+const enableBatchDispatch = reducer => (state, action) => {
+  if (action.type === 'BATCH_ACTIONS') {
+    return action.actions.reduce(reducer, state)
+  }
+  return reducer(state, action)
+}
+
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
   const meta = {}
@@ -101,10 +108,15 @@ const composeBundles = (...bundles) => {
     }
 
     const store = createStore(
-      combineReducers(meta.reducers),
+      enableBatchDispatch(combineReducers(meta.reducers)),
       data,
       customApplyMiddleware(...middleware)
     )
+
+    const { dispatch } = store
+    store.dispatch = (...actions) => {
+      dispatch(actions.length > 1 ? {type: 'BATCH_ACTIONS', actions} : actions[0])
+    }
 
     store.bundles = bundles
 
