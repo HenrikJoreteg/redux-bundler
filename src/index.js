@@ -1,6 +1,6 @@
 import appTime from './bundles/app-time'
 import asyncCount from './bundles/async-count'
-import compose from './compose'
+import compose from './compose/index'
 import createRoutingBundle from './bundles/create-route-bundle'
 import createAsyncResource from './bundles/create-async-resource-bundle'
 import caching from './bundles/local-caching/index'

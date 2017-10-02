@@ -82,7 +82,9 @@ export default {
       store.logSelectors()
       store.logReactors()
       console.groupEnd()
-      store.logNextReaction()
+      if (store.isReacting) {
+        console.log(`%cqueuing reaction:`, colorOrange)
+      }
     }
   }
 }

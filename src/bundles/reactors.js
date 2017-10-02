@@ -6,11 +6,13 @@ const ric = IS_BROWSER && self.requestIdleCallback || ((func) => { setTimeout(fu
 const defaults = {
   idleTimeout: 30000,
   idleAction: 'APP_IDLE',
-  doneCallback: null
+  doneCallback: null,
+  stopWhenTabInactive: true
 }
 
-export const getIdleDispatcher = (timeout, fn) => debounce(() => {
-  raf(fn)
+export const getIdleDispatcher = (stopWhenInactive, timeout, fn) => debounce(() => {
+  // the requestAnimationFrame ensures it doesn't run when tab isn't active
+  stopWhenInactive ? raf(ric(fn)) : ric(fn)
 }, timeout)
 
 export default (opts) => ({
@@ -22,7 +24,7 @@ export default (opts) => ({
     const { idleAction, idleTimeout } = opts
     let idleDispatcher
     if (idleTimeout) {
-      idleDispatcher = getIdleDispatcher(idleTimeout, () => store.dispatch({type: idleAction}))
+      idleDispatcher = getIdleDispatcher(opts.stopWhenTabInactive, idleTimeout, () => store.dispatch({type: idleAction}))
     }
 
     const reactorNames = flattenExtractedToArray(extracted)
@@ -38,17 +40,19 @@ export default (opts) => ({
     }
 
     const cancelIfDone = () => {
-      if (!IS_BROWSER && !store.nextReaction && (!store.selectAsyncActive || !store.selectAsyncActive())) {
+      if (!IS_BROWSER && !store.isReacting && (!store.selectAsyncActive || !store.selectAsyncActive())) {
         idleDispatcher && idleDispatcher.cancel()
         opts.doneCallback && opts.doneCallback()
       }
     }
 
-    const hasReactions = () => store.reactors.some(name => store[name]())
+    const getHasReactions = () => store.reactors.some(name => store[name]())
     const getActiveReactions = () => store.reactors.map(name => store[name]()).filter(Boolean)
 
     const dispatchNext = () => {
-      if (hasReactions()) {
+      const hasReactions = getHasReactions()
+      if (hasReactions) {
+        store.isReacting = true
         ric(() => {
           const reactions = getActiveReactions()
           // if another action snuck in here due to requestIdleCallback delay
@@ -66,8 +70,10 @@ export default (opts) => ({
               }
               return store.unboundActionCreators[actionCreator]()
             })
+            store.isReacting = false
             store.dispatch(...cleaned)
           }
+          store.isReacting = false
         })
       }
     }

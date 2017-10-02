@@ -1,6 +1,6 @@
-import debugMiddleware from './middleware/debug'
-import thunkMiddleware from './middleware/custom-thunk'
-import customApplyMiddleware from './middleware/custom-apply-middleware'
+import debugMiddleware from '../middleware/debug'
+import thunkMiddleware from '../middleware/custom-thunk'
+import customApplyMiddleware from '../middleware/custom-apply-middleware'
 import { createStore, combineReducers, bindActionCreators } from 'redux'
 import { resolveSelectors } from 'create-selector'
 
