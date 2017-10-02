@@ -5,15 +5,8 @@ export default function applyMiddleware (...middlewares) {
     const store = createStore(reducer, preloadedState, enhancer)
     let dispatch = store.dispatch
     let chain = []
-
-    const middlewareAPI = {
-      getState: store.getState,
-      dispatch: (action) => dispatch(action),
-      store
-    }
-    chain = middlewares.map(middleware => middleware(middlewareAPI))
+    chain = middlewares.map(middleware => middleware(store))
     dispatch = compose(...chain)(store.dispatch)
-
     return Object.assign(store, { dispatch })
   }
 }

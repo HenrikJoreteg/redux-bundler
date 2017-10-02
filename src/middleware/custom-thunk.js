@@ -1,13 +1,11 @@
-function createThunkMiddleware (extra) {
-  return ({ dispatch, getState, store }) => next => action => {
-    if (typeof action === 'function') {
-      return action(Object.assign({}, store, extra))
-    }
-    return next(action)
+export default store => next => action => {
+  if (typeof action === 'function') {
+    return action(getActionArgs(store))
   }
+  return next(action)
 }
 
-const thunk = createThunkMiddleware()
-thunk.withExtraArgs = createThunkMiddleware
-
-export default thunk
+export const getActionArgs = store => {
+  const { getState, dispatch } = store
+  return Object.assign({}, {getState, dispatch, store}, store.meta.extraArgs)
+}

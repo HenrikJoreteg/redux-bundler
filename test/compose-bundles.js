@@ -10,7 +10,7 @@ test('composeBundles', (t) => {
 
 test('makes selectors available to thunk actions', (t) => {
   const store = composeBundles()()
-  store.dispatch(({dispatch, getState, selectAppTime}) => {
+  store.dispatch(({dispatch, getState, store: { selectAppTime }}) => {
     t.ok(getState)
     t.ok(dispatch)
     t.ok(selectAppTime())

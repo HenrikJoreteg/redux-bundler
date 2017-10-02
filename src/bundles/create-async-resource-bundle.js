@@ -88,7 +88,8 @@ export default (spec) => {
   const actions = {
     START: `${actionBaseType}_START`,
     SUCCESS: `${actionBaseType}_SUCCESS`,
-    ERROR: `${actionBaseType}_ERROR`
+    ERROR: `${actionBaseType}_ERROR`,
+    MAKE_STALE: `${actionBaseType}_MAKE_STALE`
   }
 
   const initialState = {
@@ -96,10 +97,12 @@ export default (spec) => {
     data: null,
     errorTimes: [],
     lastSuccess: null,
+    stale: false,
     failedPermanantly: false
   }
 
   const doFetchError = (error) => ({type: actions.ERROR, error})
+  const doMarkAsStale = (error) => ({type: actions.ERROR, error})
   const doFetchSuccess = (payload) => ({type: actions.SUCCESS, payload})
   const doFetchData = () => (args) => {
     const { dispatch } = args
@@ -139,6 +142,12 @@ export default (spec) => {
           failedPermanantly: !!(error && error.permanent)
         })
       }
+      if (type === actions.MAKE_STALE) {
+        return Object.assign({}, state, {
+          errorTimes: [],
+          stale: true
+        })
+      }
       return state
     },
     [`select${ucaseName}Raw`]: inputSelector,
@@ -151,7 +160,8 @@ export default (spec) => {
     [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
     [`doFetch${ucaseName}`]: doFetchData,
     [`doFetch${ucaseName}Success`]: doFetchSuccess,
-    [`doFetch${ucaseName}Error`]: doFetchError
+    [`doFetch${ucaseName}Error`]: doFetchError,
+    [`doMark${ucaseName}AsStale`]: doMarkAsStale
   }
 
   if (opts.persist) {

@@ -49,13 +49,13 @@ const consumeBundle = (bundle, accum = {}, bundles) => {
         return accum
       }, {})
     }
-    if (key.indexOf('do') === 0) {
+    if (key.slice(0, 2) === 'do') {
       const obj = {}
       obj[key] = value
       Object.assign(accum.actionCreators, obj)
       return
     }
-    if (key.indexOf('select') === 0) {
+    if (key.slice(0, 6) === 'select') {
       const obj = {}
       obj[key] = value
       Object.assign(accum.selectors, obj)
@@ -79,7 +79,7 @@ const decorateStore = (store, meta) => {
   resolveSelectors(combinedSelectors)
   store.meta.selectors = combinedSelectors
   bindSelectorsToStore(store, combinedSelectors)
-  Object.assign(store, bindActionCreators(meta.actionCreators, store.dispatch))
+  Object.assign(store, {unboundActionCreators: meta.actionCreators}, bindActionCreators(meta.actionCreators, store.dispatch))
   Object.assign(store.meta, meta)
   for (const appName in meta.initMethods) {
     meta.initMethods[appName](store, meta.itemsToExtract[appName])
@@ -99,7 +99,7 @@ const composeBundles = (...bundles) => {
   bundles.forEach(bundle => consumeBundle(bundle, meta, bundles))
   return data => {
     const middleware = [
-      thunkMiddleware.withExtraArgs(meta.extraArgs),
+      thunkMiddleware,
       debugMiddleware
     ]
 
