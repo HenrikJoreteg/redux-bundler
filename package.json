@@ -8,8 +8,7 @@
     "idb-keyval": "2.3.0",
     "querystringify": "0.0.4",
     "redux": "3.7.2",
-    "reselect": "3.0.1",
-    "ric-shim": "1.0.0"
+    "reselect": "3.0.1"
   },
   "devDependencies": {
     "buble": "0.15.2",
@@ -30,8 +29,9 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
+    "lint": "standard",
     "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
-    "prepublish": "standard && npm run build",
+    "prepublish": "npm run lint && npm run build",
     "test": "npm run build && tape test/*.js && standard --fix",
     "watch": "npm-watch"
   },

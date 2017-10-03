@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundles } = require('../')
+const { composeBundles, composeBundlesRaw, appTimeBundle } = require('../')
 
 test('composeBundles', (t) => {
   const createStore = composeBundles()
@@ -16,4 +16,13 @@ test('makes selectors available to thunk actions', (t) => {
     t.ok(selectAppTime())
     t.end()
   })
+})
+
+test('composeBundlesRaw', t => {
+  const createStore = composeBundlesRaw(appTimeBundle)
+  t.equal(typeof createStore, 'function', 'returns a function')
+  t.ok(createStore().getState, 'is a redux store')
+  const store = createStore()
+  t.equal(typeof store.selectAppTime(), 'number', 'attached bound selectors')
+  t.end()
 })

@@ -1,22 +1,23 @@
-import { IS_BROWSER } from '../../utils'
+import { IS_BROWSER, ric } from '../../utils'
 import { cacheItem } from './cache'
-import ric from 'ric-shim'
 
-const defaults = { version: 0 }
+const defaults = { version: 0, cacheFunction: cacheItem }
 export default (spec) => {
   const opts = Object.assign({}, defaults, spec)
 
   return {
     name: 'localCache',
     extract: 'persistActions',
-    getMiddleware: extracted => {
+    getMiddleware: chunk => {
       const combinedActions = {}
-      for (const bundleName in extracted) {
-        (extracted[bundleName] || []).forEach(type => {
-          combinedActions[type] || (combinedActions[type] = [])
-          combinedActions[type].push(bundleName)
-        })
-      }
+      chunk.rawBundles.forEach(bundle => {
+        if (bundle.persistActions) {
+          bundle.persistActions.forEach(type => {
+            combinedActions[type] || (combinedActions[type] = [])
+            combinedActions[type].push(bundle.name)
+          })
+        }
+      })
 
       return ({getState}) => (next) => (action) => {
         const keys = combinedActions[action.type]
@@ -26,7 +27,7 @@ export default (spec) => {
           if (IS_BROWSER) {
             ric(() => {
               Promise.all(keys.map(key =>
-                cacheItem(key, state[key], {version: opts.version})
+                opts.cacheFunction(key, state[key], {version: opts.version})
               )).then(() => {
                 if (state.debug) {
                   console.info(`persisted ${keys.join(', ')} because of action ${action.type}`)

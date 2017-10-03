@@ -7,7 +7,6 @@ const ACTION_2 = 'ACTION_2'
 
 const bundleWithReactors = {
   name: 'reactionary',
-  reactors: ['selectShouldReact0', 'selectShouldReact1', 'selectShouldReact2'],
   reducer: (state = {started: false, a0: false, a1: false, a2: false}, action) => {
     if (action.type === 'START') {
       return Object.assign({}, state, {started: true})
@@ -24,17 +23,17 @@ const bundleWithReactors = {
     return state
   },
   doAction2: () => ({type: ACTION_2}),
-  selectShouldReact0: state => {
+  reactShouldReact0: state => {
     if (state.reactionary.started && !state.reactionary.a0) {
       return { type: ACTION_0 }
     }
   },
-  selectShouldReact1: state => {
+  reactShouldReact1: state => {
     if (state.reactionary.started && !state.reactionary.a1) {
       return () => ({ type: ACTION_1 })
     }
   },
-  selectShouldReact2: state => {
+  reactShouldReact2: state => {
     if (state.reactionary.started && !state.reactionary.a2) {
       return { actionCreator: 'doAction2' }
     }

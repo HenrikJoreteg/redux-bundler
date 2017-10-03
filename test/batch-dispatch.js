@@ -25,7 +25,6 @@ test('batch dispatch', (t) => {
   })
   store.dispatch({type: 'ACTION1'}, {type: 'ACTION2'}, {type: 'ACTION3'})
   t.equal(count, 1)
-  console.log(store.getState())
   t.deepEqual(store.getState().batch, {no1: true, no2: true, no3: true}, 'Ok')
   t.end()
 })

@@ -3,87 +3,53 @@ import thunkMiddleware from '../middleware/custom-thunk'
 import customApplyMiddleware from '../middleware/custom-apply-middleware'
 import { createStore, combineReducers, bindActionCreators } from 'redux'
 import { resolveSelectors } from 'create-selector'
-
-const consumeBundle = (bundle, accum = {}, bundles) => {
-  // simple test to see whether we have needed props
-  if (!accum.reducers) {
-    Object.assign(accum, {
-      reducers: {},
-      extraMiddleware: {},
-      initMethods: {},
-      extraArgs: {},
-      itemsToExtract: {},
-      actionCreators: {},
-      selectors: {}
-    })
-  }
-  const { name } = bundle
-  Object.keys(bundle).forEach(key => {
-    const value = bundle[key]
-    if (key === 'reducer') {
-      accum.reducers[name] = value
-      return
-    }
-    if (key === 'getReducer') {
-      accum.reducers[name] = value()
-      return
-    }
-    if (key === 'getMiddleware') {
-      accum.extraMiddleware[name] = value
-      return
-    }
-    if (key === 'init') {
-      accum.initMethods[name] = value
-      return
-    }
-    if (key === 'extraArgs') {
-      Object.assign(accum.extraArgs, value)
-      return
-    }
-    if (key === 'extract') {
-      accum.itemsToExtract[name] = bundles.reduce((accum, bundle) => {
-        const extracted = bundle[value]
-        if (extracted) {
-          accum[bundle.name] = extracted
-        }
-        return accum
-      }, {})
-    }
-    if (key.slice(0, 2) === 'do') {
-      const obj = {}
-      obj[key] = value
-      Object.assign(accum.actionCreators, obj)
-      return
-    }
-    if (key.slice(0, 6) === 'select') {
-      const obj = {}
-      obj[key] = value
-      Object.assign(accum.selectors, obj)
-      return
-    }
-  })
-  return accum
-}
+import { createChunk } from './consume-bundle'
 
 const bindSelectorsToStore = (store, selectors) => {
   for (const key in selectors) {
     const selector = selectors[key]
-    store[key] = () =>
-      selector(store.getState())
+    if (!store[key]) {
+      store[key] = () =>
+        selector(store.getState())
+    }
   }
 }
 
-const decorateStore = (store, meta) => {
-  store.meta || (store.meta = {})
-  const combinedSelectors = Object.assign(store.meta.selectors || {}, meta.selectors)
+const decorateStore = (store, processed) => {
+  store.meta || (store.meta = {
+    chunks: [],
+    unboundSelectors: {},
+    unboundActionCreators: {},
+    reactorNames: []
+  })
+  const { meta } = store
+
+  // attach for reference
+  meta.chunks.push(processed)
+  
+  // grab existing unbound (but resolved) selectors, combine with new ones
+  const combinedSelectors = Object.assign(meta.unboundSelectors, processed.selectors)
+  
+  // run resolver
   resolveSelectors(combinedSelectors)
-  store.meta.selectors = combinedSelectors
+  
+  // update collection of resolved selectors
+  meta.unboundSelectors = combinedSelectors
+  
+  // make sure all selectors are bound (won't overwrite if already bound)
   bindSelectorsToStore(store, combinedSelectors)
-  Object.assign(store, {unboundActionCreators: meta.actionCreators}, bindActionCreators(meta.actionCreators, store.dispatch))
-  Object.assign(store.meta, meta)
-  for (const appName in meta.initMethods) {
-    meta.initMethods[appName](store, meta.itemsToExtract[appName])
-  }
+  
+  // build our list of reactor names
+  meta.reactorNames.push(...processed.reactorNames)
+
+  // update collection of all unbound action creators
+  Object.assign(meta.unboundActionCreators, processed.actionCreators)
+
+  // bind and attach only the next action crators to the store
+  Object.assign(store, bindActionCreators(processed.actionCreators, store.dispatch))
+
+  // run any new init methods
+  processed.initMethods.forEach(fn => fn(store))
 }
 
 const enableBatchDispatch = reducer => (state, action) => {
@@ -95,51 +61,36 @@ const enableBatchDispatch = reducer => (state, action) => {
 
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
-  const meta = {}
-  bundles.forEach(bundle => consumeBundle(bundle, meta, bundles))
+  const firstChunk = createChunk(bundles)
+
   return data => {
+    // build our list of middleware
     const middleware = [
       thunkMiddleware,
-      debugMiddleware
+      debugMiddleware,
+      ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
     ]
 
-    for (const appName in meta.extraMiddleware) {
-      middleware.push(meta.extraMiddleware[appName](meta.itemsToExtract[appName]))
-    }
-
+    // actually init our store
     const store = createStore(
-      enableBatchDispatch(combineReducers(meta.reducers)),
+      enableBatchDispatch(combineReducers(firstChunk.reducers)),
       data,
       customApplyMiddleware(...middleware)
     )
 
+    // upgrade dispatch to take multiple and automatically
+    // batch dispatch in that case
     const { dispatch } = store
     store.dispatch = (...actions) => {
       dispatch(actions.length > 1 ? {type: 'BATCH_ACTIONS', actions} : actions[0])
     }
 
-    store.bundles = bundles
-
-    decorateStore(store, meta)
+    decorateStore(store, firstChunk)
 
     store.integrateBundles = (...bundlesToIntegrate) => {
-      const { bundles } = store
-      const bundleMap = bundles.reduce((acc, bundle, index) => {
-        acc[bundle.name] = index
-        return acc
-      }, {})
-      bundlesToIntegrate.forEach(newBundle => {
-        const currentIndex = bundleMap[newBundle.name]
-        if (currentIndex != null) {
-          bundles[currentIndex] = newBundle
-        } else {
-          bundles.push(newBundle)
-        }
-      })
-      const meta = {}
-      bundles.forEach(bundle => consumeBundle(bundle, meta, bundles))
-      decorateStore(store, meta)
-      store.replaceReducer(combineReducers(meta.reducers))
+      decorateStore(store, createChunk(bundlesToIntegrate))
+      const allReducers = store.meta.chunks.reduce((accum, chunk) => Object.assign(accum, chunk.reducers), {})
+      store.replaceReducer(enableBatchDispatch(combineReducers(allReducers)))
     }
 
     return store

@@ -4,11 +4,14 @@ const changes = {
   'ERROR': -1
 }
 
+const re = /_(START|SUCCESS|ERROR)$/
+
 export default {
   name: 'asyncCount',
   reducer: (state = 0, { type }) => {
-    const last = type.split('_').slice(-1)[0]
-    return state + (changes[last] || 0)
+    const result = re.exec(type)
+    if (!result) return state
+    return state + changes[result[1]]
   },
   selectAsyncActive: state => state.asyncCount > 0
 }

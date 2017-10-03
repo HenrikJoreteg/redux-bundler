@@ -1,7 +1,5 @@
-import { IS_BROWSER, flattenExtractedToArray, debounce } from '../utils'
+import { IS_BROWSER, debounce, ric, raf } from '../utils'
 import { getActionArgs } from '../middleware/custom-thunk'
-const raf = IS_BROWSER && self.requestAnimationFrame || ((func) => { setTimeout(func, 0) })
-const ric = IS_BROWSER && self.requestIdleCallback || ((func) => { setTimeout(func, 0) })
 
 const defaults = {
   idleTimeout: 30000,
@@ -12,13 +10,12 @@ const defaults = {
 
 export const getIdleDispatcher = (stopWhenInactive, timeout, fn) => debounce(() => {
   // the requestAnimationFrame ensures it doesn't run when tab isn't active
-  stopWhenInactive ? raf(ric(fn)) : ric(fn)
+  stopWhenInactive ? raf(() => ric(fn)) : ric(fn)
 }, timeout)
 
 export default (opts) => ({
   name: 'reactors',
-  extract: 'reactors',
-  init: (store, extracted) => {
+  init: store => {
     opts || (opts = {})
     Object.assign(opts, defaults)
     const { idleAction, idleTimeout } = opts
@@ -27,12 +24,8 @@ export default (opts) => ({
       idleDispatcher = getIdleDispatcher(opts.stopWhenTabInactive, idleTimeout, () => store.dispatch({type: idleAction}))
     }
 
-    const reactorNames = flattenExtractedToArray(extracted)
-
-    store.reactors = reactorNames
-
     if (process.env.NODE_ENV !== 'production') {
-      reactorNames.forEach(name => {
+      store.meta.reactorNames.forEach(name => {
         if (!store[name]) {
           throw Error(`Reactor '${name}' not found on the store. Make sure you're defining as selector by that name.`)
         }
@@ -46,8 +39,8 @@ export default (opts) => ({
       }
     }
 
-    const getHasReactions = () => store.reactors.some(name => store[name]())
-    const getActiveReactions = () => store.reactors.map(name => store[name]()).filter(Boolean)
+    const getHasReactions = () => store.meta.reactorNames.some(name => store[name]())
+    const getActiveReactions = () => store.meta.reactorNames.map(name => store[name]()).filter(Boolean)
 
     const dispatchNext = () => {
       const hasReactions = getHasReactions()
@@ -66,9 +59,9 @@ export default (opts) => ({
               if (!actionCreator) return action
               const { args } = action
               if (args) {
-                return store.unboundActionCreators[actionCreator](...args)
+                return store.meta.unboundActionCreators[actionCreator](...args)
               }
-              return store.unboundActionCreators[actionCreator]()
+              return store.meta.unboundActionCreators[actionCreator]()
             })
             store.isReacting = false
             store.dispatch(...cleaned)
