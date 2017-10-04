@@ -33,8 +33,11 @@ export const addGlobalListener = (eventName, handler) => {
   }
 }
 
-export const selectorNameToValueName = name =>
-  name.charAt(6).toLowerCase() + name.slice(7)
+export const selectorNameToValueName = name => {
+  const isSelect = startsWith(name, 'select')
+  const start = isSelect ? 6 : 5
+  return name.charAt(start).toLowerCase() + name.slice(start + 1)
+}
 
 export const debounce = (fn, wait) => {
   let timeout

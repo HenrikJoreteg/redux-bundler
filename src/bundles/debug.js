@@ -20,7 +20,7 @@ export default {
   selectIsDebug: state => state.debug,
   init: (store) => {
     if (store.selectIsDebug()) {
-      const names = store.bundles.map(bundle => bundle.name)
+      const names = store.meta.chunks[0].bundleNames
       self.store = store
       const actionCreators = []
       for (const key in store) {
@@ -33,7 +33,6 @@ export default {
       const black = 'color: black;'
       const colorGreen = 'color: #4CAF50;'
       const colorOrange = 'color: #F57C00;'
-      const normal = 'font-weight: normal;'
 
       store.logSelectors = self.logSelectors = () => {
         if (!store.selectAll) return
@@ -52,7 +51,8 @@ export default {
 
       store.logReactors = self.logReactors = () => {
         console.groupCollapsed('%creactors', colorOrange)
-        store.reactors && store.reactors.forEach(name => console.log(name))
+        const { reactorNames } = store.meta
+        reactorNames.forEach(name => console.log(name))
         console.groupEnd()
       }
 
@@ -70,15 +70,6 @@ export default {
 
       console.groupCollapsed('%credux bundler v%s', colorTitle, version)
       store.logBundles()
-      const exported = []
-      for (const key in store) {
-        if (key.indexOf('select') === 0 || key.indexOf('do') === 0) {
-          exported.push(`${key}()`)
-        }
-      }
-      exported.sort()
-      exported.unshift('store')
-      console.log(`%cattached to self/window:\n  %c${exported.join('\n  ')}`, colorTitle, black + normal)
       store.logSelectors()
       store.logReactors()
       console.groupEnd()

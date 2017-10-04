@@ -2,7 +2,7 @@ import { startsWith } from '../utils'
 
 export const normalizeBundle = bundle => {
   const { name } = bundle
-  if (!name) throw TypeError('Bundles must have a .name')
+  if (!name) throw TypeError('bundles must have a "name" property')
   const result = {
     name,
     reducer: bundle.reducer || (bundle.getReducer && bundle.getReducer()) || null,
@@ -35,6 +35,7 @@ export const normalizeBundle = bundle => {
 export const createChunk = (rawBundles) => {
   const normalizedBundles = rawBundles.map(normalizeBundle)
   const result = {
+    bundleNames: [],
     reducers: {},
     selectors: {},
     extraArgs: {},
@@ -46,6 +47,7 @@ export const createChunk = (rawBundles) => {
     reactorNames: []
   }
   normalizedBundles.forEach(bundle => {
+    result.bundleNames.push(bundle.name)
     Object.assign(result.selectors, bundle.selectors)
     Object.assign(result.extraArgs, bundle.extraArgs)
     Object.assign(result.actionCreators, bundle.actionCreators)

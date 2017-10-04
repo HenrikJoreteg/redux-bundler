@@ -67,13 +67,13 @@ test('integrateBundles reactors', t => {
 
   t.equal(store.selectIsFlippedUp(), true, 'is flipped up per first action')
   t.equal(store.selectIsDone(), true, 'is still marked as done')
-  t.equal(store.isReacting, true, 'store reacting flag should be true')
+  t.equal(store.activeReactor, 'reactShouldFlipDown', 'active reactor should be on store')
 
   // give the reactor a chance to finish
   setTimeout(() => {
     t.equal(store.selectIsFlippedUp(), false, 'is flipped')
     t.equal(store.selectIsDone(), true, 'is still done')
-    t.equal(store.isReacting, false, 'store reacting flag should be false')
+    t.equal(store.activeReactor, null, 'active reactor should be null')
     t.end()
   })
 })

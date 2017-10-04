@@ -1,5 +1,4 @@
 import { IS_BROWSER, debounce, ric, raf } from '../utils'
-import { getActionArgs } from '../middleware/custom-thunk'
 
 const defaults = {
   idleTimeout: 30000,
@@ -33,40 +32,33 @@ export default (opts) => ({
     }
 
     const cancelIfDone = () => {
-      if (!IS_BROWSER && !store.isReacting && (!store.selectAsyncActive || !store.selectAsyncActive())) {
+      if (!IS_BROWSER && !store.nextReaction && (!store.selectAsyncActive || !store.selectAsyncActive())) {
         idleDispatcher && idleDispatcher.cancel()
         opts.doneCallback && opts.doneCallback()
       }
     }
 
-    const getHasReactions = () => store.meta.reactorNames.some(name => store[name]())
-    const getActiveReactions = () => store.meta.reactorNames.map(name => store[name]()).filter(Boolean)
-
     const dispatchNext = () => {
-      const hasReactions = getHasReactions()
-      if (hasReactions) {
-        store.isReacting = true
+      // one at a time
+      if (store.nextReaction) {
+        return
+      }
+      // look for the next one
+      store.meta.reactorNames.some(name => {
+        const result = store[name]()
+        if (result) {
+          store.activeReactor = name
+          store.nextReaction = result
+        }
+        return result
+      })
+      if (store.nextReaction) {
+        // let browser chill
         ric(() => {
-          const reactions = getActiveReactions()
-          // if another action snuck in here due to requestIdleCallback delay
-          // re-run the active selector test
-          if (reactions.length) {
-            const cleaned = reactions.map(action => {
-              if (typeof action === 'function') {
-                return action(getActionArgs(store))
-              }
-              const { actionCreator } = action
-              if (!actionCreator) return action
-              const { args } = action
-              if (args) {
-                return store.meta.unboundActionCreators[actionCreator](...args)
-              }
-              return store.meta.unboundActionCreators[actionCreator]()
-            })
-            store.isReacting = false
-            store.dispatch(...cleaned)
-          }
-          store.isReacting = false
+          const { nextReaction } = store
+          store.activeReactor = null
+          store.nextReaction = null
+          store.dispatch(nextReaction)
         })
       }
     }

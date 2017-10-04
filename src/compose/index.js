@@ -1,4 +1,5 @@
 import debugMiddleware from '../middleware/debug'
+import namedActionMiddleware from '../middleware/named-action'
 import thunkMiddleware from '../middleware/custom-thunk'
 import customApplyMiddleware from '../middleware/custom-apply-middleware'
 import { createStore, combineReducers, bindActionCreators } from 'redux'
@@ -16,33 +17,38 @@ const bindSelectorsToStore = (store, selectors) => {
 }
 
 const decorateStore = (store, processed) => {
-  store.meta || (store.meta = {
-    chunks: [],
-    unboundSelectors: {},
-    unboundActionCreators: {},
-    reactorNames: []
-  })
+  if (!store.meta) {
+    store.meta = {
+      chunks: [],
+      unboundSelectors: {},
+      unboundActionCreators: {},
+      reactorNames: [],
+      extraArgs: {}
+    }
+  }
+
   const { meta } = store
 
   // attach for reference
   meta.chunks.push(processed)
-  
+
   // grab existing unbound (but resolved) selectors, combine with new ones
   const combinedSelectors = Object.assign(meta.unboundSelectors, processed.selectors)
-  
+
   // run resolver
   resolveSelectors(combinedSelectors)
-  
+
   // update collection of resolved selectors
   meta.unboundSelectors = combinedSelectors
-  
+
   // make sure all selectors are bound (won't overwrite if already bound)
   bindSelectorsToStore(store, combinedSelectors)
-  
-  // build our list of reactor names
-  meta.reactorNames.push(...processed.reactorNames)
 
-  // update collection of all unbound action creators
+  // build our list of reactor names
+  meta.reactorNames = meta.reactorNames.concat(processed.reactorNames)
+
+  // extend global collections with new stuff
+  Object.assign(meta.extraArgs, processed.extraArgs)
   Object.assign(meta.unboundActionCreators, processed.actionCreators)
 
   // bind and attach only the next action crators to the store
@@ -66,6 +72,7 @@ const composeBundles = (...bundles) => {
   return data => {
     // build our list of middleware
     const middleware = [
+      namedActionMiddleware,
       thunkMiddleware,
       debugMiddleware,
       ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))

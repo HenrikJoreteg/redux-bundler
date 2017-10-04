@@ -1,11 +1,7 @@
 export default store => next => action => {
   if (typeof action === 'function') {
-    return action(getActionArgs(store))
+    const { getState, dispatch } = store
+    return action(Object.assign({}, {getState, dispatch, store}, store.meta.extraArgs))
   }
   return next(action)
-}
-
-export const getActionArgs = store => {
-  const { getState, dispatch } = store
-  return Object.assign({}, {getState, dispatch, store}, store.meta.extraArgs)
 }
