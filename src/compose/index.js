@@ -88,9 +88,8 @@ const composeBundles = (...bundles) => {
     // upgrade dispatch to take multiple and automatically
     // batch dispatch in that case
     const { dispatch } = store
-    store.dispatch = (...actions) => {
+    store.dispatch = (...actions) =>
       dispatch(actions.length > 1 ? {type: 'BATCH_ACTIONS', actions} : actions[0])
-    }
 
     decorateStore(store, firstChunk)
 

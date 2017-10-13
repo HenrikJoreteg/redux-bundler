@@ -26,3 +26,13 @@ test('composeBundlesRaw', t => {
   t.equal(typeof store.selectAppTime(), 'number', 'attached bound selectors')
   t.end()
 })
+
+test('ensure dispatch returns what the thunk function returns', t => {
+  const store = composeBundles()()
+  const result = store.dispatch(({dispatch}) => {
+    return true
+  })
+  t.equal(result, true, 'should return true')
+  t.end()
+})
+
