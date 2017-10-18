@@ -51,8 +51,8 @@ export default (opts) => {
       const parsed = new URL(newState.charAt(0) === '/' ? 'http://example.com' + newState : newState)
       state = {
         pathname: parsed.pathname,
-        query: parsed.search || undefined,
-        hash: parsed.hash || undefined
+        query: parsed.search || '',
+        hash: parsed.hash || ''
       }
     }
     const url = new URL(selectUrlRaw(getState()).url)

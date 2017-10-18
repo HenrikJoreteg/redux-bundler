@@ -56,6 +56,8 @@ test('url-bundle actionCreators', (t) => {
   resetStore()
   store.doUpdateUrl('/hi?there=you#something')
   t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/hi?there=you#something', replace: false})
+  store.doUpdateUrl('/boo')
+  t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/boo', replace: false}, 'clears existing when passing full string')
 
   resetStore()
   store.doUpdateUrl('/hi?there=you')
