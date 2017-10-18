@@ -46,7 +46,15 @@ export default (opts) => {
   const selectSubdomains = createSelector(selectHostname, hostname => parseSubdomains(hostname))
 
   const doUpdateUrl = (newState, opts = {replace: false}) => ({dispatch, getState}) => {
-    const state = (typeof newState === 'string') ? { pathname: newState, hash: '', query: '' } : newState
+    let state = newState
+    if (typeof newState === 'string') {
+      const parsed = new URL(newState.charAt(0) === '/' ? 'http://example.com' + newState : newState)
+      state = {
+        pathname: parsed.pathname,
+        query: parsed.search || undefined,
+        hash: parsed.hash || undefined
+      }
+    }
     const url = new URL(selectUrlRaw(getState()).url)
     if (isDefined(state.pathname)) url.pathname = state.pathname
     if (isDefined(state.hash)) url.hash = ensureString(state.hash)

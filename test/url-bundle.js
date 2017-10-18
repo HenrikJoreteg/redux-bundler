@@ -53,5 +53,17 @@ test('url-bundle actionCreators', (t) => {
   store.doUpdateHash({ok: 'hi'})
   t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/something#ok=hi', replace: false})
 
+  resetStore()
+  store.doUpdateUrl('/hi?there=you#something')
+  t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/hi?there=you#something', replace: false})
+
+  resetStore()
+  store.doUpdateUrl('/hi?there=you')
+  t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/hi?there=you', replace: false})
+
+  resetStore()
+  store.doUpdateUrl('/hi#something')
+  t.deepEqual(store.selectUrlRaw(), {url: 'http://something.com/hi#something', replace: false})
+
   t.end()
 })
