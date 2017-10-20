@@ -132,7 +132,8 @@ export default (spec) => {
           data: updatedData,
           lastSuccess: Date.now(),
           errorTimes: [],
-          failedPermanantly: false
+          failedPermanantly: false,
+          stale: false
         })
       }
       if (type === actions.ERROR) {

@@ -92,6 +92,7 @@ export default (opts) => {
         if (lastState !== newState && newUrl !== loc.href) {
           try {
             window.history[newState.replace ? 'replaceState' : 'pushState']({}, null, newState.url)
+            document.body.scrollTop = 0
           } catch (e) {
             console.error(e)
           }
