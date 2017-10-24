@@ -7,9 +7,10 @@ const defaults = {
   stopWhenTabInactive: true
 }
 
+const ricOptions = {timeout: 500}
 export const getIdleDispatcher = (stopWhenInactive, timeout, fn) => debounce(() => {
   // the requestAnimationFrame ensures it doesn't run when tab isn't active
-  stopWhenInactive ? raf(() => ric(fn)) : ric(fn)
+  stopWhenInactive ? raf(() => ric(fn, ricOptions)) : ric(fn, ricOptions)
 }, timeout)
 
 export default (opts) => ({
@@ -59,7 +60,7 @@ export default (opts) => ({
           store.activeReactor = null
           store.nextReaction = null
           store.dispatch(nextReaction)
-        })
+        }, ricOptions)
       }
     }
 
