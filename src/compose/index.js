@@ -22,8 +22,7 @@ const decorateStore = (store, processed) => {
       chunks: [],
       unboundSelectors: {},
       unboundActionCreators: {},
-      reactorNames: [],
-      extraArgs: {}
+      reactorNames: []
     }
   }
 
@@ -48,10 +47,9 @@ const decorateStore = (store, processed) => {
   meta.reactorNames = meta.reactorNames.concat(processed.reactorNames)
 
   // extend global collections with new stuff
-  Object.assign(meta.extraArgs, processed.extraArgs)
   Object.assign(meta.unboundActionCreators, processed.actionCreators)
 
-  // bind and attach only the next action crators to the store
+  // bind and attach only the next action creators to the store
   Object.assign(store, bindActionCreators(processed.actionCreators, store.dispatch))
 
   // run any new init methods
@@ -68,21 +66,17 @@ const enableBatchDispatch = reducer => (state, action) => {
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
   const firstChunk = createChunk(bundles)
-
   return data => {
-    // build our list of middleware
-    const middleware = [
-      namedActionMiddleware,
-      thunkMiddleware,
-      debugMiddleware,
-      ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
-    ]
-
     // actually init our store
     const store = createStore(
       enableBatchDispatch(combineReducers(firstChunk.reducers)),
       data,
-      customApplyMiddleware(...middleware)
+      customApplyMiddleware(...[
+        namedActionMiddleware,
+        thunkMiddleware(firstChunk.extraArgCreators),
+        debugMiddleware,
+        ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
+      ])
     )
 
     // upgrade dispatch to take multiple and automatically

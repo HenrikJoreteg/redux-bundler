@@ -36,3 +36,19 @@ test('ensure dispatch returns what the thunk function returns', t => {
   t.end()
 })
 
+test('ensure getExtraArgs has access to store and is available to dispatched function actions', t => {
+  const extraThing = {}
+  let passedStore
+  const store = composeBundles({
+    name: 'extra',
+    getExtraArgs: thePassedStore => {
+      passedStore = thePassedStore
+      return { extraThing }
+    }
+  })()
+  t.equal(store, passedStore, 'has access to store')
+  store.dispatch((args) => {
+    t.equal(args.extraThing, extraThing, 'is available to dispatched functions')
+    t.end()
+  })
+})

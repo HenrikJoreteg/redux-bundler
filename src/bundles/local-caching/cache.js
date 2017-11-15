@@ -1,4 +1,4 @@
-// Thin layer on top of idbkey val with support for versioning and
+// Thin layer on top of idb-keyval with support for versioning and
 // max age
 import idbKeyval from 'idb-keyval'
 

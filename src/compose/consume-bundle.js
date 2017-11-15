@@ -7,8 +7,8 @@ export const normalizeBundle = bundle => {
     name,
     reducer: bundle.reducer || (bundle.getReducer && bundle.getReducer()) || null,
     init: bundle.init || null,
-    extraArgs: bundle.extraArgs || null,
-    getMiddleware: bundle.getMiddleware,
+    extraArgCreators: bundle.getExtraArgs || null,
+    middlewareCreators: bundle.getMiddleware,
     actionCreators: null,
     selectors: null,
     reactorNames: null,
@@ -38,22 +38,22 @@ export const createChunk = (rawBundles) => {
     bundleNames: [],
     reducers: {},
     selectors: {},
-    extraArgs: {},
     actionCreators: {},
     rawBundles: [],
     processedBundles: [],
     initMethods: [],
     middlewareCreators: [],
+    extraArgCreators: [],
     reactorNames: []
   }
   normalizedBundles.forEach(bundle => {
     result.bundleNames.push(bundle.name)
     Object.assign(result.selectors, bundle.selectors)
-    Object.assign(result.extraArgs, bundle.extraArgs)
     Object.assign(result.actionCreators, bundle.actionCreators)
     if (bundle.reducer) Object.assign(result.reducers, {[bundle.name]: bundle.reducer})
     if (bundle.init) result.initMethods.push(bundle.init)
-    if (bundle.middlewareCreators) result.middlewareCreators.push(bundle.getMiddleware)
+    if (bundle.middlewareCreators) result.middlewareCreators.push(bundle.middlewareCreators)
+    if (bundle.extraArgCreators) result.extraArgCreators.push(bundle.extraArgCreators)
     if (bundle.reactorNames) result.reactorNames.push(...bundle.reactorNames)
     result.processedBundles.push(bundle)
     result.rawBundles.push(bundle.rawBundle)
