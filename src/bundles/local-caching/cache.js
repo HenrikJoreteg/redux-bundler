@@ -10,7 +10,6 @@ export const getCachedItem = (key, opts) => {
     .then(JSON.parse)
     .then(parsed => {
       const age = Date.now() - parsed.time
-      console.log('VERSION', version, parsed.version)
       if (age > maxAge || version !== parsed.version) {
         lib.delete(key)
         return null
