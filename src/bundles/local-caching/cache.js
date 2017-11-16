@@ -1,15 +1,16 @@
 // Thin layer on top of idb-keyval with support for versioning and
 // max age
-import idbKeyval from 'idb-keyval'
+import idbKeyVal from 'idb-keyval'
 
-const defaultOpts = {maxAge: Infinity, version: 0, lib: idbKeyval}
+const defaultOpts = {maxAge: Infinity, version: 0, lib: idbKeyVal}
 
 export const getCachedItem = (key, opts) => {
-  const { maxAge, version, lib } = Object.assign(opts, defaultOpts)
+  const { maxAge, version, lib } = Object.assign({}, defaultOpts, opts)
   return lib.get(key)
     .then(JSON.parse)
     .then(parsed => {
       const age = Date.now() - parsed.time
+      console.log('VERSION', version, parsed.version)
       if (age > maxAge || version !== parsed.version) {
         lib.delete(key)
         return null
@@ -22,12 +23,12 @@ export const getCachedItem = (key, opts) => {
     .catch(() => null)
 }
 
-export const getAllCached = opts => {
-  Object.assign(opts, defaultOpts)
+export const getAllCached = spec => {
+  const opts = Object.assign({}, defaultOpts, spec)
   let keys
   return opts.lib.keys()
-    .then(retrivedKeys => {
-      keys = retrivedKeys
+    .then(retrievedKeys => {
+      keys = retrievedKeys
       return Promise.all(keys.map(key =>
         getCachedItem(key, opts)
           .then(res => res.data)
@@ -45,8 +46,8 @@ export const getAllCached = opts => {
 export const clearAllCached = (opts = defaultOpts) =>
   opts.lib.clear().catch(() => null)
 
-export const cacheItem = (key, data, opts) => {
-  Object.assign(opts, defaultOpts)
+export const cacheItem = (key, data, spec) => {
+  const opts = Object.assign({}, defaultOpts, spec)
   return opts.lib.set(key, JSON.stringify({
     version: opts.version,
     time: Date.now(),
