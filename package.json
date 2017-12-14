@@ -3,7 +3,7 @@
   "version": "14.0.2",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
-    "create-selector": "2.2.0",
+    "create-selector": "3.0.0",
     "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.3.0",
     "querystringify": "0.0.4",
