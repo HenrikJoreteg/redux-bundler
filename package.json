@@ -1,6 +1,6 @@
 {
   "name": "redux-bundler",
-  "version": "15.0.0",
+  "version": "16.0.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "dependencies": {
     "create-selector": "3.0.0",
