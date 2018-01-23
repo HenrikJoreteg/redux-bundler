@@ -5,6 +5,8 @@ import customApplyMiddleware from '../middleware/custom-apply-middleware'
 import { createStore, combineReducers, bindActionCreators } from 'redux'
 import { resolveSelectors } from 'create-selector'
 import { createChunk } from './consume-bundle'
+import addBindingMethods from './add-binding-methods'
+import { selectorNameToValueName } from '../utils'
 
 const bindSelectorsToStore = (store, selectors) => {
   for (const key in selectors) {
@@ -85,8 +87,25 @@ const composeBundles = (...bundles) => {
     store.dispatch = (...actions) =>
       dispatch(actions.length > 1 ? {type: 'BATCH_ACTIONS', actions} : actions[0])
 
+    // get values from an array of selector names
+    store.select = selectorNames =>
+      selectorNames.reduce((obj, name) => {
+        if (!store[name]) throw Error(`SelectorNotFound ${name}`)
+        obj[selectorNameToValueName(name)] = store[name]()
+        return obj
+      }, {})
+
+    // get all values from all available selectors (even if added later)
+    store.selectAll = () =>
+      store.select(Object.keys(store.meta.unboundSelectors))
+
+    // add all the gathered bundle data into the store
     decorateStore(store, firstChunk)
 
+    // adds support for subscribing to changes from an array of selector strings
+    addBindingMethods(store)
+
+    // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
       decorateStore(store, createChunk(bundlesToIntegrate))
       const allReducers = store.meta.chunks.reduce((accum, chunk) => Object.assign(accum, chunk.reducers), {})

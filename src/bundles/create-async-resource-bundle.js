@@ -31,7 +31,7 @@ const defaultOpts = {
 export default (spec) => {
   const opts = Object.assign({}, defaultOpts, spec)
   const { name, staleAge, retryAfter, actionBaseType, checkIfOnline } = opts
-  const ucaseName = name.charAt(0).toUpperCase() + name.slice(1)
+  const uCaseName = name.charAt(0).toUpperCase() + name.slice(1)
 
   if (process.env.NODE_ENV !== 'production') {
     for (const item in opts) {
@@ -60,7 +60,7 @@ export default (spec) => {
   )
   const failedPermanentlySelector = createSelector(
     inputSelector,
-    resourceState => resourceState.failedPermanantly
+    resourceState => resourceState.failedPermanently
   )
   const shouldUpdateSelector = createSelector(
     isLoadingSelector,
@@ -69,11 +69,11 @@ export default (spec) => {
     dataSelector,
     isStaleSelector,
     onlineBundle.selectIsOnline,
-    (isLoading, failedPermanantly, isWaitingToRetry, data, isStale, isOnline) => {
+    (isLoading, failedPermanently, isWaitingToRetry, data, isStale, isOnline) => {
       if (
         (checkIfOnline && !isOnline) ||
         isLoading ||
-        failedPermanantly ||
+        failedPermanently ||
         isWaitingToRetry
       ) {
         return false
@@ -98,7 +98,7 @@ export default (spec) => {
     errorTimes: [],
     lastSuccess: null,
     stale: false,
-    failedPermanantly: false
+    failedPermanently: false
   }
 
   const doFetchError = (error) => ({type: actions.ERROR, error})
@@ -132,7 +132,7 @@ export default (spec) => {
           data: updatedData,
           lastSuccess: Date.now(),
           errorTimes: [],
-          failedPermanantly: false,
+          failedPermanently: false,
           stale: false
         })
       }
@@ -140,7 +140,7 @@ export default (spec) => {
         return Object.assign({}, state, {
           isLoading: false,
           errorTimes: state.errorTimes.concat([Date.now()]),
-          failedPermanantly: !!(error && error.permanent)
+          failedPermanently: !!(error && error.permanent)
         })
       }
       if (type === actions.MAKE_STALE) {
@@ -151,18 +151,18 @@ export default (spec) => {
       }
       return state
     },
-    [`select${ucaseName}Raw`]: inputSelector,
-    [`select${ucaseName}`]: dataSelector,
-    [`select${ucaseName}IsStale`]: isStaleSelector,
-    [`select${ucaseName}LastError`]: lastErrorSelector,
-    [`select${ucaseName}IsWaitingToRetry`]: isWaitingToRetrySelector,
-    [`select${ucaseName}IsLoading`]: isLoadingSelector,
-    [`select${ucaseName}FailedPermanantly`]: failedPermanentlySelector,
-    [`select${ucaseName}ShouldUpdate`]: shouldUpdateSelector,
-    [`doFetch${ucaseName}`]: doFetchData,
-    [`doFetch${ucaseName}Success`]: doFetchSuccess,
-    [`doFetch${ucaseName}Error`]: doFetchError,
-    [`doMark${ucaseName}AsStale`]: doMarkAsStale
+    [`select${uCaseName}Raw`]: inputSelector,
+    [`select${uCaseName}`]: dataSelector,
+    [`select${uCaseName}IsStale`]: isStaleSelector,
+    [`select${uCaseName}LastError`]: lastErrorSelector,
+    [`select${uCaseName}IsWaitingToRetry`]: isWaitingToRetrySelector,
+    [`select${uCaseName}IsLoading`]: isLoadingSelector,
+    [`select${uCaseName}FailedPermanently`]: failedPermanentlySelector,
+    [`select${uCaseName}ShouldUpdate`]: shouldUpdateSelector,
+    [`doFetch${uCaseName}`]: doFetchData,
+    [`doFetch${uCaseName}Success`]: doFetchSuccess,
+    [`doFetch${uCaseName}Error`]: doFetchError,
+    [`doMark${uCaseName}AsStale`]: doMarkAsStale
   }
 
   if (opts.persist) {

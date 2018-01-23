@@ -11,10 +11,10 @@
     "reselect": "3.0.1"
   },
   "devDependencies": {
-    "buble": "0.15.2",
+    "buble": "0.18.0",
     "nodemon": "1.10.2",
     "npm-watch": "0.1.6",
-    "rollup": "0.49.2",
+    "rollup": "0.54.0",
     "rollup-plugin-json": "2.3.0",
     "standard": "8.3.0",
     "tap-spec": "4.1.1",
@@ -32,7 +32,7 @@
     "lint": "standard",
     "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
     "prepublish": "npm run lint && npm run build",
-    "test": "npm run build && tape test/*.js && standard --fix",
+    "test": "npm run build && tape test/*.js | tap-spec && standard --fix",
     "watch": "npm-watch"
   },
   "standard": {
