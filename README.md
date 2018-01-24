@@ -21,27 +21,27 @@ Historically redux developers would spread this out across several files maybe a
 With redux-bundler you create a single file perhaps in "/bundles/user.js" that looks something like this:
 
 ```js
-import { createSelector } from "redux-bundler";
+import { createSelector } from 'redux-bundler'
 
 export default {
-  name: "user",
+  name: 'user',
   getReducer: () => {
-    const initialState = { loggedIn: false, name: null };
+    const initialState = { loggedIn: false, name: null }
 
     return (state = initialState, { type, payload }) => {
-      if (type === "USER_LOGGED_IN") {
-        return Object.assign({}, user, { loggedIn: true, name: payload });
+      if (type === 'USER_LOGGED_IN') {
+        return Object.assign({}, user, { loggedIn: true, name: payload })
       }
-      return state;
-    };
+      return state
+    }
   },
   selectUserState: state => state.user,
   selectIsLoggedIn: createSelector(
-    "selectUserState",
+    'selectUserState',
     userState => userState.loggedIn
   ),
-  doLogin: () => ({ type: "USER_LOGGED_IN" })
-};
+  doLogin: () => ({ type: 'USER_LOGGED_IN' })
+}
 ```
 
 In this way you group related reducers, selectors, action creators. Redux-bundler then takes bundles like this and combines them all into a store and pre-binds and attaches everything to the _redux store itself_.
@@ -133,33 +133,33 @@ redux-bundler includes a pattern for this. Bundles can include what I call "reac
 As an example, I like to make a bundle that just manages all the redirects in my app. Here's an an abbreviated version from an actual app:
 
 ```js
-import { createSelector } from "redux-bundler";
+import { createSelector } from 'redux-bundler'
 
-const publicUrls = ["/", "/login", "/signup"];
+const publicUrls = ['/', '/login', '/signup']
 
 export default {
-  name: "redirects",
+  name: 'redirects',
   reactRedirects: createSelector(
-    "selectIsLoggedIn",
-    "selectPathname",
-    "selectHasNoOrgs",
+    'selectIsLoggedIn',
+    'selectPathname',
+    'selectHasNoOrgs',
     (isLoggedIn, pathname, hasNoOrgs, activeOrgHasBasicInfo) => {
       if (isLoggedIn && publicUrls.includes(pathname)) {
-        return { actionCreator: "doUpdateUrl", args: ["/orgs"] };
+        return { actionCreator: 'doUpdateUrl', args: ['/orgs'] }
       }
-      if (!isLoggedIn && pathname.startsWith("/orgs")) {
-        return { actionCreator: "doUpdateUrl", args: ["/login"] };
+      if (!isLoggedIn && pathname.startsWith('/orgs')) {
+        return { actionCreator: 'doUpdateUrl', args: ['/login'] }
       }
-      if (hasNoOrgs && pathname === "/orgs") {
-        return { actionCreator: "doReplaceUrl", args: ["/orgs/create"] };
+      if (hasNoOrgs && pathname === '/orgs') {
+        return { actionCreator: 'doReplaceUrl', args: ['/orgs/create'] }
       }
       // remove trailing slash
-      if (pathname !== "/" && pathname.endsWith("/")) {
-        return { actionCreator: "doReplaceUrl", args: [pathname.slice(0, -1)] };
+      if (pathname !== '/' && pathname.endsWith('/')) {
+        return { actionCreator: 'doReplaceUrl', args: [pathname.slice(0, -1)] }
       }
     }
   )
-};
+}
 ```
 
 Now I have one unified place to see anything that could cause a redirect in my app.
@@ -170,18 +170,18 @@ Now I have one unified place to see anything that could cause a redirect in my a
 2. just keep a single, flat folder called `bundles` with one bundle per file
 3. make an `index.js` file in `bundles` to export the result of `composeBundles()`, the resulting function takes a single argument which is any locally cached or bootstrapped data you may have, and returns a redux store. This is also useful for passing settings or config values to bundles that are dynamic as you see with the `cachingBundle` and `googleAnalytics` below:
    > ```js
-   > import { composeBundles, cachingBundle } from "redux-bundler";
-   > import config from "../config";
-   > import user from "/user";
-   > import other from "./other";
-   > import googleAnalytics from "./analytics";
+   > import { composeBundles, cachingBundle } from 'redux-bundler'
+   > import config from '../config'
+   > import user from '/user'
+   > import other from './other'
+   > import googleAnalytics from './analytics'
    >
    > export default composeBundles(
    >   user,
    >   cachingBundle({ version: config.browserCacheVersion }),
    >   other,
-   >   googleAnalytics(config.gaId, "/admin")
-   > );
+   >   googleAnalytics(config.gaId, '/admin')
+   > )
    > ```
 4. data is _always_ read from the store via selectors
 5. selectors should be written to take _the entire_ state as an argument
@@ -220,7 +220,7 @@ These will be bound to dispatch for you and attached to the store. So you can ca
 
 ```js
 const doSomething = value => ({ dispatch }) =>
-  dispatch({ type: "something", payload: value });
+  dispatch({ type: 'something', payload: value })
 ```
 
 Note that unlike standard thunk that uses positional arguments, this passes just one object containing `dispatch`, `getState`, and any other items included by bundles that define `extraArgs`.
