@@ -10,7 +10,9 @@ It lets you compose a larger redux app out what I call "redux bundles" that enca
 
 This isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
 
-There's a ton more that needs to be documented, but i've open sourced a small sample application the source is here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) and it's deployed an running here: [https://redux-bundler.netlify.com/](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
+There's a ton more that needs to be documented, but i've open sourced a small sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) and it's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
+
+File size will vary drastically depending on how much of the included capabilities you add, but as a rough guide the sample application was just thrown together using Parcel. It doesn't do tree-shaking or code-splitting. So it includes the application code, Preact, Redux, Redux-bundler (and all the optional bundles most of which aren't used), a local indexedDB powered caching support in a single JS file that ends up at ~18.5kb min + gzip. Which, although it could be better, is small enough for my tastes and really isn't too bad given that it's a full-fledged set of application tools.
 
 ## A quick example
 
