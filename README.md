@@ -10,7 +10,7 @@ It lets you compose a larger redux app out what I call "redux bundles" that enca
 
 This isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
 
-There's a ton more that needs to be documented, but i've included an example application in the "examples" folder that should get someone up and running if they want to try these concepts out.
+There's a ton more that needs to be documented, but i've open sourced a small sample application the source is here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) and it's deployed an running here: [https://redux-bundler.netlify.com/](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
 
 ## A quick example
 

@@ -1,8 +1,6 @@
 node_modules
 .DS_Store
 npm-debug.log
-.cache
-examples/reactive-data-fetching/dist
 
 # this is built and published not tracked in git
 /index.js

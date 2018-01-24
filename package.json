@@ -47,8 +47,7 @@
     "lint": "standard",
     "prepublish": "npm run lint && npm run build",
     "test": "npm run build && tape test/*.js | tap-spec && standard --fix",
-    "watch": "npm-watch",
-    "build-example-site": "cd examples/reactive-data-fetching && npm i && npm run build && cd ../../"
+    "watch": "npm-watch"
   },
   "standard": {
     "globals": [
