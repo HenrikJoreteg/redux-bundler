@@ -82,6 +82,7 @@ Things to note about the example:
 * if for some reason you make a typo in one of these names of a selector or action creator the mistake will be easy to catch because `connect()` will throw an error if you try to connect something that doesn't exist on the store.
 * There's a single import, instead of three. This is a drastic reduction of boilerplate especially when you're connecting many things (not to mention wasted time resolving require dependencies).
 * There's no need to write a `mapStateToProps` or `mapDispatchToProps` function to pass to `connect()`
+* The `connect()` method here along with a `<Provider />` component for Preact live [in this repo](https://github.com/HenrikJoreteg/redux-bundler-preact). I have not written bindings to React yet, because... well I just haven't. Most of the complexity of getting state deltas etc is already part of redux-bundler so writing those bindings would not be hard, mostly just copying what I did for preact for react.
 
 ## What this enables
 
