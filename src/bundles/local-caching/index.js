@@ -7,7 +7,6 @@ export default (spec) => {
 
   return {
     name: 'localCache',
-    extract: 'persistActions',
     getMiddleware: chunk => {
       const combinedActions = {}
       chunk.rawBundles.forEach(bundle => {

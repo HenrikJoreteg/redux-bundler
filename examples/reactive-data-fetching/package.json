@@ -1,0 +1,24 @@
+{
+  "name": "reactive-data-fetching",
+  "version": "1.0.0",
+  "description": "example showing how to use redux-bundler for data fetching",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel ./src/index.html",
+    "build": "parcel build src/index.html && cp _redirects dist/_redirects"
+  },
+  "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
+  "license": "MIT",
+  "dependencies": {
+    "parcel-bundler": "1.5.0",
+    "preact": "8.2.7",
+    "preact-nav-helper": "1.0.0",
+    "redux-bundler": "16.0.0",
+    "redux-bundler-preact": "1.0.0",
+    "surge": "0.19.0"
+  },
+  "devDependencies": {
+    "babel-preset-env": "1.6.1",
+    "babel-preset-preact": "1.1.0"
+  }
+}

@@ -1,7 +1,11 @@
 {
   "name": "redux-bundler",
+  "description": "Compose a redux store out of smaller bundles of related redux functionality",
   "version": "16.0.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
+  "bugs": {
+    "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
+  },
   "dependencies": {
     "create-selector": "3.0.0",
     "feather-route-matcher": "3.0.0",
@@ -25,15 +29,26 @@
     "index.js",
     "src"
   ],
-  "module": "src/index.js",
+  "homepage": "https://github.com/HenrikJoreteg/redux-bundler",
+  "keywords": [
+    "PWAs",
+    "bundler",
+    "redux"
+  ],
   "license": "MIT",
   "main": "index.js",
+  "module": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HenrikJoreteg/redux-bundler"
+  },
   "scripts": {
-    "lint": "standard",
     "build": "rollup -c > tmp.js && buble tmp.js > index.js && rm tmp.js",
+    "lint": "standard",
     "prepublish": "npm run lint && npm run build",
     "test": "npm run build && tape test/*.js | tap-spec && standard --fix",
-    "watch": "npm-watch"
+    "watch": "npm-watch",
+    "build-example-site": "cd examples/reactive-data-fetching && npm i && npm run build && cd ../../"
   },
   "standard": {
     "globals": [
