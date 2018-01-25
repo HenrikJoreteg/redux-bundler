@@ -242,7 +242,7 @@ If you define this function it should return an object containing items you wish
 
 Commonly this would be used for passing things like api wrappers, configs, etc.
 
-**important**: this function will be called _with the store_. This allows you do do things like create API wrappers that automatically handle authorization failures to trigger redirects, etc.
+**important**: this function will be called _with the store_. This allows you to do things like create API wrappers that automatically handle authorization failures to trigger redirects, etc.
 
 ### `bundle.init(store)`
 
@@ -258,10 +258,8 @@ None of which are added by default, but many of which you'll likely want.
 
 * `urlBundle`: a complete redux-based url solution. It essentially binds the browser URL to redux store state and provides a very complete set of selectors and action creators to give you full control of browser URLs.
 * `createRouteBundle`: a configurable bundle that you provide pass an object of routes to and it returns a bundle with selectors to extract route parameters from the routes you define.
-* `appTimeBundle`: tracks current action cycle as part of state (useful for deterministic action creators)
+* `appTimeBundle`: tracks current app time as part of state, it gets set any time an action is fired. This is useful for writing deterministic action creators and eliminates the need for setting timers throughout the app. They can just tie into "appTime".
 * `asyncCountBundle`: tracks how many outstanding async actions are occurring (by action type naming conventions).
-* `effects`: extracts effects and triggers them. Also triggers an `APP_IDLE` action every 30 seconds if no other action has occurred. This allows for discovery of stale data without user action.
-* `inspectBundle`: Add this bundle last, set `localStorage.debug = true` in your console and it will print out description of your bundle and expose all your selectors, actionCreators and the `store` itself to `window` for easy debugging. Also shows you effects to be triggered based on current state after each action.
 
 ## credits
 
