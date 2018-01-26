@@ -48,7 +48,7 @@ export default {
 
 In this way you group related reducers, selectors, action creators. Redux-bundler then takes bundles like this and combines them all into a store and pre-binds and attaches everything to the _redux store itself_.
 
-For example, simply by naming a function on the exported object `selectIsLoggedIn` redux-bundler when given this bundle with add a method to the store itself that can call without arguments like this: `store.selectIsLoggedIn()` that returns the result of that selector given the current redux state.
+For example, simply by naming a function on the exported object `selectIsLoggedIn` redux-bundler when given this bundle will add a method to the store itself that can be called without arguments like this: `store.selectIsLoggedIn()` that returns the result of that selector given the current redux state.
 
 Similarly, action creators start with `do` and get pre-bound and attached to the store so all you have to do is call `store.doLogin()` to dispatch the action creator on the store.
 
