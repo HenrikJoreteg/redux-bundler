@@ -32,7 +32,7 @@ export default {
 
     return (state = initialState, { type, payload }) => {
       if (type === 'USER_LOGGED_IN') {
-        return Object.assign({}, user, { loggedIn: true, name: payload })
+        return Object.assign({}, { loggedIn: true, name: payload })
       }
       return state
     }
@@ -42,7 +42,7 @@ export default {
     'selectUserState',
     userState => userState.loggedIn
   ),
-  doLogin: () => ({ type: 'USER_LOGGED_IN' })
+  doLogin: name => ({ type: 'USER_LOGGED_IN', payload: name })
 }
 ```
 
@@ -63,7 +63,7 @@ const MyComponent = ({isLoggedIn, doLogin}) => (
       <p>You are logged in!</p>
     )}
     {!isLoggedIn && (
-      <button onClick={doLogin}>Click to log in!</button>
+      <button onClick={() => doLogin('John Doe')}>Click to log in!</button>
     )}
   </div>
 )
