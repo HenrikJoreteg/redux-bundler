@@ -32,7 +32,7 @@ export default {
 
     return (state = initialState, { type, payload }) => {
       if (type === 'USER_LOGGED_IN') {
-        return Object.assign({}, { loggedIn: true, name: payload })
+        return Object.assign({}, state, { loggedIn: true, name: payload })
       }
       return state
     }
