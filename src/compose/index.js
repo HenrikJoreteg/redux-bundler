@@ -99,6 +99,9 @@ const composeBundles = (...bundles) => {
     store.selectAll = () =>
       store.select(Object.keys(store.meta.unboundSelectors))
 
+    // add support for dispatching an action by name
+    store.action = (name, args) => store[name](...args)
+
     // add all the gathered bundle data into the store
     decorateStore(store, firstChunk)
 
