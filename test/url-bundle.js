@@ -7,6 +7,14 @@ test('url-bundle selectors', (t) => {
   const startUrl = 'http://subdomain.something.com:3030/something#hi=there'
   const store = composeBundlesRaw(urlBundle())({url: startUrl})
   t.deepEqual(store.selectUrlRaw(), {url: startUrl, replace: false}, 'returns basic start')
+  // make sure object will be serializable
+  const urlObj = store.selectUrlObject()
+  for (const key in urlObj) {
+    const val = urlObj[key]
+    if (typeof val !== 'string') {
+      t.fail('all object values should be strings')
+    }
+  }
   t.equal(store.selectUrlObject().href, startUrl, 'returns href')
   t.deepEqual(store.selectQueryObject(), {}, 'returns parsed object')
   t.equal(store.selectQueryString(), '', 'returns href')

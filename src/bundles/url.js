@@ -2,8 +2,9 @@ import qs from 'querystringify'
 import { createSelector } from 'create-selector'
 import { HAS_WINDOW } from '../utils'
 
+export const isString = obj => Object.prototype.toString.call(obj) === '[object String]'
 export const isDefined = thing => typeof thing !== 'undefined'
-export const ensureString = input => typeof input === 'string' ? input : qs.stringify(input)
+export const ensureString = input => isString(input) ? input : qs.stringify(input)
 const IPRE = /^[0-9\.]+$/
 export const parseSubdomains = (hostname, getBareHost) => {
   if (IPRE.test(hostname)) return []
@@ -31,12 +32,23 @@ const defaults = {
   actionType: 'UPDATE_URL'
 }
 
+const makeSerializable = (url) => {
+  const result = {}
+  for (const key in url) {
+    const val = url[key]
+    if (isString(val)) {
+      result[key] = val
+    }
+  }
+  return result
+}
+
 export default (opts) => {
   const config = Object.assign({}, defaults, opts)
   const actionType = config.actionType
 
   const selectUrlRaw = state => state[config.name]
-  const selectUrlObject = createSelector(selectUrlRaw, urlState => new URL(urlState.url))
+  const selectUrlObject = createSelector(selectUrlRaw, urlState => makeSerializable(new URL(urlState.url)))
   const selectQueryObject = createSelector(selectUrlObject, urlObj => qs.parse(urlObj.search))
   const selectQueryString = createSelector(selectQueryObject, queryObj => qs.stringify(queryObj))
   const selectPathname = createSelector(selectUrlObject, urlObj => urlObj.pathname)
