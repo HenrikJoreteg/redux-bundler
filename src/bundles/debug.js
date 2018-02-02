@@ -6,7 +6,7 @@ const DISABLE = 'DISABLE_DEBUG'
 
 export default {
   name: 'debug',
-  reducer: (state = HAS_DEBUG_FLAG, {type}) => {
+  reducer: (state = HAS_DEBUG_FLAG, { type }) => {
     if (type === ENABLE) {
       return true
     }
@@ -18,7 +18,7 @@ export default {
   doEnableDebug: () => ({ type: ENABLE }),
   doDisableDebug: () => ({ type: DISABLE }),
   selectIsDebug: state => state.debug,
-  init: (store) => {
+  init: store => {
     if (store.selectIsDebug()) {
       const names = store.meta.chunks[0].bundleNames
       self.store = store
@@ -40,7 +40,12 @@ export default {
       }
 
       store.logBundles = self.logBundles = () => {
-        console.log('%cinstalled bundles:\n  %c%s', colorTitle, black, names.join('\n  '))
+        console.log(
+          '%cinstalled bundles:\n  %c%s',
+          colorTitle,
+          black,
+          names.join('\n  ')
+        )
       }
 
       store.logActionCreators = self.logActionCreators = () => {

@@ -1,7 +1,7 @@
 const changes = {
-  'START': 1,
-  'SUCCESS': -1,
-  'ERROR': -1
+  START: 1,
+  SUCCESS: -1,
+  ERROR: -1
 }
 
 const re = /_(START|SUCCESS|ERROR)$/

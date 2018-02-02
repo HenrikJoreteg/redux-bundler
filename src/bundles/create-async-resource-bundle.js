@@ -2,10 +2,8 @@ import { createSelector } from 'reselect'
 import appTimeBundle from './app-time'
 import onlineBundle from './online'
 
-const createTimeCheckSelector = (timeSelector, age, invert = true) => createSelector(
-  timeSelector,
-  appTimeBundle.selectAppTime,
-  (time, appTime) => {
+const createTimeCheckSelector = (timeSelector, age, invert = true) =>
+  createSelector(timeSelector, appTimeBundle.selectAppTime, (time, appTime) => {
     if (!time) {
       return false
     }
@@ -15,8 +13,7 @@ const createTimeCheckSelector = (timeSelector, age, invert = true) => createSele
     } else {
       return elapsed < age
     }
-  }
-)
+  })
 
 const defaultOpts = {
   name: null,
@@ -28,7 +25,7 @@ const defaultOpts = {
   persist: true
 }
 
-export default (spec) => {
+export default spec => {
   const opts = Object.assign({}, defaultOpts, spec)
   const { name, staleAge, retryAfter, actionBaseType, checkIfOnline } = opts
   const uCaseName = name.charAt(0).toUpperCase() + name.slice(1)
@@ -36,7 +33,9 @@ export default (spec) => {
   if (process.env.NODE_ENV !== 'production') {
     for (const item in opts) {
       if (opts[item] === null) {
-        throw Error(`You must supply an ${item} option when creating a resource bundle`)
+        throw Error(
+          `You must supply an ${item} option when creating a resource bundle`
+        )
       }
     }
   }
@@ -47,13 +46,20 @@ export default (spec) => {
     inputSelector,
     resourceState => resourceState.data
   )
-  const lastSuccessSelector = createSelector(inputSelector, resource => resource.lastSuccess)
+  const lastSuccessSelector = createSelector(
+    inputSelector,
+    resource => resource.lastSuccess
+  )
   const lastErrorSelector = createSelector(
     inputSelector,
     resource => resource.errorTimes.slice(-1)[0] || null
   )
   const isStaleSelector = createTimeCheckSelector(lastSuccessSelector, staleAge)
-  const isWaitingToRetrySelector = createTimeCheckSelector(lastErrorSelector, retryAfter, false)
+  const isWaitingToRetrySelector = createTimeCheckSelector(
+    lastErrorSelector,
+    retryAfter,
+    false
+  )
   const isLoadingSelector = createSelector(
     inputSelector,
     resourceState => resourceState.isLoading
@@ -69,7 +75,14 @@ export default (spec) => {
     dataSelector,
     isStaleSelector,
     onlineBundle.selectIsOnline,
-    (isLoading, failedPermanently, isWaitingToRetry, data, isStale, isOnline) => {
+    (
+      isLoading,
+      failedPermanently,
+      isWaitingToRetry,
+      data,
+      isStale,
+      isOnline
+    ) => {
       if (
         (checkIfOnline && !isOnline) ||
         isLoading ||
@@ -101,22 +114,25 @@ export default (spec) => {
     failedPermanently: false
   }
 
-  const doFetchError = (error) => ({type: actions.ERROR, error})
-  const doMarkAsStale = (error) => ({type: actions.ERROR, error})
-  const doFetchSuccess = (payload) => ({type: actions.SUCCESS, payload})
-  const doFetchData = () => (args) => {
+  const doFetchError = error => ({ type: actions.ERROR, error })
+  const doMarkAsStale = error => ({ type: actions.ERROR, error })
+  const doFetchSuccess = payload => ({ type: actions.SUCCESS, payload })
+  const doFetchData = () => args => {
     const { dispatch } = args
-    dispatch({type: actions.START})
-    return opts.getPromise(args)
-      .then(
-        (payload) => { dispatch(doFetchSuccess(payload)) },
-        (error) => { dispatch(doFetchError(error)) }
-      )
+    dispatch({ type: actions.START })
+    return opts.getPromise(args).then(
+      payload => {
+        dispatch(doFetchSuccess(payload))
+      },
+      error => {
+        dispatch(doFetchError(error))
+      }
+    )
   }
 
   const result = {
     name,
-    reducer: (state = initialState, {type, payload, error, merge}) => {
+    reducer: (state = initialState, { type, payload, error, merge }) => {
       if (type === actions.START) {
         return Object.assign({}, state, { isLoading: true })
       }
@@ -166,7 +182,7 @@ export default (spec) => {
   }
 
   if (opts.persist) {
-    result.persistActions = [ actions.SUCCESS ]
+    result.persistActions = [actions.SUCCESS]
   }
 
   return result

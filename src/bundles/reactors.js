@@ -7,13 +7,14 @@ const defaults = {
   stopWhenTabInactive: true
 }
 
-const ricOptions = {timeout: 500}
-export const getIdleDispatcher = (stopWhenInactive, timeout, fn) => debounce(() => {
-  // the requestAnimationFrame ensures it doesn't run when tab isn't active
-  stopWhenInactive ? raf(() => ric(fn, ricOptions)) : ric(fn, ricOptions)
-}, timeout)
+const ricOptions = { timeout: 500 }
+export const getIdleDispatcher = (stopWhenInactive, timeout, fn) =>
+  debounce(() => {
+    // the requestAnimationFrame ensures it doesn't run when tab isn't active
+    stopWhenInactive ? raf(() => ric(fn, ricOptions)) : ric(fn, ricOptions)
+  }, timeout)
 
-export default (opts) => ({
+export default opts => ({
   name: 'reactors',
   init: store => {
     opts || (opts = {})
@@ -21,19 +22,29 @@ export default (opts) => ({
     const { idleAction, idleTimeout } = opts
     let idleDispatcher
     if (idleTimeout) {
-      idleDispatcher = getIdleDispatcher(opts.stopWhenTabInactive, idleTimeout, () => store.dispatch({type: idleAction}))
+      idleDispatcher = getIdleDispatcher(
+        opts.stopWhenTabInactive,
+        idleTimeout,
+        () => store.dispatch({ type: idleAction })
+      )
     }
 
     if (process.env.NODE_ENV !== 'production') {
       store.meta.reactorNames.forEach(name => {
         if (!store[name]) {
-          throw Error(`Reactor '${name}' not found on the store. Make sure you're defining as selector by that name.`)
+          throw Error(
+            `Reactor '${name}' not found on the store. Make sure you're defining as selector by that name.`
+          )
         }
       })
     }
 
     const cancelIfDone = () => {
-      if (!IS_BROWSER && !store.nextReaction && (!store.selectAsyncActive || !store.selectAsyncActive())) {
+      if (
+        !IS_BROWSER &&
+        !store.nextReaction &&
+        (!store.selectAsyncActive || !store.selectAsyncActive())
+      ) {
         idleDispatcher && idleDispatcher.cancel()
         opts.doneCallback && opts.doneCallback()
       }

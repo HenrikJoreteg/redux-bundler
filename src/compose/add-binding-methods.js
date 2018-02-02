@@ -4,8 +4,8 @@ export default store => {
   store.subscriptions = {
     watchedValues: {}
   }
-  const subscriptions = store.subscriptions.set = new Set()
-  const watchedSelectors = store.subscriptions.watchedSelectors = {}
+  const subscriptions = (store.subscriptions.set = new Set())
+  const watchedSelectors = (store.subscriptions.watchedSelectors = {})
 
   const watch = selectorName => {
     watchedSelectors[selectorName] = (watchedSelectors[selectorName] || 0) + 1
@@ -21,7 +21,9 @@ export default store => {
 
   // add single store subscription for tracking watched changes
   store.subscribe(() => {
-    const newValues = watchedSelectors.all ? store.selectAll() : store.select(Object.keys(watchedSelectors))
+    const newValues = watchedSelectors.all
+      ? store.selectAll()
+      : store.select(Object.keys(watchedSelectors))
     const { watchedValues } = store.subscriptions
 
     // the only diffing in the app happens here
@@ -79,7 +81,10 @@ export default store => {
 
     // make sure starting values are in watched so we can
     // track changes
-    Object.assign(store.subscriptions.watchedValues, isAll ? store.selectAll() : store.select(keys))
+    Object.assign(
+      store.subscriptions.watchedValues,
+      isAll ? store.selectAll() : store.select(keys)
+    )
 
     // return function that can be used to unsubscribe
     return () => {

@@ -2,11 +2,12 @@
 // max age
 import idbKeyVal from 'idb-keyval'
 
-const defaultOpts = {maxAge: Infinity, version: 0, lib: idbKeyVal}
+const defaultOpts = { maxAge: Infinity, version: 0, lib: idbKeyVal }
 
 export const getCachedItem = (key, opts) => {
   const { maxAge, version, lib } = Object.assign({}, defaultOpts, opts)
-  return lib.get(key)
+  return lib
+    .get(key)
     .then(JSON.parse)
     .then(parsed => {
       const age = Date.now() - parsed.time
@@ -25,20 +26,22 @@ export const getCachedItem = (key, opts) => {
 export const getAllCached = spec => {
   const opts = Object.assign({}, defaultOpts, spec)
   let keys
-  return opts.lib.keys()
+  return opts.lib
+    .keys()
     .then(retrievedKeys => {
       keys = retrievedKeys
-      return Promise.all(keys.map(key =>
-        getCachedItem(key, opts)
-          .then(res => res.data)
-      ))
+      return Promise.all(
+        keys.map(key => getCachedItem(key, opts).then(res => res.data))
+      )
     })
-    .then(data => data.reduce((acc, bundleData, index) => {
-      if (bundleData) {
-        acc[keys[index]] = bundleData
-      }
-      return acc
-    }, {}))
+    .then(data =>
+      data.reduce((acc, bundleData, index) => {
+        if (bundleData) {
+          acc[keys[index]] = bundleData
+        }
+        return acc
+      }, {})
+    )
     .catch(() => {})
 }
 
@@ -47,10 +50,14 @@ export const clearAllCached = (opts = defaultOpts) =>
 
 export const cacheItem = (key, data, spec) => {
   const opts = Object.assign({}, defaultOpts, spec)
-  return opts.lib.set(key, JSON.stringify({
-    version: opts.version,
-    time: Date.now(),
-    data: data
-  }))
-  .catch(() => null)
+  return opts.lib
+    .set(
+      key,
+      JSON.stringify({
+        version: opts.version,
+        time: Date.now(),
+        data: data
+      })
+    )
+    .catch(() => null)
 }

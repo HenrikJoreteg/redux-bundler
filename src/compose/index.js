@@ -12,8 +12,7 @@ const bindSelectorsToStore = (store, selectors) => {
   for (const key in selectors) {
     const selector = selectors[key]
     if (!store[key]) {
-      store[key] = () =>
-        selector(store.getState())
+      store[key] = () => selector(store.getState())
     }
   }
 }
@@ -34,7 +33,10 @@ const decorateStore = (store, processed) => {
   meta.chunks.push(processed)
 
   // grab existing unbound (but resolved) selectors, combine with new ones
-  const combinedSelectors = Object.assign(meta.unboundSelectors, processed.selectors)
+  const combinedSelectors = Object.assign(
+    meta.unboundSelectors,
+    processed.selectors
+  )
 
   // run resolver
   resolveSelectors(combinedSelectors)
@@ -52,7 +54,10 @@ const decorateStore = (store, processed) => {
   Object.assign(meta.unboundActionCreators, processed.actionCreators)
 
   // bind and attach only the next action creators to the store
-  Object.assign(store, bindActionCreators(processed.actionCreators, store.dispatch))
+  Object.assign(
+    store,
+    bindActionCreators(processed.actionCreators, store.dispatch)
+  )
 
   // run any new init methods
   processed.initMethods.forEach(fn => fn(store))
@@ -68,24 +73,29 @@ const enableBatchDispatch = reducer => (state, action) => {
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
   const firstChunk = createChunk(bundles)
+
   return data => {
     // actually init our store
     const store = createStore(
       enableBatchDispatch(combineReducers(firstChunk.reducers)),
       data,
-      customApplyMiddleware(...[
-        namedActionMiddleware,
-        thunkMiddleware(firstChunk.extraArgCreators),
-        debugMiddleware,
-        ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
-      ])
+      customApplyMiddleware(
+        ...[
+          namedActionMiddleware,
+          thunkMiddleware(firstChunk.extraArgCreators),
+          debugMiddleware,
+          ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
+        ]
+      )
     )
 
     // upgrade dispatch to take multiple and automatically
     // batch dispatch in that case
     const { dispatch } = store
     store.dispatch = (...actions) =>
-      dispatch(actions.length > 1 ? {type: 'BATCH_ACTIONS', actions} : actions[0])
+      dispatch(
+        actions.length > 1 ? { type: 'BATCH_ACTIONS', actions } : actions[0]
+      )
 
     // get values from an array of selector names
     store.select = selectorNames =>
@@ -111,7 +121,10 @@ const composeBundles = (...bundles) => {
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
       decorateStore(store, createChunk(bundlesToIntegrate))
-      const allReducers = store.meta.chunks.reduce((accum, chunk) => Object.assign(accum, chunk.reducers), {})
+      const allReducers = store.meta.chunks.reduce(
+        (accum, chunk) => Object.assign(accum, chunk.reducers),
+        {}
+      )
       store.replaceReducer(enableBatchDispatch(combineReducers(allReducers)))
     }
 

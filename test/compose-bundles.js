@@ -1,16 +1,16 @@
 const test = require('tape')
 const { composeBundles, composeBundlesRaw, appTimeBundle } = require('../')
 
-test('composeBundles', (t) => {
+test('composeBundles', t => {
   const createStore = composeBundles()
   t.equal(typeof createStore, 'function', 'returns a function')
   t.ok(createStore().getState, 'is a redux store')
   t.end()
 })
 
-test('makes selectors available to thunk actions', (t) => {
+test('makes selectors available to thunk actions', t => {
   const store = composeBundles()()
-  store.dispatch(({dispatch, getState, store: { selectAppTime }}) => {
+  store.dispatch(({ dispatch, getState, store: { selectAppTime } }) => {
     t.ok(getState)
     t.ok(dispatch)
     t.ok(selectAppTime())
@@ -29,7 +29,7 @@ test('composeBundlesRaw', t => {
 
 test('ensure dispatch returns what the thunk function returns', t => {
   const store = composeBundles()()
-  const result = store.dispatch(({dispatch}) => {
+  const result = store.dispatch(({ dispatch }) => {
     return true
   })
   t.equal(result, true, 'should return true')
@@ -47,7 +47,7 @@ test('ensure getExtraArgs has access to store and is available to dispatched fun
     }
   })()
   t.equal(store, passedStore, 'has access to store')
-  store.dispatch((args) => {
+  store.dispatch(args => {
     t.equal(args.extraThing, extraThing, 'is available to dispatched functions')
     t.end()
   })

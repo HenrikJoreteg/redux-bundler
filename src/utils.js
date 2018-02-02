@@ -1,17 +1,21 @@
 let debug = false
-try { debug = !!window.localStorage.debug } catch (e) {}
+try {
+  debug = !!window.localStorage.debug
+} catch (e) {}
 export const HAS_DEBUG_FLAG = debug
 export const HAS_WINDOW = typeof window !== 'undefined'
 export const IS_BROWSER = HAS_WINDOW || typeof self !== 'undefined'
 
-const fallback = (func) => { setTimeout(func, 0) }
-export const raf = IS_BROWSER && self.requestAnimationFrame || fallback
-export const ric = IS_BROWSER && self.requestIdleCallback || fallback
+const fallback = func => {
+  setTimeout(func, 0)
+}
+export const raf = IS_BROWSER ? self.requestAnimationFrame : fallback
+export const ric = IS_BROWSER ? self.requestIdleCallback : fallback
 
 export const startsWith = (string, searchString) =>
   string.substr(0, searchString.length) === searchString
 
-export const flattenExtractedToObject = (extracted) => {
+export const flattenExtractedToObject = extracted => {
   const result = {}
   for (const appName in extracted) {
     Object.assign(result, extracted[appName])
@@ -19,7 +23,7 @@ export const flattenExtractedToObject = (extracted) => {
   return result
 }
 
-export const flattenExtractedToArray = (extracted) => {
+export const flattenExtractedToArray = extracted => {
   let accum = []
   for (const appName in extracted) {
     accum.push(...extracted[appName])
