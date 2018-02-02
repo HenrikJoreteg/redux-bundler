@@ -2,7 +2,12 @@ import debugMiddleware from '../middleware/debug'
 import namedActionMiddleware from '../middleware/named-action'
 import thunkMiddleware from '../middleware/custom-thunk'
 import customApplyMiddleware from '../middleware/custom-apply-middleware'
-import { createStore, combineReducers, bindActionCreators } from 'redux'
+import {
+  createStore,
+  combineReducers,
+  bindActionCreators,
+  compose
+} from 'redux'
 import { resolveSelectors } from 'create-selector'
 import { createChunk } from './consume-bundle'
 import addBindingMethods from './add-binding-methods'
@@ -70,15 +75,17 @@ const enableBatchDispatch = reducer => (state, action) => {
   return reducer(state, action)
 }
 
+const composeEnhancers =
+  typeof __REDUX_DEVTOOLS_EXTENSION_COMPOSE__ !== 'undefined'
+    ? __REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : compose
+
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
   const firstChunk = createChunk(bundles)
 
   return data => {
-    // actually init our store
-    const store = createStore(
-      enableBatchDispatch(combineReducers(firstChunk.reducers)),
-      data,
+    const enhancer = composeEnhancers(
       customApplyMiddleware(
         ...[
           namedActionMiddleware,
@@ -87,6 +94,13 @@ const composeBundles = (...bundles) => {
           ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
         ]
       )
+    )
+
+    // actually init our store
+    const store = createStore(
+      enableBatchDispatch(combineReducers(firstChunk.reducers)),
+      data,
+      enhancer
     )
 
     // upgrade dispatch to take multiple and automatically

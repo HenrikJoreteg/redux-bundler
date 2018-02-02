@@ -61,7 +61,8 @@
     "globals": [
       "window",
       "self",
-      "URL"
+      "URL",
+      "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"
     ]
   },
   "watch": {
