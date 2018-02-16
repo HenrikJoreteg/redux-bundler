@@ -70,6 +70,7 @@ export default opts => ({
           const { nextReaction } = store
           store.activeReactor = null
           store.nextReaction = null
+          if (window.debugState.paused) return
           store.dispatch(nextReaction)
         }, ricOptions)
       }

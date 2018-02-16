@@ -18,8 +18,87 @@ export default {
   doEnableDebug: () => ({ type: ENABLE }),
   doDisableDebug: () => ({ type: DISABLE }),
   selectIsDebug: state => state.debug,
+  getMiddleware: () => 
+    store => next => action => {
+      const isDebug = store.getState().debug
+      const result = next(action)
+    
+      if (isDebug && !window.debugState.paused) {
+        window.debugState.actionHistory.push(action)
+      }
+
+      return result
+    },
   init: store => {
     if (store.selectIsDebug()) {
+      const debugState = window.debugState = {
+        initialData: store.getState(),
+        actionHistory: []
+      }
+      store.pause = () => {
+        if (debugState.paused) return
+        debugState.dispatch = store.dispatch
+        debugState.paused = true
+        store.dispatch = () => {
+          console.log('cannot dispatch APP IS PAUSED')
+        } 
+      }
+      store.goTo = index => {
+        if (!debugState.paused) {
+          store.pause()
+        }
+        debugState.currentIndex = index
+        const relevantHistory = debugState.actionHistory.slice(0, debugState.currentIndex)
+        store.nextReaction = null
+        store.activeReactor = null
+        debugState.dispatch({type: '@@RESET', payload: debugState.initialData})
+        console.clear()
+        relevantHistory.map(action => debugState.dispatch(action))
+        console.log(`STEP ${relevantHistory.length} OF ${debugState.actionHistory.length}`)
+        console.log('app actions are paused')
+      }
+      store.resume = () => {
+        if (!debugState.paused) return
+        store.dispatch = debugState.dispatch
+        debugState.paused = false
+        delete debugState.dispatch
+      }
+
+      const getCurrentIndex = () => {
+        if (!debugState.hasOwnProperty('currentIndex')) {
+          debugState.currentIndex = debugState.actionHistory.length
+        }
+        return debugState.currentIndex
+      }
+
+      store.back = () => {
+        const nextIndex = getCurrentIndex() - 1
+        if (nextIndex < 0) {
+          console.log('cannot go back further')
+          return
+        }
+        store.goTo(nextIndex)
+      }
+      store.forward = () => {
+        const nextIndex = getCurrentIndex() + 1
+        if (!debugState.actionHistory[nextIndex - 1]) {
+          console.log('cannot go forward further')
+          return
+        }
+        store.goTo(nextIndex)
+      }
+      store.replayFromStart = (speed = 1500) => {
+        let length = debugState.actionHistory.length
+        let start = 0
+        const goToNext = () => {
+          if (start <= length) {
+            store.goTo(start++)
+            setTimeout(goToNext, speed)
+          }
+        }
+        goToNext()
+      }
+
       const names = store.meta.chunks[0].bundleNames
       self.store = store
       const actionCreators = []

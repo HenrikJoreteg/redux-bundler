@@ -18,30 +18,37 @@ export default spec => {
         }
       })
 
-      return ({ getState }) => next => action => {
-        const keys = combinedActions[action.type]
-        const res = next(action)
-        const state = getState()
-        if (keys) {
-          if (IS_BROWSER) {
-            ric(() => {
-              Promise.all(
-                keys.map(key =>
-                  opts.cacheFunction(key, state[key], { version: opts.version })
-                )
-              ).then(() => {
-                if (state.debug) {
-                  console.info(
-                    `persisted ${keys.join(', ')} because of action ${
-                      action.type
-                    }`
-                  )
-                }
-              })
-            })
+      return ({ getState }) => {
+        console.warn('FIRST WRAPPER CALLED')
+        return next => {
+          console.warn('SECOND WRAPPER CALLED')
+          return action => {
+            console.warn('THIRD WRAPPER CALLED')
+            const keys = combinedActions[action.type]
+            const res = next(action)
+            const state = getState()
+            if (keys) {
+              if (IS_BROWSER) {
+                ric(() => {
+                  Promise.all(
+                    keys.map(key =>
+                      opts.cacheFunction(key, state[key], { version: opts.version })
+                    )
+                  ).then(() => {
+                    if (state.debug) {
+                      console.info(
+                        `persisted ${keys.join(', ')} because of action ${
+                          action.type
+                        }`
+                      )
+                    }
+                  })
+                })
+              }
+            }
+            return res
           }
         }
-        return res
       }
     }
   }

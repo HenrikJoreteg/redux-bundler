@@ -70,6 +70,13 @@ const enableBatchDispatch = reducer => (state, action) => {
   return reducer(state, action)
 }
 
+const enableReset = reducer => (state, action) => {
+  if (action.type === '@@RESET') {
+    return action.payload
+  }
+  return reducer(state, action)
+}
+
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
   const firstChunk = createChunk(bundles)
@@ -77,7 +84,7 @@ const composeBundles = (...bundles) => {
   return data => {
     // actually init our store
     const store = createStore(
-      enableBatchDispatch(combineReducers(firstChunk.reducers)),
+      enableReset(enableBatchDispatch(combineReducers(firstChunk.reducers))),
       data,
       customApplyMiddleware(
         ...[
