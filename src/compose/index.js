@@ -112,11 +112,11 @@ const composeBundles = (...bundles) => {
     // add support for dispatching an action by name
     store.action = (name, args) => store[name](...args)
 
-    // add all the gathered bundle data into the store
-    decorateStore(store, firstChunk)
-
     // adds support for subscribing to changes from an array of selector strings
     addBindingMethods(store)
+
+    // add all the gathered bundle data into the store
+    decorateStore(store, firstChunk)
 
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
