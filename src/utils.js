@@ -10,7 +10,8 @@ const fallback = func => {
   setTimeout(func, 0)
 }
 export const raf = IS_BROWSER ? self.requestAnimationFrame : fallback
-export const ric = IS_BROWSER ? self.requestIdleCallback : fallback
+export const ric =
+  IS_BROWSER && self.requestIdleCallback ? self.requestIdleCallback : fallback
 
 export const startsWith = (string, searchString) =>
   string.substr(0, searchString.length) === searchString
