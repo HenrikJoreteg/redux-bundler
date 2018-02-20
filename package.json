@@ -41,7 +41,7 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "module": "src/index.js",
+  "module": "index.js",
   "prettier": {
     "semi": false,
     "singleQuote": true
@@ -62,6 +62,9 @@
       "window",
       "self",
       "URL"
+    ],
+    "ignore": [
+      "index.js"
     ]
   },
   "watch": {
