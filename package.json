@@ -31,8 +31,7 @@
     "whatwg-url": "6.3.0"
   },
   "files": [
-    "index.js",
-    "src"
+    "dist"
   ],
   "homepage": "https://github.com/HenrikJoreteg/redux-bundler",
   "keywords": [
@@ -42,8 +41,8 @@
   ],
   "license": "MIT",
   "source": "src/index.js",
-  "main": "dist/index.js",
-  "module": "dist/index.m.js",
+  "main": "dist/redux-bundler.js",
+  "module": "dist/redux-bundler.m.js",
   "prettier": {
     "semi": false,
     "singleQuote": true

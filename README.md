@@ -265,6 +265,7 @@ None of which are added by default, but many of which you'll likely want.
 
 ## changelog
 
+* `17.0.1` - Fix to ensure publishing/mapping to correct build files :facepalm:.
 * `17.0.0` - Switched to build with microbundle. Should address issues #5, #8. No longer pulling in redux-bundler version into build.
 * `16.1.1` - Ensure all output from selectors of included bundles is serializable. `selectUrlObject()` in the url bundle was returning a `URL` object instance. Now it just returns a plain object with all string properties from the URL object. Did this as bug fix release because it was always intended this way. In theory it could could be a breaking change, but odds are miniscule. Only if someone were doing `selectUrlObject` then treating its resulting `searchParams` prop as a `URLSearchParams` object and calling its methods instead of using one of the selectors that already exist for accessing query params.
 * `16.1.0` - Added `.action()` method to store for calling an action creator by name (useful when wanting to proxy all actions to another object, such as a web worker)
