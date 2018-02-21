@@ -1,5 +1,9 @@
 const test = require('tape')
-const { composeBundles, composeBundlesRaw, appTimeBundle } = require('../')
+const {
+  composeBundles,
+  composeBundlesRaw,
+  appTimeBundle
+} = require('../dist/redux-bundler')
 
 test('composeBundles', t => {
   const createStore = composeBundles()

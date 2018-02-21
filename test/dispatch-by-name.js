@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundlesRaw } = require('../')
+const { composeBundlesRaw } = require('../dist/redux-bundler')
 
 test('.action() same as doAction', t => {
   let count = 0

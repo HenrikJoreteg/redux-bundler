@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundles } = require('../')
+const { composeBundles } = require('../dist/redux-bundler')
 
 test('batch dispatch', t => {
   const bundle = {

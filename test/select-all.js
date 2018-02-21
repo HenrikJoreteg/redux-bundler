@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundles } = require('../')
+const { composeBundles } = require('../dist/redux-bundler')
 
 test('selectAll', t => {
   const store = composeBundles()({ url: 'https://example.com' })

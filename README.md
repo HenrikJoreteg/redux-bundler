@@ -14,6 +14,8 @@ There's a ton more that needs to be documented, but i've open sourced a small sa
 
 File size will vary drastically depending on how much of the included capabilities you add, but as a rough guide the sample application was just thrown together using Parcel. It doesn't do tree-shaking or code-splitting. So it includes the application code, Preact, Redux, Redux-bundler (and all the optional bundles most of which aren't used), a local indexedDB powered caching support in a single JS file that ends up at ~18.5kb min + gzip. Which, although it could be better, is small enough for my tastes and really isn't too bad given that it's a full-fledged set of application tools.
 
+Note: this includes its dependencies for simplicity. But this also means you end up with code from redux with the debug blocks `if (process.env.NODE_ENV !== "production")` still present. Build your app with NODE_ENV="production" before minification to strip that out for production. You can use DefinePlugin for webpack (http://stackoverflow.com/questions/30030031), loose-envify (https://github.com/zertosh/loose-envify) for browserify, or rollup-plugin-replace for Rollup (https://github.com/rollup/rollup-plugin-replace) to do this.
+
 ## A quick example
 
 Suppose you want to track some state related to the current user in your app.
@@ -263,6 +265,7 @@ None of which are added by default, but many of which you'll likely want.
 
 ## changelog
 
+* `17.0.0` - Switched to build with microbundle. Should address issues #5, #8. No longer pulling in redux-bundler version into build.
 * `16.1.1` - Ensure all output from selectors of included bundles is serializable. `selectUrlObject()` in the url bundle was returning a `URL` object instance. Now it just returns a plain object with all string properties from the URL object. Did this as bug fix release because it was always intended this way. In theory it could could be a breaking change, but odds are miniscule. Only if someone were doing `selectUrlObject` then treating its resulting `searchParams` prop as a `URLSearchParams` object and calling its methods instead of using one of the selectors that already exist for accessing query params.
 * `16.1.0` - Added `.action()` method to store for calling an action creator by name (useful when wanting to proxy all actions to another object, such as a web worker)
 * `16.0.0` - First public release

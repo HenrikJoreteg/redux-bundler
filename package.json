@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "buble": "0.18.0",
+    "microbundle": "0.4.4",
     "nodemon": "1.10.2",
     "npm-watch": "0.1.6",
     "prettier-standard": "8.0.0",
@@ -40,8 +41,9 @@
     "redux"
   ],
   "license": "MIT",
-  "main": "index.js",
-  "module": "src/index.js",
+  "source": "src/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.m.js",
   "prettier": {
     "semi": false,
     "singleQuote": true
@@ -51,7 +53,7 @@
     "url": "https://github.com/HenrikJoreteg/redux-bundler"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "microbundle -o dist",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
     "test": "npm run build && tape test/*.js | tap-spec && npm run lint",

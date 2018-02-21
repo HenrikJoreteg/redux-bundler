@@ -1,4 +1,4 @@
-import { version } from '../../package.json'
+// import { version } from '../../package.json'
 import { HAS_DEBUG_FLAG } from '../utils'
 
 const ENABLE = 'ENABLE_DEBUG'
@@ -73,7 +73,7 @@ export default {
         }
       }
 
-      console.groupCollapsed('%credux bundler v%s', colorTitle, version)
+      console.groupCollapsed('%credux bundler', colorTitle)
       store.logBundles()
       store.logSelectors()
       store.logReactors()

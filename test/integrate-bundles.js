@@ -5,7 +5,7 @@ const {
   composeBundlesRaw,
   asyncCountBundle,
   appTimeBundle
-} = require('../')
+} = require('../dist/redux-bundler')
 
 test('integrateBundles', t => {
   const store = composeBundlesRaw(appTimeBundle)()

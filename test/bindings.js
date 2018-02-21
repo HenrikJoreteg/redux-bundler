@@ -1,5 +1,5 @@
 const test = require('tape')
-const { composeBundlesRaw } = require('../')
+const { composeBundlesRaw } = require('../dist/redux-bundler')
 const { createSelector } = require('create-selector')
 
 const getStore = composeBundlesRaw(

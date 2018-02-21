@@ -1,5 +1,5 @@
 const test = require('tape')
-const { createAsyncResourceBundle } = require('../')
+const { createAsyncResourceBundle } = require('../dist/redux-bundler')
 
 const getAsyncBundle = result =>
   createAsyncResourceBundle({
