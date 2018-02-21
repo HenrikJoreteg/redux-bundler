@@ -11,6 +11,7 @@ import debug from './bundles/debug'
 import online from './bundles/online'
 export { createSelector, resolveSelectors } from 'create-selector'
 export * from './utils'
+export * from 'redux'
 export * from './bundles/local-caching/cache'
 
 export const appTimeBundle = appTime
