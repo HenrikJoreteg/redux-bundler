@@ -265,6 +265,7 @@ None of which are added by default, but many of which you'll likely want.
 
 ## changelog
 
+* `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
 * `17.1.0` - Export `*` from redux in index.
 * `17.0.1` - Fix to ensure publishing/mapping to correct build files :facepalm:.
 * `17.0.0` - Switched to build with microbundle. Should address issues #5, #8. No longer pulling in redux-bundler version into build.
