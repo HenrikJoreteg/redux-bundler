@@ -5,5 +5,5 @@ export default routes => ({
   name: 'routes',
   selectRouteInfo: createSelector('selectPathname', createRouteMatcher(routes)),
   selectRouteParams: createSelector('selectRouteInfo', ({ params }) => params),
-  selectCurrentComponent: createSelector('selectRouteInfo', ({ page }) => page)
+  selectRoute: createSelector('selectRouteInfo', ({ page }) => page)
 })

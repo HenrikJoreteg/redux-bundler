@@ -109,21 +109,21 @@ This is another one of the chief complaints people have with redux. They eventua
 
 Let's take a step back. Many developers, if using react will use component life-cycle methods like `componentDidMount` to trigger data fetches required by that component. But this sucks for many reasons:
 
-1. You've coupled data fetching arbitrarily to a component, what if another component needs the same data but it hasn't been fetched yet?
-2. What if the component, due to user actions gets removed and immediately added back because the user clicked "back"?
-3. What if you know ahead of time that data is _going_ to be needed by the application, even if it isn't needed yet?
-4. What if it fails and we want to retry a couple of times before we show a "failed" message to the user?
-5. What if you want to show the data you already have, while fetching updated data in the background?
+1.  You've coupled data fetching arbitrarily to a component, what if another component needs the same data but it hasn't been fetched yet?
+2.  What if the component, due to user actions gets removed and immediately added back because the user clicked "back"?
+3.  What if you know ahead of time that data is _going_ to be needed by the application, even if it isn't needed yet?
+4.  What if it fails and we want to retry a couple of times before we show a "failed" message to the user?
+5.  What if you want to show the data you already have, while fetching updated data in the background?
 
 The point I'm trying to make is that coupling data fetches to a component being visible, or even to a certain URL in your app isn't ideal.
 
 What you're really trying to do is define a set of _conditions_ that should lead to a new data fetch. For example you may want to fetch if:
 
-1. Nothing has actually happened but 5 minutes have passed since the last successful fetch.
-2. You don't already have the data
-3. It errored last time you fetched and 15 seconds has passed, but you still have some data that you want to keep showing because it's recent enough.
-4. You've successfully fetched related data first
-5. A user is on any url that includes `/reports` in the pathname.
+1.  Nothing has actually happened but 5 minutes have passed since the last successful fetch.
+2.  You don't already have the data
+3.  It errored last time you fetched and 15 seconds has passed, but you still have some data that you want to keep showing because it's recent enough.
+4.  You've successfully fetched related data first
+5.  A user is on any url that includes `/reports` in the pathname.
 
 Good luck writing that with simple procedural code!
 
@@ -171,33 +171,33 @@ Now I have one unified place to see anything that could cause a redirect in my a
 
 ## Recommended patterns
 
-1. _all_ redux-related functionality should live in a bundle.
-2. just keep a single, flat folder called `bundles` with one bundle per file
-3. make an `index.js` file in `bundles` to export the result of `composeBundles()`, the resulting function takes a single argument which is any locally cached or bootstrapped data you may have, and returns a redux store. This is also useful for passing settings or config values to bundles that are dynamic as you see with the `cachingBundle` and `googleAnalytics` below:
-   > ```js
-   > import { composeBundles, cachingBundle } from 'redux-bundler'
-   > import config from '../config'
-   > import user from '/user'
-   > import other from './other'
-   > import googleAnalytics from './analytics'
-   >
-   > export default composeBundles(
-   >   user,
-   >   cachingBundle({ version: config.browserCacheVersion }),
-   >   other,
-   >   googleAnalytics(config.gaId, '/admin')
-   > )
-   > ```
-4. data is _always_ read from the store via selectors
-5. selectors should be written to take _the entire_ state as an argument
-6. Selectors should be named starting with the word `select` such as `selectAppTime`.
-7. Actions creators should be named starting with the word `do` such as `doLogin`.
+1.  _all_ redux-related functionality should live in a bundle.
+2.  just keep a single, flat folder called `bundles` with one bundle per file
+3.  make an `index.js` file in `bundles` to export the result of `composeBundles()`, the resulting function takes a single argument which is any locally cached or bootstrapped data you may have, and returns a redux store. This is also useful for passing settings or config values to bundles that are dynamic as you see with the `cachingBundle` and `googleAnalytics` below:
+    > ```js
+    > import { composeBundles, cachingBundle } from 'redux-bundler'
+    > import config from '../config'
+    > import user from '/user'
+    > import other from './other'
+    > import googleAnalytics from './analytics'
+    >
+    > export default composeBundles(
+    >   user,
+    >   cachingBundle({ version: config.browserCacheVersion }),
+    >   other,
+    >   googleAnalytics(config.gaId, '/admin')
+    > )
+    > ```
+4.  data is _always_ read from the store via selectors
+5.  selectors should be written to take _the entire_ state as an argument
+6.  Selectors should be named starting with the word `select` such as `selectAppTime`.
+7.  Actions creators should be named starting with the word `do` such as `doLogin`.
 
 ## Included middleware
 
-1. A slightly modified `thunk` middleware. Main difference being that everything is passed as a single argument object and one of the arguments passed is the `store` itself. It passes `{dispatch, store, getState}` plus anything you've explicitly set as extraArgs if any of your bundles define them.
-2. Debug middleware for logging out actions and state with each action. But it also shows you things like the next "reaction" selector that will run.
-3. In order to support the "reactors" pattern where a selector causes an action. It includes a `namedActionMiddleware` that lets you dispatch something that looks like: `{actionCreator: 'doTheThing', args: ['hi']}`. And it will call the right action creator with the arguments you pass. Very likely you'll never use this directly.
+1.  A slightly modified `thunk` middleware. Main difference being that everything is passed as a single argument object and one of the arguments passed is the `store` itself. It passes `{dispatch, store, getState}` plus anything you've explicitly set as extraArgs if any of your bundles define them.
+2.  Debug middleware for logging out actions and state with each action. But it also shows you things like the next "reaction" selector that will run.
+3.  In order to support the "reactors" pattern where a selector causes an action. It includes a `namedActionMiddleware` that lets you dispatch something that looks like: `{actionCreator: 'doTheThing', args: ['hi']}`. And it will call the right action creator with the arguments you pass. Very likely you'll never use this directly.
 
 ## Bundle API
 
@@ -265,6 +265,7 @@ None of which are added by default, but many of which you'll likely want.
 
 ## changelog
 
+* `18.0.0` - Renamed `selectCurrentComponent` -> `selectRoute` in create route bundle.
 * `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
 * `17.1.0` - Export `*` from redux in index.
 * `17.0.1` - Fix to ensure publishing/mapping to correct build files :facepalm:.
