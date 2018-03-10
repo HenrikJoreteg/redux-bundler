@@ -10,12 +10,12 @@
     "create-selector": "4.0.1",
     "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.3.0",
-    "querystringify": "0.0.4",
-    "redux": "3.7.2",
     "microbundle": "0.4.4",
     "nodemon": "1.10.2",
-    "npm-watch": "0.1.6",
     "prettier-standard": "8.0.0",
+    "querystringify": "0.0.4",
+    "redux": "3.7.2",
+    "redux-persist-middleware": "1.0.0",
     "standard": "10.0.3",
     "tap-spec": "4.1.1",
     "tape": "4.6.0",
@@ -46,8 +46,7 @@
     "build": "microbundle",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
-    "test": "npm run build && tape test/*.js | tap-spec && npm run lint",
-    "watch": "npm-watch"
+    "test": "npm run build && tape test/*.js | tap-spec && npm run lint"
   },
   "standard": {
     "globals": [
@@ -55,8 +54,5 @@
       "self",
       "URL"
     ]
-  },
-  "watch": {
-    "test": "{src,test}/**.js"
   }
 }

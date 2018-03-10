@@ -175,15 +175,20 @@ Now I have one unified place to see anything that could cause a redirect in my a
 2.  just keep a single, flat folder called `bundles` with one bundle per file
 3.  make an `index.js` file in `bundles` to export the result of `composeBundles()`, the resulting function takes a single argument which is any locally cached or bootstrapped data you may have, and returns a redux store. This is also useful for passing settings or config values to bundles that are dynamic as you see with the `cachingBundle` and `googleAnalytics` below:
     > ```js
-    > import { composeBundles, cachingBundle } from 'redux-bundler'
+    > import { composeBundles, createCacheBundle } from 'redux-bundler'
     > import config from '../config'
     > import user from '/user'
     > import other from './other'
     > import googleAnalytics from './analytics'
+    > import { getConfiguredCache } from 'money-clip'
+    >
+    > const cache = getConfiguredCache({
+    >   version: config.browserCacheVersion
+    > })
     >
     > export default composeBundles(
     >   user,
-    >   cachingBundle({ version: config.browserCacheVersion }),
+    >   createCacheBundle(cache.set),
     >   other,
     >   googleAnalytics(config.gaId, '/admin')
     > )
@@ -262,9 +267,11 @@ None of which are added by default, but many of which you'll likely want.
 * `createRouteBundle`: a configurable bundle that you provide pass an object of routes to and it returns a bundle with selectors to extract route parameters from the routes you define.
 * `appTimeBundle`: tracks current app time as part of state, it gets set any time an action is fired. This is useful for writing deterministic action creators and eliminates the need for setting timers throughout the app. They can just tie into "appTime".
 * `asyncCountBundle`: tracks how many outstanding async actions are occurring (by action type naming conventions).
+* `createCachingBundle`: a configurable bundle for setting up local caching of data.
 
 ## changelog
 
+* `19.0.0` - Externalized caching lib as its own library called [money-clip](https://github.com/HenrikJoreteg/money-clip) and the caching bundle now uses [redux-persist-middleware](https://github.com/HenrikJoreteg/redux-persist-middleware) to generate it's persistance middleware. Nothing huge changes other than importing caching lib from outside of bundler. I've updated [redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) for sample usage of caching bundle with money-clip. Renamed `cacheBundle` -> `createCacheBundle` since it needs to be configured to be used. Removed unused `npm-watch` dev dependency.
 * `18.0.0` - Renamed `selectCurrentComponent` -> `selectRoute` in create route bundle.
 * `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
 * `17.1.0` - Export `*` from redux in index.
