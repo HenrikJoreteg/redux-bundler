@@ -1,7 +1,7 @@
 {
   "name": "redux-bundler",
   "description": "Compose a redux store out of smaller bundles of related redux functionality",
-  "version": "18.0.0",
+  "version": "19.0.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "bugs": {
     "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
