@@ -271,6 +271,7 @@ None of which are added by default, but many of which you'll likely want.
 
 ## changelog
 
+* `19.0.1` - Minor fix for WebWorkers (updating redux-persist-middleware dep).
 * `19.0.0` - Externalized caching lib as its own library called [money-clip](https://github.com/HenrikJoreteg/money-clip) and the caching bundle now uses [redux-persist-middleware](https://github.com/HenrikJoreteg/redux-persist-middleware) to generate it's persistance middleware. Nothing huge changes other than importing caching lib from outside of bundler. I've updated [redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) for sample usage of caching bundle with money-clip. Renamed `cacheBundle` -> `createCacheBundle` since it needs to be configured to be used. Removed unused `npm-watch` dev dependency.
 * `18.0.0` - Renamed `selectCurrentComponent` -> `selectRoute` in create route bundle.
 * `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
