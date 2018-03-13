@@ -2,7 +2,7 @@
 
 **clarification**: this is not an "asset bundler" like WebPack or Parcel, it's a way to minimize redux boilerplate by defining redux-related functionality into "bundles" and then compose them to create a redux store.
 
-It's no secret that there's a lot of boilerplate when building redux applications. There are some [tips for reducing it in the official documentation](https://redux.js.org/docs/recipes/ReducingBoilerplate.html) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
+It's no secret that there's a lot of boilerplate when building redux applications. There are some [tips for reducing it in the official documentation](https://redux.js.org/recipes/reducing-boilerplate) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
 
 I've been building redux apps for quite some time and some of you may have been introduced to it when I first [blogged about it](https://blog.andyet.com/2015/08/06/what-the-flux-lets-redux/) back in 2015. This library is how I build redux apps, I finally decided to open source it.
 
