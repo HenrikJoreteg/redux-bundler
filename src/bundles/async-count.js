@@ -1,10 +1,10 @@
 const changes = {
-  START: 1,
-  SUCCESS: -1,
-  ERROR: -1
+  STARTED: 1,
+  FINISHED: -1,
+  FAILED: -1
 }
 
-const re = /_(START|SUCCESS|ERROR)$/
+const re = /_(STARTED|FINISHED|FAILED)$/
 
 export default {
   name: 'asyncCount',

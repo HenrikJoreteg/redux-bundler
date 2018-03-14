@@ -1,11 +1,11 @@
 // polyfill URL for node
 global.URL = require('whatwg-url').URL
 const test = require('tape')
-const { composeBundlesRaw, urlBundle } = require('../dist/redux-bundler')
+const { composeBundlesRaw, createUrlBundle } = require('../dist/redux-bundler')
 
 test('url-bundle selectors', t => {
   const startUrl = 'http://subdomain.something.com:3030/something#hi=there'
-  const store = composeBundlesRaw(urlBundle())({ url: startUrl })
+  const store = composeBundlesRaw(createUrlBundle())({ url: startUrl })
   t.deepEqual(
     store.selectUrlRaw(),
     { url: startUrl, replace: false },
@@ -32,7 +32,7 @@ test('url-bundle selectors', t => {
     'get bare domain'
   )
 
-  const store2 = composeBundlesRaw(urlBundle())()
+  const store2 = composeBundlesRaw(createUrlBundle())()
   t.deepEqual(store2.selectUrlRaw(), { url: '/', replace: false })
   t.end()
 })
@@ -41,7 +41,7 @@ test('url-bundle actionCreators', t => {
   const start = 'http://something.com/something'
   let store
   const resetStore = (startUrl = start) => {
-    store = composeBundlesRaw(urlBundle())({ url: startUrl })
+    store = composeBundlesRaw(createUrlBundle())({ url: startUrl })
   }
 
   resetStore()

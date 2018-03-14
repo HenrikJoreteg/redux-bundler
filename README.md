@@ -1,8 +1,23 @@
 # redux-bundler
 
-**clarification**: this is not an "asset bundler" like WebPack or Parcel, it's a way to minimize redux boilerplate by defining redux-related functionality into "bundles" and then compose them to create a redux store.
+A Redux framework for composing a store out of smaller bundles of functionality.
 
-It's no secret that there's a lot of boilerplate when building redux applications. There are some [tips for reducing it in the official documentation](https://redux.js.org/docs/recipes/ReducingBoilerplate.html) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
+1.  Dramatically reduces boilerplate without changing or replacing basic Redux concepts.
+1.  Not a toy project. This is how I build production Redux apps.
+1.  One npm install includes a lot of functionality and still only weighs [9kb total](https://bundlephobia.com/result?p=redux-bundler).
+1.  Designed with PWAs in mind. Pair with [preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete app toolkit in ~14kb (before tree-shaking).
+1.  "Batteries included" approach where you use what you want, and tree-shake out the rest.
+1.  Simplified and more efficient `connect()` for binding to components (available for [React](https://github.com/HenrikJoreteg/redux-bundler-react) and [Preact](https://github.com/HenrikJoreteg/redux-bundler-preact))
+1.  Includes a very lightweight, robust, routing system (optional).
+1.  Supports code-splitting/lazy-loading of Redux bundles.
+1.  Makes re-use of Redux related code between apps really simple; just publish a bundle to npm.
+1.  Can run entirely in a WebWorker using [redux-bundler-worker](https://github.com/HenrikJoreteg/redux-bundler-worker) (complete [example app here](https://github.com/HenrikJoreteg/redux-bundler-worker-example)).
+1.  Supports the "reactor" pattern letting your react to your application state to dispatch other actions. This lets you write a total "honey badger" of an app that can seamlessly recover from errors and tolerate terrible network conditions.
+1.  Full [example-app](https://github.com/HenrikJoreteg/redux-bundler-example) available demonstrating data fetching, clientside caching, routing, etc.
+
+## Motivation
+
+It's no secret that there's a lot of boilerplate when building Redux applications. There are some [tips for reducing it in the official documentation](https://redux.js.org/recipes/ReducingBoilerplate.html) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
 
 I've been building redux apps for quite some time and some of you may have been introduced to it when I first [blogged about it](https://blog.andyet.com/2015/08/06/what-the-flux-lets-redux/) back in 2015. This library is how I build redux apps, I finally decided to open source it.
 
@@ -10,9 +25,7 @@ It lets you compose a larger redux app out what I call "redux bundles" that enca
 
 This isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
 
-There's a ton more that needs to be documented, but i've open sourced a small sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) and it's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
-
-File size will vary drastically depending on how much of the included capabilities you add, but as a rough guide the sample application was just thrown together using Parcel. It doesn't do tree-shaking or code-splitting. So it includes the application code, Preact, Redux, Redux-bundler (and all the optional bundles most of which aren't used), a local indexedDB powered caching support in a single JS file that ends up at ~18.5kb min + gzip. Which, although it could be better, is small enough for my tastes and really isn't too bad given that it's a full-fledged set of application tools.
+There's a ton more that needs to be documented, but the sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) is a good way to see how to build something with it. It's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
 
 Note: redux-bundler includes its dependencies for simplicity to minimize surface are for bugs due to version mismatches. It also exports all the exports from redux. So you can still do stuff like `import { combineReducers } from 'redux-bundler'`. However, this also means you end up with code from redux with the debug blocks `if (process.env.NODE_ENV !== "production")` still present. Build your app with NODE_ENV="production" before minification to strip that out for production. You can use DefinePlugin for webpack (http://stackoverflow.com/questions/30030031), loose-envify (https://github.com/zertosh/loose-envify) for browserify, or rollup-plugin-replace for Rollup (https://github.com/rollup/rollup-plugin-replace) to do this.
 
@@ -263,13 +276,92 @@ This borrows from Django's "batteries included" approach. Where you don't have t
 
 None of which are added by default, but many of which you'll likely want.
 
-* `urlBundle`: a complete redux-based url solution. It essentially binds the browser URL to redux store state and provides a very complete set of selectors and action creators to give you full control of browser URLs.
-* `createRouteBundle`: a configurable bundle that you provide pass an object of routes to and it returns a bundle with selectors to extract route parameters from the routes you define.
-* `appTimeBundle`: tracks current app time as part of state, it gets set any time an action is fired. This is useful for writing deterministic action creators and eliminates the need for setting timers throughout the app. They can just tie into "appTime".
-* `asyncCountBundle`: tracks how many outstanding async actions are occurring (by action type naming conventions).
-* `createCachingBundle`: a configurable bundle for setting up local caching of data.
+### `createUrlBundle([optionsObject])`
 
-## changelog
+A complete redux-based URL solution. It binds the browser URL to Redux store state and provides a very complete
+set of selectors and action creators to give you full control of browser URLs.
+
+Options object:
+
+* `inert`: Boolean whether or not to bind to the browser. If you make it `inert` it will simply maintain state in Redux without trying to update the browser, or listen for `popstate`
+
+Action creators:
+
+* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`.
+  `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
+* `doUpdateQuery(queryString | queryObject, [options])`: can be used to update query string in place. Either pass in new query string or an object. It does a replaceState by default but you can pass `{replace: false}` if you want to do a push.
+* `doUpdateHash(string | object, [options])`: for updating hash value, does a push by default, but can do replace if passed `{replace: true}`.
+
+Selectors:
+
+* `selectUrlRaw()`: returns contents of reducer.
+* `selectUrlObject()`: returns an object like what would come from `new URL()` but as a plain object.
+* `selectQueryObject()`: returns query string as an object
+* `selectQueryString()`: returns query string as a string
+* `selectPathname()`: returns pathname, without hash or query
+* `selectHash()`: returns hash value as string
+* `selectHashObject()`: returns hash value as object (if relevant)
+* `selectHostname()`: returns hostname as string.
+* `selectSubdomains()`: returns array of subdomains, if relevant.
+
+### `createRouteBundle(routesObject)`
+
+Takes an object of routes and returns a bundle with selectors to extract route parameters from the routes.
+
+Example:
+
+```js
+export default createRouteBundle({
+  '/': Home,
+  '/users': UserList,
+  '/users/:userId': UserDetail,
+  '*': NotFound
+})
+```
+
+The valus like `Home`, `UserList`, etc, can be _anything_. Whatever the current route that matches, calling `selectRoute()` will _return whatever that is_. This could be a root component for that "page" in your app. Or it could be an object with a componenet name along with a page title or whatever else you may want to link to that route.
+
+Then in your root component in your appp you'd simply `selectRoute()` to retrieve it. There's
+
+Selectors:
+
+`selectRouteParams()`: returns an object of any route params extracted based on current route and current URL. In the example above `/users/:userId` would return `{userId: 'valueExtractedFromURL'}`.
+`selectRoute()`: returns whatever the value was in the routes object for the current matched route.
+
+### `appTimeBundle`
+
+This simply tracks an `appTime` timestamp that gets set any time an action is fired. This is useful for writing deterministic selectors and eliminates the need for setting timers throughout the app. Any selector that uses `selectAppTime` will get this time as an argument. It's ridiculously tiny at only 5 lines of code, but is a nice pattern. Just be careful to not do expensive work in reaction to this changing, as it changes _with each action_.
+
+### `asyncCountBundle`
+
+This bundle takes no options, simply add it as is. It uses action naming conventions to track how many outstanding async actions are occurring.
+
+It works like this:
+
+If an action contains `STARTED` it increments, if it contains `FINISHED` or `FAILED` it decrements. It adds a single selector to the store called `selectAsyncActive`. This is intended to be used to display a global loading indicator in the app. You may have seen these implemented as a thin colored bar across the top of the UI.
+
+### `createCachingBundle(cachingFunction)` a configurable bundle for setting up local caching of data
+
+This bundle takes a single required option: a function to use to persist data. The function has to take two arguments: the key and the value. The previously mentioned [example app](https://github.com/HenrikJoreteg/redux-bundler-example/blob/master/src/bundles/index.js) shows how to do this using [money-clip](https://github.com/HenrikJoreteg/money-clip).
+
+Once the caching bundle has been added, other bundles can indicate that their contents should be persisted by exporting a `persistActions` array of action types. Any time one of those action types occur, the contents of that bunble's reducer will be persisted lazily. Again, see the example app for usage.
+
+## How to use
+
+## Changelog
+
+* `20.0.0` - Mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
+
+  * Changed all action types to be past-tense (so they don't sound like RPC calls). Action types should describe things that happened, not sound like they're causing things to happen. So in asyncCount instead of `START`, `SUCCESS`, `ERROR` it's now `STARTED`, `FINISHED`, `FAILED`. In URL bundle `UPDATE_URL` -> `URL_UPDATED`. In geolocation bundle `REQUEST_GEOLOCATION_X` -> `GEOLOCATION_REQUEST_X`.
+  * All included bundles that require instantiation with a config are now named `createXBundle` for consistency. This includes `createGeolocationBundle`, `createReactorBundle`, `createCacheBundle`.
+  * Added docs to readme several of the included bundles.
+  * Significant changes to `createAsyncResourceBundle`:
+    * `actionBaseType` is now the noun, such as `USER`, from this we build `FETCH_USER_STARTED`, `USER_EXPIRED`, etc.
+    * `doMarkXAsStale` is now `doMarkXAsOutdated`.
+    * Action type names updated to be past tense: `MAKE_STALE` -> `X_INVALIDATED`
+    * Added `doClearX` action creator and reducer case.
+    * Now takes 3 time-related settings: `staleAfter`, `retryAfter`, and `expireAfter`.
+    * Support for `expireAfter` was added, the `X_EXPIRED` action will be dispatched clearing the state.
 
 * `19.0.1` - Minor fix for WebWorkers (updating redux-persist-middleware dep).
 * `19.0.0` - Externalized caching lib as its own library called [money-clip](https://github.com/HenrikJoreteg/money-clip) and the caching bundle now uses [redux-persist-middleware](https://github.com/HenrikJoreteg/redux-persist-middleware) to generate it's persistance middleware. Nothing huge changes other than importing caching lib from outside of bundler. I've updated [redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) for sample usage of caching bundle with money-clip. Renamed `cacheBundle` -> `createCacheBundle` since it needs to be configured to be used. Removed unused `npm-watch` dev dependency.

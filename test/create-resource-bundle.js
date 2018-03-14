@@ -1,19 +1,29 @@
 const test = require('tape')
-const { createAsyncResourceBundle } = require('../dist/redux-bundler')
+const {
+  createSelector,
+  createAsyncResourceBundle,
+  createReactorBundle,
+  composeBundlesRaw,
+  onlineBundle
+} = require('../dist/redux-bundler')
 
-const getAsyncBundle = result =>
-  createAsyncResourceBundle({
-    name: 'user',
-    actionBaseType: 'FETCH_USER',
-    getPromise: () =>
-      new Promise((resolve, reject) => {
-        if (result instanceof Error) {
-          reject(result)
-        } else {
-          resolve(result)
-        }
-      })
-  })
+const getAsyncBundleStore = result =>
+  composeBundlesRaw(
+    {
+      name: 'appTime',
+      reducer: (state = Date.now()) => state,
+      selectAppTime: state => state.appTime
+    },
+    onlineBundle,
+    createAsyncResourceBundle({
+      name: 'user',
+      actionBaseType: 'USER',
+      getPromise: () =>
+        result instanceof Error
+          ? Promise.reject(result)
+          : Promise.resolve(result)
+    })
+  )
 
 const getDispatchStub = (t, expected) => {
   let count = 0
@@ -28,27 +38,21 @@ const getDispatchStub = (t, expected) => {
 }
 
 test('createAsyncResourceBundle basics', t => {
-  const bundle = getAsyncBundle({ name: 'henrik' })
-  t.equal(bundle.name, 'user', 'creates a named bundle')
-  t.ok(bundle.selectUserShouldUpdate, 'creates a should update selector')
-  t.ok(bundle.doFetchUser, 'creates an action creator for fetching')
+  const store = getAsyncBundleStore({ name: 'henrik' })()
+  t.ok(store.selectUserShouldUpdate, 'creates a should update selector')
+  t.ok(store.doFetchUser, 'creates an action creator for fetching')
   t.end()
 })
 
 test('createAsyncResourceBundle action creator success dispatches', t => {
-  const bundle = getAsyncBundle({ name: 'henrik' })
-  const thunk = bundle.doFetchUser()
-  t.ok(
-    thunk({ dispatch: () => {} }).then,
-    'calling the thunk will return a promise'
-  )
+  const store = getAsyncBundleStore({ name: 'henrik' })()
+  store.dispatch = getDispatchStub(t, [
+    { type: 'FETCH_USER_STARTED' },
+    { type: 'FETCH_USER_FINISHED', payload: { name: 'henrik' } }
+  ])
 
-  thunk({
-    dispatch: getDispatchStub(t, [
-      { type: 'FETCH_USER_START' },
-      { type: 'FETCH_USER_SUCCESS', payload: { name: 'henrik' } }
-    ])
-  })
+  const promise = store.doFetchUser()
+  t.ok(promise.then, 'calling the thunk will return a promise')
 
   // this will allow second dispatch to occur
   setTimeout(() => {
@@ -58,19 +62,14 @@ test('createAsyncResourceBundle action creator success dispatches', t => {
 
 test('createAsyncResourceBundle action creator error dispatches', t => {
   const err = new Error('boom')
-  const bundle = getAsyncBundle(err)
-  const thunk = bundle.doFetchUser()
-  t.ok(
-    thunk({ dispatch: () => {} }).then,
-    'calling the thunk will return a promise'
-  )
+  const store = getAsyncBundleStore(err)()
 
-  thunk({
-    dispatch: getDispatchStub(t, [
-      { type: 'FETCH_USER_START' },
-      { type: 'FETCH_USER_ERROR', error: err }
-    ])
-  })
+  store.dispatch = getDispatchStub(t, [
+    { type: 'FETCH_USER_STARTED' },
+    { type: 'FETCH_USER_FAILED', error: err }
+  ])
+
+  store.doFetchUser()
 
   // this will allow second dispatch to occur
   setTimeout(() => {
@@ -78,29 +77,160 @@ test('createAsyncResourceBundle action creator error dispatches', t => {
   }, 0)
 })
 
-test('createAsyncResourceBundle handles waiting when errored properly', t => {
+test('createAsyncResourceBundle handles waiting when failed properly', t => {
   const err = new Error('boom')
-  const bundle = getAsyncBundle(err)
+  let store = getAsyncBundleStore(err)({ user: { errorTimes: [12, 25] } })
+  t.equal(store.selectUserLastError(), 25, 'plucks out last error')
+
+  store = getAsyncBundleStore(err)({
+    appTime: 600000,
+    user: { errorTimes: [950, 999] }
+  })
   t.equal(
-    bundle.selectUserLastError({ user: { errorTimes: [12, 25] } }),
-    25,
-    'plucks out last error'
-  )
-  t.equal(
-    bundle.selectUserIsWaitingToRetry({
-      appTime: 26,
-      user: { errorTimes: [12, 25] }
-    }),
-    true,
+    store.selectUserIsWaitingToRetry(),
+    false,
     'is waiting to retry if within time'
   )
+  store = getAsyncBundleStore(err)({
+    appTime: 1000,
+    user: { errorTimes: [950, 999] }
+  })
+
   t.equal(
-    bundle.selectUserIsWaitingToRetry({
-      appTime: 60004,
-      user: { errorTimes: [1, 2] }
-    }),
-    false,
+    store.selectUserIsWaitingToRetry(),
+    true,
     'is not waiting to retry if error has passed'
   )
   t.end()
+})
+
+test('createAsyncResourceBundle doClear', t => {
+  let store = getAsyncBundleStore({ name: 'henrik' })()
+
+  t.deepEqual(store.selectUser(), null)
+  store.doFetchUser()
+  setTimeout(() => {
+    t.deepEqual(store.selectUser(), { name: 'henrik' })
+    store.doClearUser()
+    t.deepEqual(store.selectUser(), null)
+    t.end()
+  }, 0)
+})
+
+test('createAsyncResourceBundle expireAfter support', t => {
+  // setup a bundle
+  const bundle = createAsyncResourceBundle({
+    name: 'user',
+    actionBaseType: 'USER',
+    expireAfter: 200,
+    getPromise: () => Promise.resolve({ name: 'henrik' })
+  })
+  bundle.reactShouldFetch = createSelector(
+    bundle.selectUserShouldUpdate,
+    shouldUpdate => {
+      if (shouldUpdate) {
+        return { actionCreator: 'doFetchUser' }
+      }
+    }
+  )
+  // use the bundle with modified appTime bundle
+  // to let us pass in a start time.
+  const createStore = composeBundlesRaw(
+    {
+      name: 'appTime',
+      reducer: (state = Date.now()) => state,
+      selectAppTime: state => state.appTime
+    },
+    onlineBundle,
+    createReactorBundle({ idleTimeout: 200 }),
+    bundle
+  )
+  // create an instance
+  const store = createStore()
+
+  // make sure it start out empty
+  t.deepEqual(store.selectUser(), null, 'user is null to start')
+
+  // give it time for the reactor to trigger
+  setTimeout(() => {
+    // should now have retrieved a user
+    t.deepEqual(
+      store.selectUser(),
+      { name: 'henrik' },
+      'use has now been fetched'
+    )
+
+    // grab populated state
+    const state = store.getState()
+
+    state.appTime = Date.now() + 100
+    const newStore = createStore(state)
+
+    const dispatch = newStore.dispatch
+
+    let count = 0
+    newStore.dispatch = arg => {
+      count++
+
+      if (count === 1) {
+        t.deepEqual(arg, { type: 'USER_EXPIRED' }, 'should dispatch expired')
+        // do actual dispatch
+        dispatch(arg)
+        t.equal(
+          newStore.selectUserIsExpired(),
+          true,
+          'expired selector returns true'
+        )
+        return
+      }
+      if (count === 2) {
+        t.deepEqual(
+          arg,
+          { actionCreator: 'doFetchUser' },
+          'should have triggered refetch'
+        )
+        dispatch(arg)
+        t.equal(
+          newStore.selectUserIsExpired(),
+          true,
+          'expired selector still returns true'
+        )
+        return
+      }
+      if (count === 3) {
+        t.deepEqual(
+          arg,
+          { type: 'FETCH_USER_STARTED' },
+          'should trigger refetch'
+        )
+        dispatch(arg)
+        t.equal(
+          newStore.selectUserIsExpired(),
+          true,
+          'expired selector still returns true'
+        )
+        return
+      }
+      if (count === 4) {
+        t.deepEqual(
+          arg,
+          { type: 'FETCH_USER_FINISHED', payload: { name: 'henrik' } },
+          'fetch finished'
+        )
+        dispatch(arg)
+        t.equal(
+          newStore.selectUserIsExpired(),
+          false,
+          'expired selector still returns false'
+        )
+        t.end()
+        return
+      }
+
+      t.fail('should never get here')
+    }
+
+    // wait
+    setTimeout(() => {}, 0)
+  }, 200)
 })

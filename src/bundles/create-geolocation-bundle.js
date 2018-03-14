@@ -26,7 +26,7 @@ export default spec => {
   const opts = Object.assign({}, defaultOpts, spec)
   return createAsyncResourceBundle({
     name: 'geolocation',
-    actionBaseType: 'REQUEST_GEOLOCATION',
+    actionBaseType: 'GEOLOCATION_REQUEST',
     getPromise: () =>
       new Promise((resolve, reject) => {
         if (!IS_BROWSER || !navigator.geolocation) {

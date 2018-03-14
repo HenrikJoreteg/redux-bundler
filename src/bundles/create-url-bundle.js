@@ -31,7 +31,7 @@ const loc = (() => {
 const defaults = {
   name: 'url',
   inert: !HAS_WINDOW,
-  actionType: 'UPDATE_URL'
+  actionType: 'URL_UPDATED'
 }
 
 const makeSerializable = url => {

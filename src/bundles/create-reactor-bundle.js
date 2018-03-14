@@ -14,11 +14,10 @@ export const getIdleDispatcher = (stopWhenInactive, timeout, fn) =>
     stopWhenInactive ? raf(() => ric(fn, ricOptions)) : ric(fn, ricOptions)
   }, timeout)
 
-export default opts => ({
+export default spec => ({
   name: 'reactors',
   init: store => {
-    opts || (opts = {})
-    Object.assign(opts, defaults)
+    const opts = Object.assign({}, defaults, spec)
     const { idleAction, idleTimeout } = opts
     let idleDispatcher
     if (idleTimeout) {

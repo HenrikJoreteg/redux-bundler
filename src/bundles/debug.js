@@ -1,8 +1,8 @@
 // import { version } from '../../package.json'
 import { HAS_DEBUG_FLAG } from '../utils'
 
-const ENABLE = 'ENABLE_DEBUG'
-const DISABLE = 'DISABLE_DEBUG'
+const ENABLE = 'DEBUG_ENABLED'
+const DISABLE = 'DEBUG_DISABLED'
 
 export default {
   name: 'debug',

@@ -1,33 +1,26 @@
-import { createSelector } from 'reselect'
-import appTimeBundle from './app-time'
-import onlineBundle from './online'
-
-const createTimeCheckSelector = (timeSelector, age, invert = true) =>
-  createSelector(timeSelector, appTimeBundle.selectAppTime, (time, appTime) => {
-    if (!time) {
-      return false
-    }
-    const elapsed = appTime - time
-    if (invert) {
-      return elapsed > age
-    } else {
-      return elapsed < age
-    }
-  })
+import { createSelector } from 'create-selector'
 
 const defaultOpts = {
   name: null,
   getPromise: null,
   actionBaseType: null,
-  staleAge: 900000, // fifteen minutes
+  staleAfter: 900000, // fifteen minutes
   retryAfter: 60000, // one minute,
+  expireAfter: Infinity,
   checkIfOnline: true,
   persist: true
 }
 
 export default spec => {
   const opts = Object.assign({}, defaultOpts, spec)
-  const { name, staleAge, retryAfter, actionBaseType, checkIfOnline } = opts
+  const {
+    name,
+    staleAfter,
+    retryAfter,
+    actionBaseType,
+    checkIfOnline,
+    expireAfter
+  } = opts
   const uCaseName = name.charAt(0).toUpperCase() + name.slice(1)
 
   if (process.env.NODE_ENV !== 'production') {
@@ -42,23 +35,36 @@ export default spec => {
 
   // build selectors
   const inputSelector = state => state[name]
-  const dataSelector = createSelector(
-    inputSelector,
-    resourceState => resourceState.data
-  )
-  const lastSuccessSelector = createSelector(
-    inputSelector,
-    resource => resource.lastSuccess
-  )
+  const dataSelector = state => state[name].data
+  const lastSuccessSelector = state => state[name].lastSuccess
+  const isExpiredSelector = state => state[name].isExpired
   const lastErrorSelector = createSelector(
     inputSelector,
     resource => resource.errorTimes.slice(-1)[0] || null
   )
-  const isStaleSelector = createTimeCheckSelector(lastSuccessSelector, staleAge)
-  const isWaitingToRetrySelector = createTimeCheckSelector(
+  const isStaleSelector = createSelector(
+    inputSelector,
+    lastSuccessSelector,
+    'selectAppTime',
+    (state, time, appTime) => {
+      if (state.isOutdated) {
+        return true
+      }
+      if (!time) {
+        return false
+      }
+      return appTime - time > staleAfter
+    }
+  )
+  const isWaitingToRetrySelector = createSelector(
     lastErrorSelector,
-    retryAfter,
-    false
+    'selectAppTime',
+    (time, appTime) => {
+      if (!time) {
+        return false
+      }
+      return appTime - time < retryAfter
+    }
   )
   const isLoadingSelector = createSelector(
     inputSelector,
@@ -74,7 +80,7 @@ export default spec => {
     isWaitingToRetrySelector,
     dataSelector,
     isStaleSelector,
-    onlineBundle.selectIsOnline,
+    'selectIsOnline',
     (
       isLoading,
       failedPermanently,
@@ -98,28 +104,25 @@ export default spec => {
     }
   )
 
+  // action types
   const actions = {
-    START: `${actionBaseType}_START`,
-    SUCCESS: `${actionBaseType}_SUCCESS`,
-    ERROR: `${actionBaseType}_ERROR`,
-    MAKE_STALE: `${actionBaseType}_MAKE_STALE`
+    STARTED: `FETCH_${actionBaseType}_STARTED`,
+    FINISHED: `FETCH_${actionBaseType}_FINISHED`,
+    FAILED: `FETCH_${actionBaseType}_FAILED`,
+    CLEARED: `${actionBaseType}_CLEARED`,
+    OUTDATED: `${actionBaseType}_OUTDATED`,
+    EXPIRED: `${actionBaseType}_EXPIRED`
   }
 
-  const initialState = {
-    isLoading: false,
-    data: null,
-    errorTimes: [],
-    lastSuccess: null,
-    stale: false,
-    failedPermanently: false
-  }
-
-  const doFetchError = error => ({ type: actions.ERROR, error })
-  const doMarkAsStale = error => ({ type: actions.ERROR, error })
-  const doFetchSuccess = payload => ({ type: actions.SUCCESS, payload })
+  // action creators
+  const doFetchError = error => ({ type: actions.FAILED, error })
+  const doMarkAsOutdated = () => ({ type: actions.OUTDATED })
+  const doClear = () => ({ type: actions.CLEARED })
+  const doExpire = () => ({ type: actions.EXPIRED })
+  const doFetchSuccess = payload => ({ type: actions.FINISHED, payload })
   const doFetchData = () => args => {
     const { dispatch } = args
-    dispatch({ type: actions.START })
+    dispatch({ type: actions.STARTED })
     return opts.getPromise(args).then(
       payload => {
         dispatch(doFetchSuccess(payload))
@@ -130,13 +133,24 @@ export default spec => {
     )
   }
 
+  const initialState = {
+    data: null,
+    errorTimes: [],
+    errorType: null,
+    lastSuccess: null,
+    isOutdated: false,
+    isLoading: false,
+    isExpired: false,
+    failedPermanently: false
+  }
+
   const result = {
     name,
     reducer: (state = initialState, { type, payload, error, merge }) => {
-      if (type === actions.START) {
+      if (type === actions.STARTED) {
         return Object.assign({}, state, { isLoading: true })
       }
-      if (type === actions.SUCCESS) {
+      if (type === actions.FINISHED) {
         let updatedData
         if (merge) {
           updatedData = Object.assign({}, state.data, payload)
@@ -148,28 +162,40 @@ export default spec => {
           data: updatedData,
           lastSuccess: Date.now(),
           errorTimes: [],
+          errorType: null,
           failedPermanently: false,
-          stale: false
+          isOutdated: false,
+          isExpired: false
         })
       }
-      if (type === actions.ERROR) {
+      if (type === actions.FAILED) {
+        const errorMessage = (error && error.message) || error
         return Object.assign({}, state, {
           isLoading: false,
           errorTimes: state.errorTimes.concat([Date.now()]),
+          errorType: errorMessage,
           failedPermanently: !!(error && error.permanent)
         })
       }
-      if (type === actions.MAKE_STALE) {
-        return Object.assign({}, state, {
-          errorTimes: [],
-          stale: true
+      if (type === actions.CLEARED) {
+        return initialState
+      }
+      if (type === actions.EXPIRED) {
+        return Object.assign({}, initialState, {
+          isExpired: true,
+          errorTimes: state.errorTimes,
+          errorType: state.errorType
         })
+      }
+      if (type === actions.OUTDATED) {
+        return Object.assign({}, state, { isOutdated: true })
       }
       return state
     },
     [`select${uCaseName}Raw`]: inputSelector,
     [`select${uCaseName}`]: dataSelector,
     [`select${uCaseName}IsStale`]: isStaleSelector,
+    [`select${uCaseName}IsExpired`]: isExpiredSelector,
     [`select${uCaseName}LastError`]: lastErrorSelector,
     [`select${uCaseName}IsWaitingToRetry`]: isWaitingToRetrySelector,
     [`select${uCaseName}IsLoading`]: isLoadingSelector,
@@ -178,11 +204,33 @@ export default spec => {
     [`doFetch${uCaseName}`]: doFetchData,
     [`doFetch${uCaseName}Success`]: doFetchSuccess,
     [`doFetch${uCaseName}Error`]: doFetchError,
-    [`doMark${uCaseName}AsStale`]: doMarkAsStale
+    [`doMark${uCaseName}AsOutdated`]: doMarkAsOutdated,
+    [`doClear${uCaseName}`]: doClear,
+    [`doExpire${uCaseName}`]: doExpire
   }
 
   if (opts.persist) {
-    result.persistActions = [actions.SUCCESS]
+    result.persistActions = [
+      actions.FINISHED,
+      actions.EXPIRED,
+      actions.OUTDATED,
+      actions.CLEARED
+    ]
+  }
+
+  if (expireAfter !== Infinity) {
+    result[`reactExpire${uCaseName}`] = createSelector(
+      lastSuccessSelector,
+      'selectAppTime',
+      (time, appTime) => {
+        if (!time) {
+          return false
+        }
+        if (appTime - time > expireAfter) {
+          return doExpire()
+        }
+      }
+    )
   }
 
   return result
