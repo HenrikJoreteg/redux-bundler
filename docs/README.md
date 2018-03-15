@@ -1,13 +1,15 @@
 # Redux Bundler <iframe src="https://ghbtns.com/github-btn.html?user=henrikjoreteg&repo=redux-bundler&type=star&count=true" frameborder="0" style="" scrolling="0" width="160px" height="20px"></iframe>
 
-A Redux framework for composing a store out of smaller bundles of functionality.
+Featherweight Redux-based toolkit for managing state for Progressive Web Apps.
+
+Pair it with [Preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete PWA toolkit in ~14kb!
 
 Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
+1.  Group redux-related code by functionality and compose into a store.
 1.  Dramatically reduces boilerplate without changing or replacing basic Redux concepts.
 1.  Not a toy project. This is how I build production Redux apps. It was extracted from real apps where it was used to solve real use cases.
 1.  `npm install redux-bundler` includes a lot of functionality and still only weighs [9kb total](https://bundlephobia.com/result?p=redux-bundler) before tree-shaking (could be much less if you don't use everything).
-1.  Designed for fast, light PWAs. Pair it with [preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete app toolkit in ~14kb (before tree-shaking).
 1.  "Batteries included" approach where you use what you want, and tree-shake out the rest.
 1.  Simplified and more efficient `connect()` for binding to components (available for [React](https://github.com/HenrikJoreteg/redux-bundler-react) and [Preact](https://github.com/HenrikJoreteg/redux-bundler-preact))
 1.  Includes a very lightweight, robust, routing system (optional).

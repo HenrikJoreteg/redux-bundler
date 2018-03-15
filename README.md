@@ -1,5 +1,5 @@
 # redux-bundler
 
-A Redux framework for composing a store out of smaller bundles of functionality.
+Featherweight Redux-based toolkit for managing state for Progressive Web Apps.
 
 Docs: https://reduxbundler.com
