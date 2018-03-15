@@ -2,7 +2,7 @@
 
 Redux-bundler includes a few middlewares by default:
 
-## Slightly modified `thunk`
+## Slightly modified `redux-thunk`
 
 Works like `redux-thunk` except that everything is passed as a single argument and since all our selectors and action creators are attached to the store instance we also pass the store itself, plus anything bundles may have added by using `getExtraArgs`. So it ends up passing something like this as an argument `{dispatch, store, getState, ...extraArgs}` to your thunk function.
 
@@ -21,11 +21,11 @@ export const doCoolStuff = () => ({ dispatch, myApiWrapper }) => {
 }
 ```
 
-## Debug middleware
+## Debug Middleware
 
 If you're using the `debugBundle` it will also add some logging middleware that logs actions and state with each action and shows you the next reactor that will be dispatched.
 
-## Named action middleware
+## Named Action Middleware
 
 The bundle created by `createReactorBundle` will also inject middleware that allows you to dispatch an object that names the action creator to be used and optionally the arguments to pass to it.
 

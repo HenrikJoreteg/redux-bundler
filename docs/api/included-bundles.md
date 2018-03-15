@@ -117,7 +117,7 @@ It works like this:
 
 If an action contains `STARTED` it increments, if it contains `FINISHED` or `FAILED` it decrements. It adds a single selector to the store called `selectAsyncActive`. This is intended to be used to display a global loading indicator in the app. You may have seen these implemented as a thin colored bar across the top of the UI.
 
-## `createCachingBundle(cachingFunction)`
+## `createCacheBundle(cachingFunction)`
 
 Adds support for local caching of bundle data to the app. Other bundle can declare caching when this has been added to the app.
 

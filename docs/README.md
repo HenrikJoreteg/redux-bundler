@@ -1,6 +1,8 @@
 # Redux Bundler Documentation
 
-A Redux framework for composing a store out of smaller bundles of functionality. Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
+A Redux framework for composing a store out of smaller bundles of functionality.
+
+Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
 1.  Dramatically reduces boilerplate without changing or replacing basic Redux concepts.
 1.  Not a toy project. This is how I build production Redux apps. It was extracted from real apps where it was used to solve real use cases.
