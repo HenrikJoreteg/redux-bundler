@@ -15,7 +15,7 @@ test('integrateBundles', t => {
   t.ok(store.selectAppTime, 'old selector is still there')
   t.ok(store.selectAppTime(), 'old selector works')
   t.ok(store.selectAsyncActive, 'has new selector now too')
-  t.ok(store.selectAsyncActive, 'new selector works')
+  t.equal(store.selectAsyncActive(), false, 'new selector works')
   t.end()
 })
 
@@ -104,6 +104,7 @@ test('resolves selectors appropriately', t => {
 
   const testBundle1 = {
     name: 'thing',
+    reducer: (state = null) => state,
     selectSomething: createSelector(thingIdentifySelector, id => id)
   }
 

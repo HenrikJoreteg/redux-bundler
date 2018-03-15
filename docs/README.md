@@ -1,11 +1,11 @@
-# redux-bundler
+# Redux Bundler Documentation
 
 A Redux framework for composing a store out of smaller bundles of functionality. Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
 1.  Dramatically reduces boilerplate without changing or replacing basic Redux concepts.
 1.  Not a toy project. This is how I build production Redux apps. It was extracted from real apps where it was used to solve real use cases.
-1.  One npm install includes a lot of functionality and still only weighs [9kb total](https://bundlephobia.com/result?p=redux-bundler) before tree-shaking. It could be a lot less if you don't use everything.
-1.  Designed with PWAs in mind. Pair with [preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete app toolkit in ~14kb (before tree-shaking).
+1.  `npm install redux-bundler` includes a lot of functionality and still only weighs [9kb total](https://bundlephobia.com/result?p=redux-bundler) before tree-shaking (could be much less if you don't use everything).
+1.  Designed for fast, light PWAs. Pair it with [preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete app toolkit in ~14kb (before tree-shaking).
 1.  "Batteries included" approach where you use what you want, and tree-shake out the rest.
 1.  Simplified and more efficient `connect()` for binding to components (available for [React](https://github.com/HenrikJoreteg/redux-bundler-react) and [Preact](https://github.com/HenrikJoreteg/redux-bundler-preact))
 1.  Includes a very lightweight, robust, routing system (optional).
@@ -71,22 +71,19 @@ The thing is, rather than importing selectors, constants, and binding action cre
 
 ```js
 import { connect } from 'redux-bundler-preact'
+import { h } from 'preact'
 
-const MyComponent = ({isLoggedIn, doLogin}) => (
-  <div>
-    {isLoggedIn && (
-      <p>You are logged in!</p>
-    )}
-    {!isLoggedIn && (
-      <button onClick={() => doLogin('John Doe')}>Click to log in!</button>
-    )}
-  </div>
-)
-
-export const connect(
+export default connect(
   'doLogin',
   'selectIsLoggedIn',
-  MyComponent
+  ({ isLoggedIn, doLogin }) => (
+    <div>
+      {isLoggedIn && <p>You are logged in!</p>}
+      {!isLoggedIn && (
+        <button onClick={() => doLogin('John Doe')}>Click to log in!</button>
+      )}
+    </div>
+  )
 )
 ```
 
@@ -94,7 +91,7 @@ Things to note about the example:
 
 * `selectIsLoggedIn` selects and passes a prop named `isLoggedIn` (not `SelectIsLoggedIn` because that'd be weird).
 * `doLogin` doesn't need to be bound to the store in any way, because it was already pre-bound when it was attached to the store so the function passed as a prop is already ready to use and it will just do what you'd expect.
-* if for some reason you make a typo in one of these names of a selector or action creator the mistake will be easy to catch because `connect()` will throw an error if you try to connect something that doesn't exist on the store.
+* If for some reason you make a typo in one of these names of a selector or action creator the mistake will be easy to catch because `connect()` will throw an error if you try to connect something that doesn't exist on the store.
 * There's a single import, instead of three. This is a drastic reduction of boilerplate especially when you're connecting many things (not to mention wasted time resolving require dependencies).
 * There's no need to write a `mapStateToProps` or `mapDispatchToProps` function to pass to `connect()`
 * The `connect()` method here along with a `<Provider />` are available [for Preact](https://github.com/HenrikJoreteg/redux-bundler-preact) and [for React](https://github.com/HenrikJoreteg/redux-bundler-react).
@@ -182,34 +179,9 @@ export default {
 
 Now I have one unified place to see anything that could cause a redirect in my app.
 
-## Recommended patterns
+## What next?
 
-1.  _all_ redux-related functionality should live in a bundle.
-2.  just keep a single, flat folder called `bundles` with one bundle per file
-3.  make an `index.js` file in `bundles` to export the result of `composeBundles()`, the resulting function takes a single argument which is any locally cached or bootstrapped data you may have, and returns a redux store. This is also useful for passing settings or config values to bundles that are dynamic as you see with the `cachingBundle` and `googleAnalytics` below:
-    > ```js
-    > import { composeBundles, createCacheBundle } from 'redux-bundler'
-    > import config from '../config'
-    > import user from '/user'
-    > import other from './other'
-    > import googleAnalytics from './analytics'
-    > import { getConfiguredCache } from 'money-clip'
-    >
-    > const cache = getConfiguredCache({
-    >   version: config.browserCacheVersion
-    > })
-    >
-    > export default composeBundles(
-    >   user,
-    >   createCacheBundle(cache.set),
-    >   other,
-    >   googleAnalytics(config.gaId, '/admin')
-    > )
-    > ```
-4.  data is _always_ read from the store via selectors
-5.  selectors should be written to take _the entire_ state as an argument
-6.  Selectors should be named starting with the word `select` such as `selectAppTime`.
-7.  Actions creators should be named starting with the word `do` such as `doLogin`.
+Check out the example app here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) to see how to build an app with redux-bundler.
 
 ## license
 

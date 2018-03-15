@@ -7,4 +7,7 @@
 * [Included Middleware](./api/middlewares.md)
 * [Included Bundles](./api/included-bundles.md)
 * [Added Store Methods](./api/store.md)
+
+## Misc
+
 * [Change Log](./changelog.md)
