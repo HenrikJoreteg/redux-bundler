@@ -1,6 +1,6 @@
-# Changelog
+# Change Log
 
-* `20.0.0 (unreleased)` - Adding documentation site, wrote lots of docs and made mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
+* `20.0.0` - Adding documentation site, wrote lots of docs and made mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
 
   * Changed all action types to be past-tense (so they don't sound like RPC calls). Action types should describe things that happened, not sound like they're causing things to happen. So in asyncCount instead of `START`, `SUCCESS`, `ERROR` it's now `STARTED`, `FINISHED`, `FAILED`. In URL bundle `UPDATE_URL` -> `URL_UPDATED`. In geolocation bundle `REQUEST_GEOLOCATION_X` -> `GEOLOCATION_REQUEST_X`.
   * All included bundles that require instantiation with a config are now named `createXBundle` for consistency. This includes `createGeolocationBundle`, `createReactorBundle`, `createCacheBundle`.
