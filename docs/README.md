@@ -1,5 +1,7 @@
 # Redux Bundler Documentation
 
+<iframe src="https://ghbtns.com/github-btn.html?user=henrikjoreteg&repo=redux-bundler&type=star&count=true" frameborder="0" scrolling="0" width="170px" height="20px"></iframe>
+
 A Redux framework for composing a store out of smaller bundles of functionality.
 
 Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
