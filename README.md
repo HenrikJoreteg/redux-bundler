@@ -111,7 +111,7 @@ This approach of consolidating everything on the store actually enables some int
 * This lib also includes an integrated approach for how to react to certain state conditions in your app. You can define special selectors that start with `react` instead of `select` that will be evaluated on a regular basis and can return actions to trigger in response. This enables really, really interesting patterns of being able to recover from failure and retrying failed requests, etc. The level of reliability that can be achieved here is _very_ powerful especially for use in PWAs that may well be offline or have really poor network conditions.
 * The fact that you _have to use a selector_ to get state from redux dramatically simplifies refactoring of large redux apps.
 * You can pass an array of selector names you want to subscribe to and get a callback with changes for those particular selectors. By consolidates state diffing into a single spot in the store, `connect()` doesn't have to do any dirty checking, so the binding code becomes very simple.
-* Connected action creators are already pre-bound to the store so you never have to import an action creator and then bind it before using it in your component, which I've found to be really confusing for devs learning redux.
+* Connected action creators are already pre-bound to the store so you never have to import an action creator and then bind it before using it in your component, which I've found to be really confusing for developers learning redux.
 * It includes a debug bundle you can enable to see nice summary of what's happening for each action that is dispatched.
 * In debug mode (which is enabled by setting `localStorage.debug` to a truthy value) the store instance is bound to `window` allowing console debugging of all your selectors, action creators via the JS console. For example you can type stuff like `store.selectIsLoggedIn()` to see results or `store.doLogout()` to trigger that action creator even if you don't have UI built for that yet.
 * It is uniquely well-suited for running inside a WebWorker. Because so much of your application logic lives in the resulting store, and because it lets you subscribe to changes and get deltas of the state you care about, this whole system is uniquely well suited for being ran off of the main thread. I've actually done this extensively but ended up backing out of that approach right before shipping because i hit a few snags with some browsers. I'll try to put together an example app sometime showing this, overall it actually works really, really well.
@@ -270,16 +270,106 @@ This will be run _once_ as a last step before the store is returned. It will be 
 
 For example, you may want redux to track current viewport width so that other selectors can change behavior based on viewport size. You could create a `viewport` bundle and register a debounced event listener for the `resize` event on window, and then dispatch a `WINDOW_RESIZED` action with the new width/height and add a `selectIsMobileViewport` selector to make it available to other bundles.
 
+### `bundle.persistActions: [...ActionTypes]`
+
+If the caching bundle is configured it will look for this property from other bundles. It should contain an array of action types that should cause contents of this bundle's reducer to be persisted to cache. These action types will be used by some generated redux middleware to lazily persist the contents of the reducer any time these actions occur.
+
+Please note this is completely inert if no caching is configured for the app.
+
+## Top level API
+
+### `composeBundles(...bundles)`
+
+Returns a function that will return a fully configured store composed of all the bundles **including some built-in ones that you're likely to want**. If you have any data to use as starting state, it can be passed to this function.
+
+Included bundles:
+
+* `appTimeBundle`
+* `asyncCountBundle`
+* `onlineBundle`
+* `createUrlBundle()`
+* `createReactorBundle()`
+* `debugBundle`
+
+### `composeBundlesRaw(...bundles)`
+
+Same as `composeBundles(...bundles)` but does not include anything bundles by default.
+
+### `createSelector()`
+
+Can be used to create selectors as described in the `selectX` section of the bundle API.
+
+### `HAS_WINDOW`
+
+Is `window` defined
+
+### `IS_BROWSER`
+
+Like `HAS_WINDOW` but also tries to determine if we're in a WebWorker.
+
+### `raf`
+
+Shim for `requestAnimationFrame` with fallback to `setTimeout(0)` for node.
+
+### `ric`
+
+Shim for `requestIdleCallback` with fallback to `setTimeout(0)` for node.
+
+### Exports `*` from redux
+
+As previously stated, this library includes Redux, so redux methods are exported too.
+
 ## Included bundles
 
-This borrows from Django's "batteries included" approach. Where you don't have to use any of this stuff, but a pretty complete set of tools required for apps is included out of the box.
+We take a "batteries included" approach where you don't have to use any of this stuff but where a pretty complete set of tools required for apps is included out of the box.
 
-None of which are added by default, but many of which you'll likely want.
+### `debugBundle`
+
+This is meant to be leave-in-able in production. It works as follows:
+
+Unless `localStorage.debug` is set to something "truthy" it will do nothing.
+
+If enabled:
+
+* The store is bound to `window.store` for easy access to _all selectors and action creators_ since they're all bound to the store. This is super helpful for debugging state issues, or running action creators even if you don't have UI built for it yet.
+* On boot, it logs out list of all installed bundles
+* On each action it logs out:
+  * action object that was dispatched
+  * the current state in its entirety
+  * the result of all selectors after that state change
+  * if there's a reactor that will be triggered as as result, it will log that out too as `next reaction`
+
+![logger screenshot](https://cloudup.com/ckaa_RK5H6a)
+
+In order to support use inside a Web Worker which doesn't have `localStorage` access debug state is stored in a reducer and it includes `doEnableDebug()` and `doDisableDebug()` action creators. But most people won't need this. Simply use the localStorage flag.
 
 ### `createUrlBundle([optionsObject])`
 
 A complete redux-based URL solution. It binds the browser URL to Redux store state and provides a very complete
 set of selectors and action creators to give you full control of browser URLs.
+
+**Handling in-app navigation**: An extremely lightweight in-app navigation approach is to just by rendering normal `<a>` tags, add an `onClick()` handler on your root component and use [internal-nav-helper](https://github.com/HenrikJoreteg/internal-nav-helper) to inspect the events, calling `doUpdateUrl` as necessary. When click events bubble up, it will inspect the event target looking for `<a>` tags and then determining whether or not to consider it an internal link based on its href. See [internal-nav-helper](https://github.com/HenrikJoreteg/internal-nav-helper) library for more details.
+
+Sample root component:
+
+```js
+import navHelper from 'internal-nav-helper'
+import { connect } from 'redux-bundler-preact'
+import { h } from 'preact'
+
+export default connect(
+  'doUpdateUrl',
+  'selectRoute',
+  ({ doUpdateUrl, route }) => {
+    const CurrentPage = route
+    return (
+      <div onClick={navHelper(doUpdateUrl)}>
+        <CurrentPage />
+      </div>
+    )
+  }
+)
+```
 
 Options object:
 
@@ -319,9 +409,9 @@ export default createRouteBundle({
 })
 ```
 
-The valus like `Home`, `UserList`, etc, can be _anything_. Whatever the current route that matches, calling `selectRoute()` will _return whatever that is_. This could be a root component for that "page" in your app. Or it could be an object with a componenet name along with a page title or whatever else you may want to link to that route.
+The value like `Home`, `UserList`, etc, can be _anything_. Whatever the current route that matches, calling `selectRoute()` will _return whatever that is_. This could be a root component for that "page" in your app. Or it could be an object with a component name along with a page title or whatever else you may want to link to that route.
 
-Then in your root component in your appp you'd simply `selectRoute()` to retrieve it. There's
+Then in your root component in your app you'd simply `selectRoute()` to retrieve it.
 
 Selectors:
 
@@ -332,6 +422,14 @@ Selectors:
 
 This simply tracks an `appTime` timestamp that gets set any time an action is fired. This is useful for writing deterministic selectors and eliminates the need for setting timers throughout the app. Any selector that uses `selectAppTime` will get this time as an argument. It's ridiculously tiny at only 5 lines of code, but is a nice pattern. Just be careful to not do expensive work in reaction to this changing, as it changes _with each action_.
 
+### `onlineBundle`
+
+Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
+
+Exports a single selector:
+
+`selectIsOnline`: Returns current state.
+
 ### `asyncCountBundle`
 
 This bundle takes no options, simply add it as is. It uses action naming conventions to track how many outstanding async actions are occurring.
@@ -340,13 +438,51 @@ It works like this:
 
 If an action contains `STARTED` it increments, if it contains `FINISHED` or `FAILED` it decrements. It adds a single selector to the store called `selectAsyncActive`. This is intended to be used to display a global loading indicator in the app. You may have seen these implemented as a thin colored bar across the top of the UI.
 
-### `createCachingBundle(cachingFunction)` a configurable bundle for setting up local caching of data
+### `createCachingBundle(cachingFunction)`
+
+Adds support for local caching of bundle data to the app. Other bundle can declare caching when this has been added to the app.
 
 This bundle takes a single required option: a function to use to persist data. The function has to take two arguments: the key and the value. The previously mentioned [example app](https://github.com/HenrikJoreteg/redux-bundler-example/blob/master/src/bundles/index.js) shows how to do this using [money-clip](https://github.com/HenrikJoreteg/money-clip).
 
-Once the caching bundle has been added, other bundles can indicate that their contents should be persisted by exporting a `persistActions` array of action types. Any time one of those action types occur, the contents of that bunble's reducer will be persisted lazily. Again, see the example app for usage.
+Once the caching bundle has been added, other bundles can indicate that their contents should be persisted by exporting a `persistActions` array of action types. Any time one of those action types occur, the contents of that bundle's reducer will be persisted lazily. Again, see the example app for usage.
 
-## How to use
+### `createAsyncResourceBundle(optionsObject)`
+
+Returns a pre-configured bundle for fetching a remote resource (like some data from an API) and provides a high-level abstraction for declaring when this data should be considered stale, what conditions should cause it to fetch, and when it should expire, etc.
+
+This bundle requires `appTimeBundle` and `onlineBundle` to be added as well (order doesn't matter) as long as both are included.
+
+Options:
+
+* `name` (required): name of reducer. Also used in action creator names and selector names. For example if the name is `users` you'll end up with a selector named: `selectUsers()`.
+* `getPromise` (required): A function that should return a Promise that gets the data. If this throws, it will automatically be retried. If you want to consider it a permanent error that should not be retried throw an error object with a `error.permanent = true` property. **note:** this function will be called with the same arguments as you get when writing a thunk action creator: `({dispatch, getState, store, ...extraArgs }) => {}`
+* `actionBaseType` (optional): This is used to build action types. So if you pass `USERS`, it will use action types like `USERS_FETCH_STARTED` and `USERS_EXPIRED`. Default: `name.toUpperCase()`.
+* `staleAfter` (optional): Length of time in milliseconds after which the data should be considered stale and needing to be re-fetched. Default: 15 minutes.
+* `retryAfter` (optional): Length of time in milliseconds after which a failed fetch should be re-tried after the last failure. Default: 1 minute.
+* `expireAfter` (optional): Length of time in milliseconds after which data should be automatically purged because it is expired. Default: `Infinity`.
+* `checkIfOnline` (optional): Whether or not to stop fetching if we know we're offline. This is imperfect because it's listens for the global `offline` and `online` events from the browser which are good for things like airplane mode, but not for "lie-fi" situations. Default: `true`
+* `persist` (optional): Whether or not to include the `persistActions` required to cache this reducers content. Simply setting this to `true` doesn't mean it will be cached. You still have to make sure caching is setup using `createCachingBundle()` and a persistance mechanism [like money-clip](https://github.com/HenrikJoreteg/money-clip). Default `true`
+
+Action creators:
+
+Names are built dynamically using the `name` of the bundle with first letter upper-cased:
+
+* `doFetch{{Name}}`: what is used internally to trigger fetches, but you can trigger it manually too.
+* `doMark{{Name}}AsOutdated`: used to forcibly mark contents as stale, which will not clear anything, but will cause it to be re-fetched as if it's too old.
+* `doClear{{Name}}`: clears and resets the reducer to initial state.
+* `doExpire{{Name}}`: should mostly likely not be used directly, but it used internally when items expire. This is a bit like `doClear{{Name}}` except it does not clear errors and explicitly denotes that the contents are expired. So, if an app is offline and the content was wiped because it expired, your UI can show a relevant message.
+
+Selectors:
+
+* `select{{Name}}Raw`: get entire contents of reducer.
+* `select{{Name}}`: get `data` portion of reducer (or `null`).
+* `select{{Name}}IsStale`: Boolean. Is data stale?
+* `select{{Name}}IsExpired`: Boolean. Is it expired?
+* `select{{Name}}LastError`: Timestamp in milliseconds of last error or `null`
+* `select{{Name}}IsWaitingToRetry`: Boolean. If there was an error and it's in the period where it's waiting to retry.
+* `select{{Name}}IsLoading`: Boolean. Is it currently trying to fetch.
+* `select{{Name}}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
+* `select{{Name}}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
 
 ## Changelog
 

@@ -22,6 +22,7 @@ export default spec => {
     expireAfter
   } = opts
   const uCaseName = name.charAt(0).toUpperCase() + name.slice(1)
+  const baseType = actionBaseType || name.toUpperCase()
 
   if (process.env.NODE_ENV !== 'production') {
     for (const item in opts) {
@@ -106,12 +107,12 @@ export default spec => {
 
   // action types
   const actions = {
-    STARTED: `FETCH_${actionBaseType}_STARTED`,
-    FINISHED: `FETCH_${actionBaseType}_FINISHED`,
-    FAILED: `FETCH_${actionBaseType}_FAILED`,
-    CLEARED: `${actionBaseType}_CLEARED`,
-    OUTDATED: `${actionBaseType}_OUTDATED`,
-    EXPIRED: `${actionBaseType}_EXPIRED`
+    STARTED: `${baseType}_FETCH_STARTED`,
+    FINISHED: `${baseType}_FETCH_FINISHED`,
+    FAILED: `${baseType}_FETCH_FAILED`,
+    CLEARED: `${baseType}_CLEARED`,
+    OUTDATED: `${baseType}_OUTDATED`,
+    EXPIRED: `${baseType}_EXPIRED`
   }
 
   // action creators
@@ -202,8 +203,6 @@ export default spec => {
     [`select${uCaseName}FailedPermanently`]: failedPermanentlySelector,
     [`select${uCaseName}ShouldUpdate`]: shouldUpdateSelector,
     [`doFetch${uCaseName}`]: doFetchData,
-    [`doFetch${uCaseName}Success`]: doFetchSuccess,
-    [`doFetch${uCaseName}Error`]: doFetchError,
     [`doMark${uCaseName}AsOutdated`]: doMarkAsOutdated,
     [`doClear${uCaseName}`]: doClear,
     [`doExpire${uCaseName}`]: doExpire

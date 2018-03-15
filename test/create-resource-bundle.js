@@ -47,8 +47,8 @@ test('createAsyncResourceBundle basics', t => {
 test('createAsyncResourceBundle action creator success dispatches', t => {
   const store = getAsyncBundleStore({ name: 'henrik' })()
   store.dispatch = getDispatchStub(t, [
-    { type: 'FETCH_USER_STARTED' },
-    { type: 'FETCH_USER_FINISHED', payload: { name: 'henrik' } }
+    { type: 'USER_FETCH_STARTED' },
+    { type: 'USER_FETCH_FINISHED', payload: { name: 'henrik' } }
   ])
 
   const promise = store.doFetchUser()
@@ -65,8 +65,8 @@ test('createAsyncResourceBundle action creator error dispatches', t => {
   const store = getAsyncBundleStore(err)()
 
   store.dispatch = getDispatchStub(t, [
-    { type: 'FETCH_USER_STARTED' },
-    { type: 'FETCH_USER_FAILED', error: err }
+    { type: 'USER_FETCH_STARTED' },
+    { type: 'USER_FETCH_FAILED', error: err }
   ])
 
   store.doFetchUser()
@@ -200,7 +200,7 @@ test('createAsyncResourceBundle expireAfter support', t => {
       if (count === 3) {
         t.deepEqual(
           arg,
-          { type: 'FETCH_USER_STARTED' },
+          { type: 'USER_FETCH_STARTED' },
           'should trigger refetch'
         )
         dispatch(arg)
@@ -214,7 +214,7 @@ test('createAsyncResourceBundle expireAfter support', t => {
       if (count === 4) {
         t.deepEqual(
           arg,
-          { type: 'FETCH_USER_FINISHED', payload: { name: 'henrik' } },
+          { type: 'USER_FETCH_FINISHED', payload: { name: 'henrik' } },
           'fetch finished'
         )
         dispatch(arg)
