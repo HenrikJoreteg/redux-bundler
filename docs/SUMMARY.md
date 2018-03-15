@@ -2,6 +2,15 @@
 
 * [Patterns](./guides/patterns.md)
 
+## Related Tools
+
+* [Preact Bindings](https://github.com/HenrikJoreteg/redux-bundler-preact)
+* [React Bindings](https://github.com/HenrikJoreteg/redux-bundler-react)
+* [Money Clip (caching)](https://github.com/HenrikJoreteg/money-clip)
+* [Example App](https://github.com/HenrikJoreteg/redux-bundler-example)
+* [WebWorker Example App](https://github.com/HenrikJoreteg/redux-bundler-example)
+* [WebWorker Helpers](https://github.com/HenrikJoreteg/redux-bundler-worker)
+
 ## API Reference
 
 * [Top Level API](./api/top-level.md)
