@@ -1,6 +1,4 @@
-# Redux Bundler Documentation
-
-<iframe src="https://ghbtns.com/github-btn.html?user=henrikjoreteg&repo=redux-bundler&type=star&count=true" frameborder="0" scrolling="0" width="170px" height="20px"></iframe>
+# Redux Bundler <iframe src="https://ghbtns.com/github-btn.html?user=henrikjoreteg&repo=redux-bundler&type=star&count=true" frameborder="0" style="" scrolling="0" width="160px" height="20px"></iframe>
 
 A Redux framework for composing a store out of smaller bundles of functionality.
 
@@ -21,7 +19,7 @@ Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
 ## Motivation
 
-It's no secret that there's a lot of boilerplate when building Redux applications. There are some [tips for reducing it in the official documentation](https://redux.js.org/recipes/ReducingBoilerplate.html) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
+Redux is awesome, but it's no secret that using it requires writing a fair amount of boilerplate. There are some [tips for reducing it in the official documentation](https://redux.js.org/recipes/ReducingBoilerplate.html) and there's an [open issue with over 100 comments](https://github.com/reactjs/redux/issues/2295) on the redux repo about how to handle it that is left largely unresolved.
 
 I've been building redux apps for quite some time and some of you may have been introduced to it when I first [blogged about it](https://blog.andyet.com/2015/08/06/what-the-flux-lets-redux/) back in 2015. This library is how I build redux apps, I finally decided to open source it.
 
