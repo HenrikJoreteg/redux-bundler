@@ -146,19 +146,19 @@ Action creators:
 
 Names are built dynamically using the `name` of the bundle with first letter upper-cased:
 
-* `doFetch{{Name}}`: what is used internally to trigger fetches, but you can trigger it manually too.
-* `doMark{{Name}}AsOutdated`: used to forcibly mark contents as stale, which will not clear anything, but will cause it to be re-fetched as if it's too old.
-* `doClear{{Name}}`: clears and resets the reducer to initial state.
-* `doExpire{{Name}}`: should mostly likely not be used directly, but it used internally when items expire. This is a bit like `doClear{{Name}}` except it does not clear errors and explicitly denotes that the contents are expired. So, if an app is offline and the content was wiped because it expired, your UI can show a relevant message.
+* `doFetch{Name}`: what is used internally to trigger fetches, but you can trigger it manually too.
+* `doMark{Name}AsOutdated`: used to forcibly mark contents as stale, which will not clear anything, but will cause it to be re-fetched as if it's too old.
+* `doClear{Name}`: clears and resets the reducer to initial state.
+* `doExpire{Name}`: should mostly likely not be used directly, but it used internally when items expire. This is a bit like `doClear{Name}` except it does not clear errors and explicitly denotes that the contents are expired. So, if an app is offline and the content was wiped because it expired, your UI can show a relevant message.
 
 Selectors:
 
-* `select{{Name}}Raw`: get entire contents of reducer.
-* `select{{Name}}`: get `data` portion of reducer (or `null`).
-* `select{{Name}}IsStale`: Boolean. Is data stale?
-* `select{{Name}}IsExpired`: Boolean. Is it expired?
-* `select{{Name}}LastError`: Timestamp in milliseconds of last error or `null`
-* `select{{Name}}IsWaitingToRetry`: Boolean. If there was an error and it's in the period where it's waiting to retry.
-* `select{{Name}}IsLoading`: Boolean. Is it currently trying to fetch.
-* `select{{Name}}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
-* `select{{Name}}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
+* `select{Name}Raw`: get entire contents of reducer.
+* `select{Name}`: get `data` portion of reducer (or `null`).
+* `select{Name}IsStale`: Boolean. Is data stale?
+* `select{Name}IsExpired`: Boolean. Is it expired?
+* `select{Name}LastError`: Timestamp in milliseconds of last error or `null`
+* `select{Name}IsWaitingToRetry`: Boolean. If there was an error and it's in the period where it's waiting to retry.
+* `select{Name}IsLoading`: Boolean. Is it currently trying to fetch.
+* `select{Name}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
+* `select{Name}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
