@@ -18,7 +18,7 @@ If enabled:
   * the result of all selectors after that state change
   * if there's a reactor that will be triggered as as result, it will log that out too as `next reaction`
 
-![logger screenshot](https://cloudup.com/ckaa_RK5H6a)
+![logger screenshot](https://cldup.com/bHBHBqkW0B-3000x3000.png)
 
 In order to support use inside a Web Worker which doesn't have `localStorage` access debug state is stored in a reducer and it includes `doEnableDebug()` and `doDisableDebug()` action creators. But most people won't need this. Simply use the localStorage flag.
 
