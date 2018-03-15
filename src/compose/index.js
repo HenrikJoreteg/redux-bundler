@@ -1,4 +1,3 @@
-import debugMiddleware from '../middleware/debug'
 import namedActionMiddleware from '../middleware/named-action'
 import thunkMiddleware from '../middleware/custom-thunk'
 import customApplyMiddleware from '../middleware/custom-apply-middleware'
@@ -83,19 +82,10 @@ const composeBundles = (...bundles) => {
         ...[
           namedActionMiddleware,
           thunkMiddleware(firstChunk.extraArgCreators),
-          debugMiddleware,
           ...firstChunk.middlewareCreators.map(fn => fn(firstChunk))
         ]
       )
     )
-
-    // upgrade dispatch to take multiple and automatically
-    // batch dispatch in that case
-    const { dispatch } = store
-    store.dispatch = (...actions) =>
-      dispatch(
-        actions.length > 1 ? { type: 'BATCH_ACTIONS', actions } : actions[0]
-      )
 
     // get values from an array of selector names
     store.select = selectorNames =>

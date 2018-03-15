@@ -1,4 +1,5 @@
 import { IS_BROWSER, debounce, ric, raf } from '../utils'
+import namedActionMiddleware from '../middleware/named-action'
 
 const defaults = {
   idleTimeout: 30000,
@@ -16,6 +17,7 @@ export const getIdleDispatcher = (stopWhenInactive, timeout, fn) =>
 
 export default spec => ({
   name: 'reactors',
+  getMiddleware: () => namedActionMiddleware,
   init: store => {
     const opts = Object.assign({}, defaults, spec)
     const { idleAction, idleTimeout } = opts

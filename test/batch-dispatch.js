@@ -23,7 +23,10 @@ test('batch dispatch', t => {
   store.subscribe(() => {
     count++
   })
-  store.dispatch({ type: 'ACTION1' }, { type: 'ACTION2' }, { type: 'ACTION3' })
+  store.dispatch({
+    type: 'BATCH_ACTIONS',
+    actions: [{ type: 'ACTION1' }, { type: 'ACTION2' }, { type: 'ACTION3' }]
+  })
   t.equal(count, 1)
   t.deepEqual(store.getState().batch, { no1: true, no2: true, no3: true }, 'Ok')
   t.end()

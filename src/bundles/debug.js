@@ -1,5 +1,6 @@
 // import { version } from '../../package.json'
 import { HAS_DEBUG_FLAG } from '../utils'
+import debugMiddleware from '../middleware/debug'
 
 const ENABLE = 'DEBUG_ENABLED'
 const DISABLE = 'DEBUG_DISABLED'
@@ -18,6 +19,7 @@ export default {
   doEnableDebug: () => ({ type: ENABLE }),
   doDisableDebug: () => ({ type: DISABLE }),
   selectIsDebug: state => state.debug,
+  getMiddleware: () => debugMiddleware,
   init: store => {
     if (store.selectIsDebug()) {
       const names = store.meta.chunks[0].bundleNames
