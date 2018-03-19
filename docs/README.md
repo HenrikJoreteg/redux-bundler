@@ -1,15 +1,146 @@
 # Redux Bundler <iframe src="https://ghbtns.com/github-btn.html?user=henrikjoreteg&repo=redux-bundler&type=star&count=true" frameborder="0" style="" scrolling="0" width="160px" height="20px"></iframe>
 
-Featherweight Redux-based toolkit for managing state for Progressive Web Apps.
-
-Pair it with [Preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) for a complete PWA toolkit in ~14kb!
+Compose a Redux store out of smaller bundles of functionality.
 
 Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
-1.  Group redux-related code by functionality and compose into a store.
+## The basic idea
+
+Organize all Redux-related code into a single flat folder of "redux bundles". A bundle is a single file for each main area of functionality in your app.
+
+A bundle can optionally export things like:
+
+1.  A name
+2.  A reducer
+3.  Action creators
+4.  Selectors (functions for reading state)
+5.  An init method
+
+For example:
+
+`bundles/users.js:`
+
+```js
+export default {
+  // the name becomes the reducer name in the resulting state
+  name: 'users',
+  // the Redux reducer function
+  reducer: (state = [], action) => {
+    // ...
+    return state
+  },
+  // anything that starts with `select` is treated as a selector
+  selectActiveUsers: state => state.users.filter(user => user.isActive),
+  // anything that starts with `do` is treated as an action creator
+  doUpdateUser: (userId, attrs) => ({ dispatch, apiFetch }) =>
+    dispatch({ type: 'USER_UPDATE_STARTED' })
+    apiFetch('/users', { type: 'PUT' }, attrs)
+      .then(res => {
+        dispatch({ type: 'USER_UPDATE_FINISHED' })
+      })
+      .catch(err => {
+        dispatch({ type: 'USER_UPDATE_FAILED' })
+      }),
+  // optional init method is ran after store is created and passed the
+  // store object.
+  init: store => {
+    // action creators are bound and attached to store as methods
+    store.doUpdateUser()
+
+    // selectors are also "bound" and attached to store as methods
+    store.selectActiveUsers()
+  }
+}
+```
+
+Redux-bundler then composes those "bundles" into a function that returns a ready-to-go Redux store.
+
+Usually you'd just do this in the index file of your bundles directory:
+
+`bundles/index.js:`
+
+```js
+import { composeBundles } from 'redux-bundler'
+import usersBundle from './the/file/above'
+import authBundle from './bundles/auth'
+// ... import other bundles
+
+export default composeBundles(
+  usersBundle,
+  viewportBundle
+  // ... add bundles here
+)
+```
+
+Then, in your root component, call the function exported by the bundles directory, pass it any initial data and you're up and running:
+
+`components/root.js`
+
+```js
+import React from 'react'
+import { render } from 'react-dom'
+// similar to react-redux
+// bindings available for React and Preact
+import { Provider } from 'redux-bundler-react'
+import App from './components/app'
+// the file above exports a ready-to-go
+// createStore function
+import createStore from './bundles'
+
+// you can also pass it initial data here if you have any
+const store = createStore(window.BOOTSTRAP_DATA)
+
+// render your app
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.body.getElementById('app')
+)
+```
+
+Now you can efficiently connect components with way less boilerplate:
+
+`components/some-component.js`
+
+```js
+import React from 'react'
+
+// pass as many names of selectors or action creators as you want
+// in any order. Functionality is implied from the name so `doX`
+// is an action. `selectX` is a selector.
+//
+// - action creators are pre-bound to the store.
+// - selector names create prop names that sound like the value so
+//   `selectActiveUsers` here, becomes: `activeUsers`
+export default connect(
+  'doUpdateUser',
+  'selectActiveUsers',
+  ({ doUpdateUser, activeUsers }) => (
+    <div>
+      {activeUsers.map(user => (
+        <div>
+          name: {user.name}
+          <button
+            onClick={() =>
+              // action creators are pre-bound to the store
+              doUpdateUser({
+                isAwesome: true
+              })
+            }
+          />
+        </div>
+      ))}
+    </div>
+  )
+)
+```
+
+## Features
+
+1.  This is not a toy project. This is how I build production Redux apps. It was extracted from real apps where it was used to solve real use cases.
+1.  It's quite small at [~9k](https://bundlephobia.com/result?p=redux-bundler). That includes Redux itself, reselect for selectors, as well as an optional super light-weight routing system. If you pair it with [Preact](https://preactjs.com/) and [money-clip](https://github.com/HenrikJoreteg/money-clip) you have a complete PWA toolkit in ~14kb! That's before tree-shaking (could be much less if you don't use everything).
 1.  Dramatically reduces boilerplate without changing or replacing basic Redux concepts.
-1.  Not a toy project. This is how I build production Redux apps. It was extracted from real apps where it was used to solve real use cases.
-1.  `npm install redux-bundler` includes a lot of functionality and still only weighs [9kb total](https://bundlephobia.com/result?p=redux-bundler) before tree-shaking (could be much less if you don't use everything).
 1.  "Batteries included" approach where you use what you want, and tree-shake out the rest.
 1.  Simplified and more efficient `connect()` for binding to components (available for [React](https://github.com/HenrikJoreteg/redux-bundler-react) and [Preact](https://github.com/HenrikJoreteg/redux-bundler-preact))
 1.  Includes a very lightweight, robust, routing system (optional).
@@ -25,97 +156,28 @@ Redux is awesome, but it's no secret that using it requires writing a fair amoun
 
 I've been building redux apps for quite some time and some of you may have been introduced to it when I first [blogged about it](https://blog.andyet.com/2015/08/06/what-the-flux-lets-redux/) back in 2015. This library is how I build redux apps, I finally decided to open source it.
 
-It lets you compose a larger redux app out what I call "redux bundles" that encapsulate related functionality. Usually, a bundle includes a reducer, some action creators, and some selectors.
+As I said this isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
 
-This isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
-
-There's a ton more that needs to be documented, but the sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) is a good way to see how to build something with it. It's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
+There's a sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) which is a good way to see how to build something with it. It's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
 
 Note: redux-bundler includes its dependencies for simplicity to minimize surface are for bugs due to version mismatches. It also exports all the exports from redux. So you can still do stuff like `import { combineReducers } from 'redux-bundler'`. However, this also means you end up with code from redux with the debug blocks `if (process.env.NODE_ENV !== "production")` still present. Build your app with NODE_ENV="production" before minification to strip that out for production. You can use DefinePlugin for webpack (http://stackoverflow.com/questions/30030031), loose-envify (https://github.com/zertosh/loose-envify) for browserify, or rollup-plugin-replace for Rollup (https://github.com/rollup/rollup-plugin-replace) to do this.
-
-## A quick example
-
-Suppose you want to track some state related to the current user in your app.
-
-Historically redux developers would spread this out across several files maybe add some action constants to one file, a reducer, somewhere else, perhaps a set of selectors in another file, and action creators in yet another.
-
-With redux-bundler you create a single file perhaps in "/bundles/user.js" that looks something like this:
-
-```js
-import { createSelector } from 'redux-bundler'
-
-export default {
-  name: 'user',
-  getReducer: () => {
-    const initialState = { loggedIn: false, name: null }
-
-    return (state = initialState, { type, payload }) => {
-      if (type === 'USER_LOGGED_IN') {
-        return Object.assign({}, state, { loggedIn: true, name: payload })
-      }
-      return state
-    }
-  },
-  selectUserState: state => state.user,
-  selectIsLoggedIn: createSelector(
-    'selectUserState',
-    userState => userState.loggedIn
-  ),
-  doLogin: name => ({ type: 'USER_LOGGED_IN', payload: name })
-}
-```
-
-In this way you group related reducers, selectors, action creators. Redux-bundler then takes bundles like this and combines them all into a store and pre-binds and attaches everything to the _redux store itself_.
-
-For example, simply by naming a function on the exported object `selectIsLoggedIn` redux-bundler when given this bundle will add a method to the store itself that can be called without arguments like this: `store.selectIsLoggedIn()` that returns the result of that selector given the current redux state.
-
-Similarly, action creators start with `do` and get pre-bound and attached to the store so all you have to do is call `store.doLogin()` to dispatch the action creator on the store.
-
-The thing is, rather than importing selectors, constants, and binding action creators all over the place you can now just `connect()` to inject it as a property _just by using its name as a string_ like this:
-
-```js
-import { connect } from 'redux-bundler-preact'
-import { h } from 'preact'
-
-export default connect(
-  'doLogin',
-  'selectIsLoggedIn',
-  ({ isLoggedIn, doLogin }) => (
-    <div>
-      {isLoggedIn && <p>You are logged in!</p>}
-      {!isLoggedIn && (
-        <button onClick={() => doLogin('John Doe')}>Click to log in!</button>
-      )}
-    </div>
-  )
-)
-```
-
-Things to note about the example:
-
-* `selectIsLoggedIn` selects and passes a prop named `isLoggedIn` (not `SelectIsLoggedIn` because that'd be weird).
-* `doLogin` doesn't need to be bound to the store in any way, because it was already pre-bound when it was attached to the store so the function passed as a prop is already ready to use and it will just do what you'd expect.
-* If for some reason you make a typo in one of these names of a selector or action creator the mistake will be easy to catch because `connect()` will throw an error if you try to connect something that doesn't exist on the store.
-* There's a single import, instead of three. This is a drastic reduction of boilerplate especially when you're connecting many things (not to mention wasted time resolving require dependencies).
-* There's no need to write a `mapStateToProps` or `mapDispatchToProps` function to pass to `connect()`
-* The `connect()` method here along with a `<Provider />` are available [for Preact](https://github.com/HenrikJoreteg/redux-bundler-preact) and [for React](https://github.com/HenrikJoreteg/redux-bundler-react).
 
 ## What this enables
 
 This approach of consolidating everything on the store actually enables some interesting things.
 
 * Reuse of redux-related functionality across applications. (For example, I share an "authBundle" between 3 different apps built on the same API).
-* You can make configurable bundles! You can write higher-level functions that returns a pre-configured bundle. This is _huge_ for reducing boilerplate for things like simple data fetches.
-* So much of your application logic can now be decoupled from components, while still keeping things tidy. Components can focus on what they do best: rendering their current props.
+* You can make configurable bundles! You can write higher-level functions that returns a pre-configured bundle. This is _huge_ for reducing boilerplate for things like simple data fetches. See the included `createAsyncResourceBundle` for an example of this.
+* Keep things tidy. Behavior is decoupled from display. Components can focus on what they do best: rendering their current props.
 * It strongly enforces a set of conventions for building redux apps (this is important for larger teams, especially). For example, you have to name your selectors starting with `select`.
-* The lib also supports lazy-loading additional redux bundles even after you've created the store. The new bundles are integrated into the existing redux store. Since, connected components reference things by name instead of directly import functions the the components can be sent in different JS payload than the redux code that will power them because until they're actually used they can reference things that don't yet exist on the store.
+* Supports lazy-loading additional redux bundles even after you've created the store. The new bundles are integrated into the existing redux store. Since, connected components reference things by name instead of directly import functions the the components can be sent in different JS payload than the redux code that will power them because until they're actually used they can reference things that don't yet exist on the store.
 * This lib also includes an integrated approach for how to react to certain state conditions in your app. You can define special selectors that start with `react` instead of `select` that will be evaluated on a regular basis and can return actions to trigger in response. This enables really, really interesting patterns of being able to recover from failure and retrying failed requests, etc. The level of reliability that can be achieved here is _very_ powerful especially for use in PWAs that may well be offline or have really poor network conditions.
-* The fact that you _have to use a selector_ to get state from redux dramatically simplifies refactoring of large redux apps.
+* The fact that you _have to use a selector_ to get state from redux dramatically simplifies refactoring of large redux apps and avoids many performance pitfalls.
 * You can pass an array of selector names you want to subscribe to and get a callback with changes for those particular selectors. By consolidates state diffing into a single spot in the store, `connect()` doesn't have to do any dirty checking, so the binding code becomes very simple.
 * Connected action creators are already pre-bound to the store so you never have to import an action creator and then bind it before using it in your component, which I've found to be really confusing for developers learning redux.
 * It includes a debug bundle you can enable to see nice summary of what's happening for each action that is dispatched.
 * In debug mode (which is enabled by setting `localStorage.debug` to a truthy value) the store instance is bound to `window` allowing console debugging of all your selectors, action creators via the JS console. For example you can type stuff like `store.selectIsLoggedIn()` to see results or `store.doLogout()` to trigger that action creator even if you don't have UI built for that yet.
-* It is uniquely well-suited for running inside a WebWorker. Because so much of your application logic lives in the resulting store, and because it lets you subscribe to changes and get deltas of the state you care about, this whole system is uniquely well suited for being ran off of the main thread. I've actually done this extensively but ended up backing out of that approach right before shipping because i hit a few snags with some browsers. I'll try to put together an example app sometime showing this, overall it actually works really, really well.
+* It is uniquely well-suited for running inside a WebWorker. Because so much of your application logic lives in the resulting store, and because it lets you subscribe to changes and get deltas of the state you care about, this whole system is uniquely well suited for being ran off of the main thread. I've put together [an example app that runs entirely in a worker](https://github.com/HenrikJoreteg/redux-bundler-worker-example)
 
 ## What about async stuff?!
 

@@ -1,5 +1,5 @@
 # redux-bundler
 
-Featherweight Redux-based toolkit for managing state for Progressive Web Apps.
+Compose a Redux store out of smaller bundles of functionality.
 
-Docs: https://reduxbundler.com
+See docs site here: https://reduxbundler.com

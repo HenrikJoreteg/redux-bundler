@@ -1,6 +1,6 @@
 {
   "name": "redux-bundler",
-  "description": "Featherweight Redux-based toolkit for managing state for Progressive Web Apps.",
+  "description": "Compose a Redux store out of smaller bundles of functionality.",
   "version": "20.0.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "bugs": {
