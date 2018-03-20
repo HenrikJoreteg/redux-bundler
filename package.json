@@ -53,7 +53,8 @@
     "globals": [
       "window",
       "self",
-      "URL"
+      "URL",
+      "history"
     ]
   }
 }

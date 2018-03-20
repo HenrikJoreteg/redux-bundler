@@ -1,6 +1,6 @@
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import { HAS_WINDOW } from '../utils'
+import { HAS_WINDOW, initScrollPosition, saveScrollPosition } from '../utils'
 
 export const isString = obj =>
   Object.prototype.toString.call(obj) === '[object String]'
@@ -31,7 +31,8 @@ const loc = (() => {
 const defaults = {
   name: 'url',
   inert: !HAS_WINDOW,
-  actionType: 'URL_UPDATED'
+  actionType: 'URL_UPDATED',
+  handleScrollRestoration: true
 }
 
 const makeSerializable = url => {
@@ -112,17 +113,17 @@ export default opts => {
         return
       }
 
-      let lastState = store.selectUrlRaw()
+      if (config.handleScrollRestoration) initScrollPosition()
 
-      const setCurrentUrl = () => {
+      window.addEventListener('popstate', () => {
         store.doUpdateUrl({
           pathname: loc.pathname,
           hash: loc.hash,
           query: loc.search
         })
-      }
+      })
 
-      window.addEventListener('popstate', setCurrentUrl)
+      let lastState = store.selectUrlRaw()
 
       store.subscribe(() => {
         const newState = store.selectUrlRaw()
@@ -134,7 +135,9 @@ export default opts => {
               null,
               newState.url
             )
+            if (config.handleScrollRestoration) saveScrollPosition()
             document.body.scrollTop = 0
+            document.body.scrollLeft = 0
           } catch (e) {
             console.error(e)
           }

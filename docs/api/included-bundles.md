@@ -53,6 +53,7 @@ export default connect(
 Options object:
 
 * `inert`: Boolean whether or not to bind to the browser. If you make it `inert` it will simply maintain state in Redux without trying to update the browser, or listen for `popstate`
+* `handleScrollRestoration`: Boolean (default `true`). Whether or not to handle scroll position restoration on document.body. Some browsers handle this for you with the notable exception of FF and IE 11. If you leave this as `true` it should work in latest version of all browsers.
 
 Action creators:
 
