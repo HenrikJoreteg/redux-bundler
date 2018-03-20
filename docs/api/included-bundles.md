@@ -163,3 +163,52 @@ Selectors:
 * `select{Name}IsLoading`: Boolean. Is it currently trying to fetch.
 * `select{Name}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
 * `select{Name}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
+
+Defining the state that should trigger the fetch:
+
+Rather than manually calling `doFetch{Name}` from a component, you can use a reactor to define the scenarios in which the action should be dispatched. The simplest way is to add it to your bundle after generating it and then using the `select{Name}ShouldUpdate` as an input selector. The following code would cause the fetch to happen right away and the data to be kept up to date not matter what state the rest of the app was in or URL/Route was being displayed.
+
+```js
+const bundle = createAsyncResourceBundle({
+  name: 'honeyBadger',
+  actionBaseType: 'HONEY_BADGER',
+  getPromise: () => {
+    // return
+  }
+})
+
+bundle.reactHoneyBadgerFetch = createSelector(
+  'selectHoneyBadgerShouldUpdate',
+  shouldUpdate => {
+    if (shouldUpdate) {
+      return { actionCreator: 'doFetchHoneyBadger' }
+    }
+  }
+)
+
+export default bundle
+```
+
+If instead you wanted to only have the fetch occur on a certain URL or route, or based on other conditions, you can check for that as well by adding and checking for other conditions in your reactor:
+
+```js
+const bundle = createAsyncResourceBundle({
+  name: 'honeyBadger',
+  actionBaseType: 'HONEY_BADGER',
+  getPromise: () => {
+    // return
+  }
+})
+
+bundle.reactHoneyBadgerFetch = createSelector(
+  'selectHoneyBadgerShouldUpdate',
+  'selectPathname',
+  (shouldUpdate, pathname) => {
+    if (shouldUpdate && pathname === '/honey-badger') {
+      return { actionCreator: 'doFetchHoneyBadger' }
+    }
+  }
+)
+
+export default bundle
+```
