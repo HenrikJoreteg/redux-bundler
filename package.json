@@ -43,7 +43,7 @@
     "url": "https://github.com/HenrikJoreteg/redux-bundler"
   },
   "scripts": {
-    "build": "microbundle",
+    "build": "microbundle --compress=false --sourcemap=false",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
     "test": "tape test/*.js | tap-spec",
