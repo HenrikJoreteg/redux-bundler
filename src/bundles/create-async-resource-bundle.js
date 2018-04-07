@@ -1,8 +1,6 @@
 import { createSelector } from 'create-selector'
 
 const defaultOpts = {
-  name: null,
-  getPromise: null,
   actionBaseType: null,
   staleAfter: 900000, // fifteen minutes
   retryAfter: 60000, // one minute,
@@ -11,8 +9,24 @@ const defaultOpts = {
   persist: true
 }
 
+const requiredOpts = {
+  name: null,
+  getPromise: null
+}
+
 export default spec => {
-  const opts = Object.assign({}, defaultOpts, spec)
+  const opts = Object.assign({}, requiredOpts, defaultOpts, spec)
+
+  if (process.env.NODE_ENV !== 'production') {
+    for (const item in requiredOpts) {
+      if (opts[item] === null) {
+        throw Error(
+          `You must supply an ${item} option when creating a resource bundle`
+        )
+      }
+    }
+  }
+
   const {
     name,
     staleAfter,
@@ -21,18 +35,9 @@ export default spec => {
     checkIfOnline,
     expireAfter
   } = opts
+
   const uCaseName = name.charAt(0).toUpperCase() + name.slice(1)
   const baseType = actionBaseType || name.toUpperCase()
-
-  if (process.env.NODE_ENV !== 'production') {
-    for (const item in opts) {
-      if (opts[item] === null) {
-        throw Error(
-          `You must supply an ${item} option when creating a resource bundle`
-        )
-      }
-    }
-  }
 
   // build selectors
   const inputSelector = state => state[name]
