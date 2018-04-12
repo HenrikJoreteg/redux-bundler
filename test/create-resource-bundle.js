@@ -7,7 +7,7 @@ const {
   onlineBundle
 } = require('../dist/redux-bundler')
 
-const getAsyncBundleStore = result =>
+const getAsyncBundleStore = (result, bundleOptions) =>
   composeBundlesRaw(
     {
       name: 'appTime',
@@ -15,14 +15,19 @@ const getAsyncBundleStore = result =>
       selectAppTime: state => state.appTime
     },
     onlineBundle,
-    createAsyncResourceBundle({
-      name: 'user',
-      actionBaseType: 'USER',
-      getPromise: () =>
-        result instanceof Error
-          ? Promise.reject(result)
-          : Promise.resolve(result)
-    })
+    createAsyncResourceBundle(
+      Object.assign(
+        {},
+        {
+          name: 'user',
+          getPromise: () =>
+            result instanceof Error
+              ? Promise.reject(result)
+              : Promise.resolve(result)
+        },
+        bundleOptions
+      )
+    )
   )
 
 const getDispatchStub = (t, expected) => {
@@ -58,6 +63,30 @@ test('createAsyncResourceBundle action creator success dispatches', t => {
   setTimeout(() => {
     t.end()
   }, 0)
+})
+
+test('createAsyncResourceBundle custom actionBaseType', t => {
+  const store = getAsyncBundleStore(
+    { name: 'gregg' },
+    { actionBaseType: 'NOTNAME' }
+  )()
+  store.dispatch = getDispatchStub(t, [
+    { type: 'NOTNAME_FETCH_STARTED' },
+    { type: 'NOTNAME_FETCH_FINISHED', payload: { name: 'gregg' } }
+  ])
+  store.doFetchUser()
+
+  // this will allow second dispatch to occur
+  setTimeout(() => {
+    t.end()
+  }, 0)
+})
+
+test('createAsyncResourceBundle checks for required options', t => {
+  t.throws(() => getAsyncBundleStore({}, { name: null }))
+  t.throws(() => getAsyncBundleStore({}, { getPromise: null }))
+  t.doesNotThrow(() => getAsyncBundleStore({}, { actionBaseType: null }))
+  t.end()
 })
 
 test('createAsyncResourceBundle action creator error dispatches', t => {
