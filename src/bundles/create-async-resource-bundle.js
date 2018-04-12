@@ -9,22 +9,18 @@ const defaultOpts = {
   persist: true
 }
 
-const requiredOpts = {
-  name: null,
-  getPromise: null
-}
-
 export default spec => {
-  const opts = Object.assign({}, requiredOpts, defaultOpts, spec)
+  const opts = Object.assign({}, defaultOpts, spec)
 
   if (process.env.NODE_ENV !== 'production') {
-    for (const item in requiredOpts) {
-      if (opts[item] === null) {
+    const requiredOptions = ['name', 'getPromise']
+    requiredOptions.forEach(requiredOption => {
+      if (!opts[requiredOption]) {
         throw Error(
-          `You must supply an ${item} option when creating a resource bundle`
+          `You must supply a ${requiredOption} option when creating a resource bundle.`
         )
       }
-    }
+    })
   }
 
   const {
