@@ -10,7 +10,7 @@ import {
 import { resolveSelectors } from 'create-selector'
 import { createChunk } from './consume-bundle'
 import addBindingMethods from './add-binding-methods'
-import { selectorNameToValueName } from '../utils'
+import { HAS_WINDOW, IS_PROD, selectorNameToValueName } from '../utils'
 
 const bindSelectorsToStore = (store, selectors) => {
   for (const key in selectors) {
@@ -75,9 +75,7 @@ const enableBatchDispatch = reducer => (state, action) => {
 }
 
 const devTools = () =>
-  process.env.NODE_ENV !== 'production' &&
-  typeof window === 'object' &&
-  window.__REDUX_DEVTOOLS_EXTENSION__
+  !IS_PROD && HAS_WINDOW && window.__REDUX_DEVTOOLS_EXTENSION__
     ? window.__REDUX_DEVTOOLS_EXTENSION__()
     : null
 
