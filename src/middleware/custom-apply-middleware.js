@@ -8,9 +8,7 @@ export default (...middlewares) => createStore => (
   enhancer
 ) => {
   const store = createStore(reducer, preloadedState, enhancer)
-  let dispatch = store.dispatch
-  let chain = []
-  chain = middlewares.map(middleware => middleware(store))
-  dispatch = compose(...chain)(store.dispatch)
-  return Object.assign(store, { dispatch })
+  const chain = middlewares.map(middleware => middleware(store))
+  store.dispatch = compose(...chain)(store.dispatch)
+  return store
 }

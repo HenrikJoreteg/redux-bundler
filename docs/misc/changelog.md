@@ -1,5 +1,6 @@
 # Change Log
 
+* `21.0.2` - Fix for bug in required options check in createAsyncResourceBundle (thanks [@greggb](https://github.com/greggb)). Minor simplification/cleanup of `custom-apply-middleware.js`.
 * `21.0.1` - Build with compress=false to avoid redux console warning and improve debugging experience.
 * `21.0.0` - Adding scroll restoration handling. (many browsers already handle this well by default, but not FF or IE 11). This handles scroll position internally in the url bundle if used, it also exports the scroll restoration helper functions so that they can be used directly as well.
 * `20.0.0` - Adding documentation site, wrote lots of docs and made mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
