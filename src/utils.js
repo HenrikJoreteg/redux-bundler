@@ -5,6 +5,7 @@ try {
 export const HAS_DEBUG_FLAG = debug || false
 export const HAS_WINDOW = typeof window !== 'undefined'
 export const IS_BROWSER = HAS_WINDOW || typeof self !== 'undefined'
+export const IS_PROD = process.env.NODE_ENV === 'production'
 const fallback = func => {
   setTimeout(func, 0)
 }
@@ -20,7 +21,7 @@ export const isPassiveSupported = () => {
   let passiveSupported = false
   try {
     var options = Object.defineProperty({}, 'passive', {
-      get: function () {
+      get: function() {
         passiveSupported = true
       }
     })
@@ -78,7 +79,7 @@ export const selectorNameToValueName = name => {
 
 export const debounce = (fn, wait) => {
   let timeout
-  const debounced = function () {
+  const debounced = function() {
     let ctx = this
     let args = arguments
     clearTimeout(timeout)
