@@ -44,7 +44,7 @@
   },
   "scripts": {
     "build": "microbundle --compress=false --sourcemap=false",
-    "dev": "microbundle watch --compress=false --sourcemap=false",
+    "dev": "microbundle watch --compress=false",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
     "test": "tape test/*.js | tap-spec",
