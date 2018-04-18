@@ -21,7 +21,7 @@ export const isPassiveSupported = () => {
   let passiveSupported = false
   try {
     var options = Object.defineProperty({}, 'passive', {
-      get: function() {
+      get: function () {
         passiveSupported = true
       }
     })
@@ -79,7 +79,7 @@ export const selectorNameToValueName = name => {
 
 export const debounce = (fn, wait) => {
   let timeout
-  const debounced = function() {
+  const debounced = function () {
     let ctx = this
     let args = arguments
     clearTimeout(timeout)

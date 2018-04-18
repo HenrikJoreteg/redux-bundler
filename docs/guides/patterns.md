@@ -41,4 +41,8 @@ Use `createRouteBundle()` to generate routes as seen in the example app. When de
 
 ## React-Native (RN)
 
-If you are using `redux-bundler` with RN make sure you run `global.self = global` as the very first piece of code. The most common approach would be to put the code snippet in a seperate file and import it as the first one in your RN entry point/s.  
+If you are using `redux-bundler` with RN make sure you run `global.self = global` as the very first piece of code. The most common approach would be to put the code snippet in a seperate file and import it as the first one in your RN entry point/s.
+
+## Using Redux DevTools
+
+Both the `debug` bundle and redux dev tools are enabled if `localStorage.debug` is set to something "truthy". In this way you can keep your production apps debuggable, you just have to flip that `localStorage.debug` flag to enable it. Also beware that running `localStorage.debug = false` in your browser console won't actually turn it off. This is because LocalStorage serializes everything to strings so the value that's stored is actually the string `"false"` which... is truthy! So to turn it back off again, you can just do: `delete localStorage.debug` instead.
