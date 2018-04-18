@@ -80,8 +80,9 @@ const enableBatchDispatch = reducer => (state, action) => {
 }
 
 const devTools = () =>
-  (!IS_PROD && HAS_WINDOW && window.__REDUX_DEVTOOLS_EXTENSION__) ||
-  (HAS_DEBUG_FLAG && HAS_WINDOW && window.__REDUX_DEVTOOLS_EXTENSION__)
+  HAS_WINDOW &&
+  window.__REDUX_DEVTOOLS_EXTENSION__ &&
+  (HAS_DEBUG_FLAG || !IS_PROD)
     ? window.__REDUX_DEVTOOLS_EXTENSION__()
     : null
 
