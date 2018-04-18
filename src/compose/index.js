@@ -84,7 +84,7 @@ const devTools = () =>
   window.__REDUX_DEVTOOLS_EXTENSION__ &&
   (HAS_DEBUG_FLAG || !IS_PROD)
     ? window.__REDUX_DEVTOOLS_EXTENSION__()
-    : null
+    : a => a
 
 const composeBundles = (...bundles) => {
   // build out object of extracted bundle info
