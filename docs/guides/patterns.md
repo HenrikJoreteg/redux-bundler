@@ -38,3 +38,7 @@ This approach is implemented in the [example app](https://github.com/HenrikJoret
 ## Routing
 
 Use `createRouteBundle()` to generate routes as seen in the example app. When determining what to actually store as the "value" for a given route, I tend to use a component but you could certainly also return a string to be used for `<title></title>` or any other relevant items.
+
+## React-Native (RN)
+
+If you are using `redux-bundler` with RN make sure you run `global.self = global` as the very first piece of code. The most common approach would be to put the code snippet in a seperate file and import it as the first one in your RN entry point/s.  
