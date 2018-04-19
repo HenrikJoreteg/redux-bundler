@@ -56,3 +56,7 @@ export default composeBundlesRaw(
     // ... add more bundles here
 )
 ```
+
+## Using Redux DevTools
+
+Both the `debug` bundle and redux dev tools are enabled if `localStorage.debug` is set to something "truthy". In this way you can keep your production apps debuggable, you just have to flip that `localStorage.debug` flag to enable it. Also beware that running `localStorage.debug = false` in your browser console won't actually turn it off. This is because LocalStorage serializes everything to strings so the value that's stored is actually the string `"false"` which... is truthy! So to turn it back off again, you can just do: `delete localStorage.debug` instead.

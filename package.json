@@ -1,7 +1,7 @@
 {
   "name": "redux-bundler",
   "description": "Compose a Redux store out of smaller bundles of functionality.",
-  "version": "21.0.3",
+  "version": "21.1.0",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "bugs": {
     "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
@@ -44,6 +44,7 @@
   },
   "scripts": {
     "build": "microbundle --compress=false --sourcemap=false",
+    "dev": "microbundle watch --compress=false",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
     "test": "tape test/*.js | tap-spec",
