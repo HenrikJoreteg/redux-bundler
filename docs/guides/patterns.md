@@ -41,7 +41,21 @@ Use `createRouteBundle()` to generate routes as seen in the example app. When de
 
 ## React-Native (RN)
 
-If you are using `redux-bundler` with RN make sure you run `global.self = global` as the very first piece of code. The most common approach would be to put the code snippet in a seperate file and import it as the first one in your RN entry point/s.
+If you are using `redux-bundler` with RN make sure you run `global.self = global` as the very first piece of code. The most common approach would be to put the code snippet in a seperate file and import it as the first one in your RN entry point/s.  
+
+Some bundles like the `debugBundle` arent compatible with RN. So we cant use `composeBundles()` and only the `composeBundlesRaw()`
+method can help us out. 
+If you want to use the reactions feature dont forget to compose `createReactionBundle()` in the compose function otherwise your 
+actions returned never got dispatched!
+
+```
+import { composeBundlesRaw, createReactorBundle } from 'redux-bundler'
+
+export default composeBundlesRaw(
+    createReactorBundle(),
+    // ... add more bundles here
+)
+```
 
 ## Using Redux DevTools
 
