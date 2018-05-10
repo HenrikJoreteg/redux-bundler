@@ -74,7 +74,7 @@ Selectors:
 * `selectHostname()`: returns hostname as string.
 * `selectSubdomains()`: returns array of subdomains, if relevant.
 
-## `createRouteBundle(routesObject)`
+## `createRouteBundle(routesObject, optionsObject)`
 
 Takes an object of routes and returns a bundle with selectors to extract route parameters from the routes.
 
@@ -93,10 +93,25 @@ The value like `Home`, `UserList`, etc, can be _anything_. Whatever the current 
 
 Then in your root component in your app you'd simply `selectRoute()` to retrieve it.
 
+Options object:
+
+* `routeInfoSelector`: String (default: `'selectPathname'`) used to configure the key that is used for matching the current route on. Set it to `'selectHash'` to enable hash-based routing. **Note**: Currently you need entries for both '' and '/' if you rely on hash-based routing.
+
+```js
+export default createRouteBundle({
+  '': Home,
+  '/': Home,
+  '/users': UserList,
+}, {
+  routeInfoSelector: 'selectHash'
+})
+```
+
 Selectors:
 
 `selectRouteParams()`: returns an object of any route params extracted based on current route and current URL. In the example above `/users/:userId` would return `{userId: 'valueExtractedFromURL'}`.
 `selectRoute()`: returns whatever the value was in the routes object for the current matched route.
+`selectRouteInfo()`: returns the key that was passed to the route matcher. By default this is the value of `selectPathname` as defined by the `createUrlBundle` above.
 
 ## `appTimeBundle`
 
