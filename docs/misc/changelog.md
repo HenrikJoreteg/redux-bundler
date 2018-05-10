@@ -1,5 +1,6 @@
 # Change Log
 
+* `21.2.0` - Added support for hash-based routing by passing in options object to `createRouteBundle` (thanks [@olizilla]!).
 * `21.1.0` - Added support for Redux Dev Tools (thanks [@aulneau](https://github.com/aulneau)!). Added CI. Added some notes for React Native users to docs (thanks [@quarkcore](https://github.com/quarkcore)).
 * `21.0.3` - Fix for bug in required options check in createAsyncResourceBundle (thanks [@greggb](https://github.com/greggb)). Minor simplification/cleanup of `custom-apply-middleware.js`. (this was supposed to be `21.0.2` but accidentally got published as `21.0.3` :facepalm:)
 * `21.0.1` - Build with compress=false to avoid redux console warning and improve debugging experience.
