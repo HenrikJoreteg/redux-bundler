@@ -10,8 +10,14 @@ export default (routes, spec) => {
   const { routeInfoSelector } = opts
   return {
     name: 'routes',
-    selectRouteInfo: createSelector(routeInfoSelector, createRouteMatcher(routes)),
-    selectRouteParams: createSelector('selectRouteInfo', ({ params }) => params),
+    selectRouteInfo: createSelector(
+      routeInfoSelector,
+      createRouteMatcher(routes)
+    ),
+    selectRouteParams: createSelector(
+      'selectRouteInfo',
+      ({ params }) => params
+    ),
     selectRoute: createSelector('selectRouteInfo', ({ page }) => page)
   }
 }

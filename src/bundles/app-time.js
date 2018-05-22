@@ -1,5 +1,5 @@
 export default {
   name: 'appTime',
-  reducer: Date.now,
+  reducer: () => Date.now(),
   selectAppTime: state => state.appTime
 }
