@@ -26,7 +26,7 @@
 
   * [debugBundle](./api/included-bundles.md#debugbundle)
   * [createUrlBundle](./api/included-bundles.md#createurlbundleoptionsobject)
-  * [createRouteBundle](./api/included-bundles.md#createroutebundleroutesobject)
+  * [createRouteBundle](./api/included-bundles.md#createroutebundleroutesobject-optionsobject)
   * [appTimeBundle](./api/included-bundles.md#apptimebundle)
   * [onlineBundle](./api/included-bundles.md#onlinebundle)
   * [asyncCountBundle](./api/included-bundles.md#asynccountbundle)
