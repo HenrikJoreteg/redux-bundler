@@ -82,7 +82,7 @@ export default {
   getMiddleware: () => debugMiddleware,
   init: store => {
     if (store.selectIsDebug()) {
-      this.doLogEverything()
+      store.doLogEverything && store.doLogEverything()
     }
   }
 }
