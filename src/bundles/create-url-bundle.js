@@ -9,12 +9,14 @@ export const ensureString = input =>
   isString(input) ? input : qs.stringify(input)
 const IPRE = /^[0-9.]+$/
 export const parseSubdomains = (hostname, getBareHost) => {
-  if (IPRE.test(hostname)) return []
-  const parts = hostname.split('.')
-  if (getBareHost) {
-    return parts.slice(-2).join('.')
+  if (hostname) {
+    if (IPRE.test(hostname)) return []
+    const parts = hostname.split('.')
+    if (getBareHost) {
+      return parts.slice(-2).join('.')
+    }
+    return hostname.split('.').slice(0, -2)
   }
-  return hostname.split('.').slice(0, -2)
 }
 export const removeLeading = (char, string) =>
   string.charAt(0) === char ? string.slice(1) : string
@@ -51,30 +53,37 @@ export default opts => {
   const actionType = config.actionType
 
   const selectUrlRaw = state => state[config.name]
-  const selectUrlObject = createSelector(selectUrlRaw, urlState =>
-    makeSerializable(new URL(urlState.url))
+  const selectUrlObject = createSelector(
+    selectUrlRaw,
+    urlState => urlState.url && makeSerializable(new URL(urlState.url))
   )
-  const selectQueryObject = createSelector(selectUrlObject, urlObj =>
-    qs.parse(urlObj.search)
+  const selectQueryObject = createSelector(
+    selectUrlObject,
+    urlObj => urlObj && qs.parse(urlObj.search)
   )
-  const selectQueryString = createSelector(selectQueryObject, queryObj =>
-    qs.stringify(queryObj)
+  const selectQueryString = createSelector(
+    selectQueryObject,
+    queryObj => queryObj && qs.stringify(queryObj)
   )
   const selectPathname = createSelector(
     selectUrlObject,
-    urlObj => urlObj.pathname
+    urlObj => urlObj && urlObj.pathname
   )
-  const selectHash = createSelector(selectUrlObject, urlObj =>
-    removeLeading('#', urlObj.hash)
+  const selectHash = createSelector(
+    selectUrlObject,
+    urlObj => urlObj && removeLeading('#', urlObj.hash)
   )
-  const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
+  const selectHashObject = createSelector(
+    selectHash,
+    hash => hash && qs.parse(hash)
+  )
   const selectHostname = createSelector(
     selectUrlObject,
-    urlObj => urlObj.hostname
+    urlObj => urlObj && urlObj.hostname
   )
-  const selectSubdomains = createSelector(selectHostname, hostname =>
-    parseSubdomains(hostname)
-  )
+  const selectSubdomains =
+    selectHostname &&
+    createSelector(selectHostname, hostname => parseSubdomains(hostname))
 
   const doUpdateUrl = (newState, opts = { replace: false }) => ({
     dispatch,
