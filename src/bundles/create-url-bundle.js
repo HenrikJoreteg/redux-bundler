@@ -152,7 +152,7 @@ export default opts => {
       }
 
       return (state = initialState, { type, payload }) => {
-        if (type === '@@redux/INIT' && typeof state === 'string') {
+        if (typeof state === 'string') {
           return {
             url: state,
             replace: false

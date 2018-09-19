@@ -1,5 +1,6 @@
 # Change Log
 
+* `22.0.0` - Upgraded to redux v4.0.0.
 * `21.2.2` - Fixed `staleAge` -> `staleAfter` bug in geolocation bundle and fix starting state from online bundle should come from `navigator.onLine` (thanks [@layflags](https://github.com/layflags)!). Minor docs update (thanks [@JayChetty](https://github.com/JayChetty)).
 * `21.2.1` - Super minor tweak to `appTimeBundle` to make it possible to overwrite `Date.now()` after the app has started which can be useful to enable speeding up time for automated testing.
 * `21.2.0` - Added support for hash-based routing by passing in options object to `createRouteBundle` (thanks [@olizilla]!).
