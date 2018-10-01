@@ -8,12 +8,11 @@ const defaults = {
 export default (routes, spec) => {
   const opts = Object.assign({}, defaults, spec)
   const { routeInfoSelector } = opts
+  const routeMatcher = createRouteMatcher(routes)
   return {
     name: 'routes',
-    selectRouteInfo: createSelector(
-      routeInfoSelector,
-      createRouteMatcher(routes)
-    ),
+    selectRouteMatcher: () => routeMatcher,
+    selectRouteInfo: createSelector(routeInfoSelector, routeMatcher),
     selectRouteParams: createSelector(
       'selectRouteInfo',
       ({ params }) => params
