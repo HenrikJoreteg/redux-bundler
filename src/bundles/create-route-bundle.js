@@ -11,6 +11,7 @@ export default (routes, spec) => {
   const routeMatcher = createRouteMatcher(routes)
   return {
     name: 'routes',
+    selectRoutes: () => routes,
     selectRouteMatcher: () => routeMatcher,
     selectRouteInfo: createSelector(routeInfoSelector, routeMatcher),
     selectRouteParams: createSelector(
