@@ -36,75 +36,16 @@ export default spec => {
   const baseType = actionBaseType || name.toUpperCase()
 
   // build selectors
-  const inputSelector = state => state[name]
-  const dataSelector = state => state[name].data
-  const lastSuccessSelector = state => state[name].lastSuccess
-  const isExpiredSelector = state => state[name].isExpired
-  const lastErrorSelector = createSelector(
-    inputSelector,
-    resource => resource.errorTimes.slice(-1)[0] || null
-  )
-  const isStaleSelector = createSelector(
-    inputSelector,
-    lastSuccessSelector,
-    'selectAppTime',
-    (state, time, appTime) => {
-      if (state.isOutdated) {
-        return true
-      }
-      if (!time) {
-        return false
-      }
-      return appTime - time > staleAfter
-    }
-  )
-  const isWaitingToRetrySelector = createSelector(
-    lastErrorSelector,
-    'selectAppTime',
-    (time, appTime) => {
-      if (!time) {
-        return false
-      }
-      return appTime - time < retryAfter
-    }
-  )
-  const isLoadingSelector = createSelector(
-    inputSelector,
-    resourceState => resourceState.isLoading
-  )
-  const failedPermanentlySelector = createSelector(
-    inputSelector,
-    resourceState => resourceState.failedPermanently
-  )
-  const shouldUpdateSelector = createSelector(
-    isLoadingSelector,
-    failedPermanentlySelector,
-    isWaitingToRetrySelector,
-    dataSelector,
-    isStaleSelector,
-    'selectIsOnline',
-    (
-      isLoading,
-      failedPermanently,
-      isWaitingToRetry,
-      data,
-      isStale,
-      isOnline
-    ) => {
-      if (
-        (checkIfOnline && !isOnline) ||
-        isLoading ||
-        failedPermanently ||
-        isWaitingToRetry
-      ) {
-        return false
-      }
-      if (!data) {
-        return true
-      }
-      return isStale
-    }
-  )
+  const inputSelectorName = `select${uCaseName}Raw`
+  const dataSelectorName = `select${uCaseName}`
+  const lastSuccessSelectorName = `select${uCaseName}LastSuccess`
+  const isExpiredSelectorName = `select${uCaseName}IsExpired`
+  const lastErrorSelectorName = `select${uCaseName}LastError`
+  const isStaleSelectorName = `select${uCaseName}IsStale`
+  const isWaitingToRetrySelectorName = `select${uCaseName}IsWaitingToRetry`
+  const isLoadingSelectorName = `select${uCaseName}IsLoading`
+  const failedPermanentlySelectorName = `select${uCaseName}FailedPermanently`
+  const shouldUpdateSelectorName = `select${uCaseName}ShouldUpdate`
 
   // action types
   const actions = {
@@ -194,15 +135,81 @@ export default spec => {
       }
       return state
     },
-    [`select${uCaseName}Raw`]: inputSelector,
-    [`select${uCaseName}`]: dataSelector,
-    [`select${uCaseName}IsStale`]: isStaleSelector,
-    [`select${uCaseName}IsExpired`]: isExpiredSelector,
-    [`select${uCaseName}LastError`]: lastErrorSelector,
-    [`select${uCaseName}IsWaitingToRetry`]: isWaitingToRetrySelector,
-    [`select${uCaseName}IsLoading`]: isLoadingSelector,
-    [`select${uCaseName}FailedPermanently`]: failedPermanentlySelector,
-    [`select${uCaseName}ShouldUpdate`]: shouldUpdateSelector,
+    [inputSelectorName]: state => state[name],
+    [dataSelectorName]: createSelector(inputSelectorName, root => root.data),
+    [isStaleSelectorName]: createSelector(
+      inputSelectorName,
+      lastSuccessSelectorName,
+      'selectAppTime',
+      (state, time, appTime) => {
+        if (state.isOutdated) {
+          return true
+        }
+        if (!time) {
+          return false
+        }
+        return appTime - time > staleAfter
+      }
+    ),
+    [isExpiredSelectorName]: createSelector(
+      inputSelectorName,
+      root => root.isExpired
+    ),
+    [lastErrorSelectorName]: createSelector(
+      inputSelectorName,
+      resource => resource.errorTimes.slice(-1)[0] || null
+    ),
+    [lastSuccessSelectorName]: createSelector(
+      inputSelectorName,
+      root => root.lastSuccess
+    ),
+    [isWaitingToRetrySelectorName]: createSelector(
+      lastErrorSelectorName,
+      'selectAppTime',
+      (time, appTime) => {
+        if (!time) {
+          return false
+        }
+        return appTime - time < retryAfter
+      }
+    ),
+    [isLoadingSelectorName]: createSelector(
+      inputSelectorName,
+      resourceState => resourceState.isLoading
+    ),
+    [failedPermanentlySelectorName]: createSelector(
+      inputSelectorName,
+      resourceState => resourceState.failedPermanently
+    ),
+    [shouldUpdateSelectorName]: createSelector(
+      isLoadingSelectorName,
+      failedPermanentlySelectorName,
+      isWaitingToRetrySelectorName,
+      dataSelectorName,
+      isStaleSelectorName,
+      'selectIsOnline',
+      (
+        isLoading,
+        failedPermanently,
+        isWaitingToRetry,
+        data,
+        isStale,
+        isOnline
+      ) => {
+        if (
+          (checkIfOnline && !isOnline) ||
+          isLoading ||
+          failedPermanently ||
+          isWaitingToRetry
+        ) {
+          return false
+        }
+        if (!data) {
+          return true
+        }
+        return isStale
+      }
+    ),
     [`doFetch${uCaseName}`]: doFetchData,
     [`doMark${uCaseName}AsOutdated`]: doMarkAsOutdated,
     [`doClear${uCaseName}`]: doClear,
@@ -220,7 +227,7 @@ export default spec => {
 
   if (expireAfter !== Infinity) {
     result[`reactExpire${uCaseName}`] = createSelector(
-      lastSuccessSelector,
+      lastSuccessSelectorName,
       'selectAppTime',
       (time, appTime) => {
         if (!time) {
