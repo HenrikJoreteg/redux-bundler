@@ -111,6 +111,7 @@ Selectors:
 
 `selectRouteParams()`: returns an object of any route params extracted based on current route and current URL. In the example above `/users/:userId` would return `{userId: 'valueExtractedFromURL'}`.
 `selectRouteMatcher()`: returns the route matcher function used. Can be useful for seeing what result a URL would return before actually setting that URL.
+`selectRoutes()`: returns the routes object originally passed in. Can be useful for static sites where you want to pre-render all available pages at build time.
 `selectRoute()`: returns whatever the value was in the routes object for the current matched route.
 `selectRouteInfo()`: returns the key that was passed to the route matcher. By default this is the value of `selectPathname` as defined by the `createUrlBundle` above.
 
