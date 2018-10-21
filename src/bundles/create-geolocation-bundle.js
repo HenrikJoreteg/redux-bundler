@@ -18,7 +18,7 @@ const defaultOpts = {
   timeout: 60000,
   enableHighAccuracy: false,
   persist: true,
-  staleAge: 900000, // fifteen minutes
+  staleAfter: 900000, // fifteen minutes
   retryAfter: 60000 // one minute,
 }
 
@@ -51,7 +51,7 @@ export default spec => {
         navigator.geolocation.getCurrentPosition(success, fail, geoOpts)
       }),
     persist: opts.persist,
-    staleAge: opts.staleAge,
+    staleAfter: opts.staleAfter,
     retryAfter: opts.retryAfter
   })
 }
