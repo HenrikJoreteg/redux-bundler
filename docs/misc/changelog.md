@@ -1,5 +1,6 @@
 # Change Log
 
+- `23.0.1` Use `--no-compress` instead of `--compress=false`. It was not being parsed properly by the updated version of microbundle.
 - `23.0.0`
   - Added support for passing a `REPLACE_STATE` action to replace entire state of store. Because this could be a breaking change if you already have such an action type, I'm doing a major version bump for this.
   - Updated npm deps to mitigate security advisories.

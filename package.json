@@ -10,14 +10,14 @@
     "create-selector": "4.0.1",
     "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.3.0",
-    "microbundle": "^0.8.3",
-    "nodemon": "^1.18.8",
+    "microbundle": "0.8.3",
+    "nodemon": "1.18.8",
     "prettier-standard": "8.0.0",
     "querystringify": "0.0.4",
     "redux": "4.0.0",
     "redux-persist-middleware": "1.0.1",
     "standard": "10.0.3",
-    "tap-spec": "^5.0.0",
+    "tap-spec": "5.0.0",
     "tape": "4.6.0",
     "whatwg-url": "6.3.0"
   },
@@ -43,8 +43,8 @@
     "url": "https://github.com/HenrikJoreteg/redux-bundler"
   },
   "scripts": {
-    "build": "microbundle --compress=false --sourcemap=false",
-    "dev": "microbundle watch --compress=false",
+    "build": "microbundle --no-compress --no-sourcemap",
+    "dev": "microbundle watch --no-compress",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
     "prepublish": "npm run lint && npm run build",
     "test": "tape test/*.js | tap-spec",
