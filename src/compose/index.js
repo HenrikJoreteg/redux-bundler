@@ -79,6 +79,15 @@ const enableBatchDispatch = reducer => (state, action) => {
   return reducer(state, action)
 }
 
+const enableReplaceState = reducer => (state, action) => {
+  if (action.type === 'REPLACE_STATE') {
+    return reducer(action.payload, action)
+  }
+  return reducer(state, action)
+}
+
+const enhanceReducer = compose(enableBatchDispatch, enableReplaceState)
+
 const devTools = () =>
   HAS_WINDOW &&
   window.__REDUX_DEVTOOLS_EXTENSION__ &&
@@ -93,7 +102,7 @@ const composeBundles = (...bundles) => {
   return data => {
     // actually init our store
     const store = createStore(
-      enableBatchDispatch(combineReducers(firstChunk.reducers)),
+      enhanceReducer(combineReducers(firstChunk.reducers)),
       data,
       compose(
         customApplyMiddleware(
@@ -135,7 +144,7 @@ const composeBundles = (...bundles) => {
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}
       )
-      store.replaceReducer(enableBatchDispatch(combineReducers(allReducers)))
+      store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
     }
 
     return store

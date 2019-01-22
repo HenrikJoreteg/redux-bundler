@@ -96,10 +96,10 @@ export const debounce = (fn, wait) => {
 export const saveScrollPosition = () => {
   history.replaceState(
     {
-      height: document.body.offsetHeight,
-      width: document.body.offsetWidth,
-      y: document.body.scrollTop,
-      x: document.body.scrollLeft
+      height: window.innerHeight,
+      width: window.innerWidth,
+      y: window.scrollY,
+      x: window.scrollX
     },
     ''
   )

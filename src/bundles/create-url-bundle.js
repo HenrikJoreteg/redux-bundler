@@ -113,7 +113,9 @@ export default opts => {
         return
       }
 
-      if (config.handleScrollRestoration) initScrollPosition()
+      if (config.handleScrollRestoration) {
+        initScrollPosition()
+      }
 
       window.addEventListener('popstate', () => {
         store.doUpdateUrl({
@@ -135,9 +137,10 @@ export default opts => {
               null,
               newState.url
             )
-            if (config.handleScrollRestoration) saveScrollPosition()
-            document.body.scrollTop = 0
-            document.body.scrollLeft = 0
+            if (config.handleScrollRestoration) {
+              saveScrollPosition()
+            }
+            window.scrollTo(0, 0)
           } catch (e) {
             console.error(e)
           }
