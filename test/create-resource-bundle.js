@@ -65,6 +65,21 @@ test('createAsyncResourceBundle action creator success dispatches', t => {
   }, 0)
 })
 
+test('createAsyncResourceBundle should update selector', t => {
+  const store = getAsyncBundleStore(0)() // <- e.g. user id 0
+  t.equal(store.selectUser(), null, "shouldn't have data")
+  t.equal(store.selectUserShouldUpdate(), true, "should update w/o data")
+  store.doFetchUser()
+
+  // wait for fetch to finish
+  setTimeout(() => {
+    t.equal(store.selectUser(), 0, "should have data")
+    t.equal(store.selectUserShouldUpdate(), false,
+      "shouldn't update with fresh data")
+    t.end()
+  }, 0)
+})
+
 test('createAsyncResourceBundle custom actionBaseType', t => {
   const store = getAsyncBundleStore(
     { name: 'gregg' },
