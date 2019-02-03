@@ -57,8 +57,8 @@ Options object:
 
 Action creators:
 
-* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`.
-  `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
+* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`. Additionally, you can pass `{ maintainScrollPosition: true }` for cases when you do not expect window scroll position to be reset to top as a result of route transition.
+* `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
 * `doUpdateQuery(queryString | queryObject, [options])`: can be used to update query string in place. Either pass in new query string or an object. It does a replaceState by default but you can pass `{replace: false}` if you want to do a push.
 * `doUpdateHash(string | object, [options])`: for updating hash value, does a push by default, but can do replace if passed `{replace: true}`.
 
