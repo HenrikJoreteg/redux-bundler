@@ -76,7 +76,7 @@ export default opts => {
     parseSubdomains(hostname)
   )
 
-  const doUpdateUrl = (newState, opts = { replace: false }) => ({
+  const doUpdateUrl = (newState, opts = { replace: false, maintainScrollPosition: false }) => ({
     dispatch,
     getState
   }) => {
@@ -97,7 +97,11 @@ export default opts => {
     if (isDefined(state.query)) url.search = ensureString(state.query)
     dispatch({
       type: actionType,
-      payload: { url: url.href, replace: opts.replace }
+      payload: {
+        url: url.href,
+        replace: opts.replace,
+        maintainScrollPosition: opts.maintainScrollPosition
+      }
     })
   }
   const doReplaceUrl = url => doUpdateUrl(url, { replace: true })
@@ -140,7 +144,9 @@ export default opts => {
             if (config.handleScrollRestoration) {
               saveScrollPosition()
             }
-            window.scrollTo(0, 0)
+            if (!newState.maintainScrollPosition) {
+              window.scrollTo(0, 0)
+            }
           } catch (e) {
             console.error(e)
           }
@@ -151,20 +157,23 @@ export default opts => {
     getReducer: () => {
       const initialState = {
         url: !config.inert && HAS_WINDOW ? loc.href : '/',
-        replace: false
+        replace: false,
+        maintainScrollPosition: false
       }
 
       return (state = initialState, { type, payload }) => {
         if (typeof state === 'string') {
           return {
             url: state,
-            replace: false
+            replace: false,
+            maintainScrollPosition: false
           }
         }
         if (type === actionType) {
           return Object.assign({
             url: payload.url || payload,
-            replace: !!payload.replace
+            replace: !!payload.replace,
+            maintainScrollPosition: !!payload.maintainScrollPosition
           })
         }
         return state
