@@ -1,5 +1,6 @@
 # Change Log
 
+- `23.1.0` Adds `maintainScrollPosition` option to `doUpdateUrl()` (thanks [@abuinitski](https://github.com/abuinitski)). Minor tweak to explicitly check for `null` instead of implied type in order to support storing `0` as the data in `createAsyncResourceBundle()` (thanks [@layflags](https://github.com/layflags)).
 - `23.0.2` Fixes issues with scroll restoration not working in all cases when using the url bundle.
 - `23.0.1` Use `--no-compress` instead of `--compress=false`. It was not being parsed properly by the updated version of microbundle.
 - `23.0.0`
