@@ -204,7 +204,7 @@ export default spec => {
         ) {
           return false
         }
-        if (!data) {
+        if (data === null) {
           return true
         }
         return isStale
