@@ -162,7 +162,7 @@ Redux is awesome, but it's no secret that using it requires writing a fair amoun
 
 I've been building redux apps for quite some time and some of you may have been introduced to it when I first [blogged about it](https://blog.andyet.com/2015/08/06/what-the-flux-lets-redux/) back in 2015. This library is how I build redux apps, I finally decided to open source it.
 
-As I said this isn't a toy project. I'm currently using this library in the three different production apps that power my online donation platform, [Speedy](https://speedy.gift). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
+As I said this isn't a toy project. I'm currently using this library for my app that helps chart anesthesia during surgeries [AnesthesiaCharting.com](https://anesthesiacharting.com). This also builds on some of the ideas that were originally conceived and battle-tested when I was helping Starbucks re-platform and build their [shiny new PWA](https://app.starbucks.com). The point is this is actually how I build things with Redux, and given the lack of "solutions" to the boilerplate issue, I decided to share it.
 
 There's a sample application [the source is here](https://github.com/HenrikJoreteg/redux-bundler-example) which is a good way to see how to build something with it. It's [deployed here](https://redux-bundler.netlify.com/) so you can see how it all works when it's up and running.
 
