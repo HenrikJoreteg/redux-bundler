@@ -76,10 +76,10 @@ export default opts => {
     parseSubdomains(hostname)
   )
 
-  const doUpdateUrl = (newState, opts = { replace: false, maintainScrollPosition: false }) => ({
-    dispatch,
-    getState
-  }) => {
+  const doUpdateUrl = (
+    newState,
+    opts = { replace: false, maintainScrollPosition: false }
+  ) => ({ dispatch, getState }) => {
     let state = newState
     if (typeof newState === 'string') {
       const parsed = new URL(

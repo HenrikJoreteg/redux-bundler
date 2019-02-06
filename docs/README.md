@@ -4,6 +4,12 @@ Compose a Redux store out of smaller bundles of functionality.
 
 Created by: [@HenrikJoreteg](http://twitter.com/henrikjoreteg)
 
+Created for and used by PWAs that value small bundle sizes, network resilience, and explicit state management. If you want to be able to declaratively combine seemingly disparate logic such as: if it's the third tuesday of the month, our cached data is more than 3.5 days old, and the user is viewing the `/reposition-satellite` page then trigger a data refresh of satellite position... this toolkit is for you.
+
+If you pair it with [Preact](https://preactjs.com/) it's ~15kb for an entire app toolkit.
+
+If you want to see an app built with it, check out: [anesthesiacharting.com](https://anesthesiacharting.com).
+
 ## The basic idea
 
 Organize all Redux-related code into a single flat folder of "redux bundles". A bundle is a single file for each main area of functionality in your app.
@@ -166,18 +172,18 @@ Note: redux-bundler includes its dependencies for simplicity to minimize surface
 
 This approach of consolidating everything on the store actually enables some interesting things.
 
-* Reuse of redux-related functionality across applications. (For example, I share an "authBundle" between 3 different apps built on the same API).
-* You can make configurable bundles! You can write higher-level functions that returns a pre-configured bundle. This is _huge_ for reducing boilerplate for things like simple data fetches. See the included `createAsyncResourceBundle` for an example of this.
-* Keep things tidy. Behavior is decoupled from display. Components can focus on what they do best: rendering their current props.
-* It strongly enforces a set of conventions for building redux apps (this is important for larger teams, especially). For example, you have to name your selectors starting with `select`.
-* Supports lazy-loading additional redux bundles even after you've created the store. The new bundles are integrated into the existing redux store. Since, connected components reference things by name instead of directly import functions the the components can be sent in different JS payload than the redux code that will power them because until they're actually used they can reference things that don't yet exist on the store.
-* This lib also includes an integrated approach for how to react to certain state conditions in your app. You can define special selectors that start with `react` instead of `select` that will be evaluated on a regular basis and can return actions to trigger in response. This enables really, really interesting patterns of being able to recover from failure and retrying failed requests, etc. The level of reliability that can be achieved here is _very_ powerful especially for use in PWAs that may well be offline or have really poor network conditions.
-* The fact that you _have to use a selector_ to get state from redux dramatically simplifies refactoring of large redux apps and avoids many performance pitfalls.
-* You can pass an array of selector names you want to subscribe to and get a callback with changes for those particular selectors. By consolidates state diffing into a single spot in the store, `connect()` doesn't have to do any dirty checking, so the binding code becomes very simple.
-* Connected action creators are already pre-bound to the store so you never have to import an action creator and then bind it before using it in your component, which I've found to be really confusing for developers learning redux.
-* It includes a debug bundle you can enable to see nice summary of what's happening for each action that is dispatched.
-* In debug mode (which is enabled by setting `localStorage.debug` to a truthy value) the store instance is bound to `window` allowing console debugging of all your selectors, action creators via the JS console. For example you can type stuff like `store.selectIsLoggedIn()` to see results or `store.doLogout()` to trigger that action creator even if you don't have UI built for that yet.
-* It is uniquely well-suited for running inside a WebWorker. Because so much of your application logic lives in the resulting store, and because it lets you subscribe to changes and get deltas of the state you care about, this whole system is uniquely well suited for being ran off of the main thread. I've put together [an example app that runs entirely in a worker](https://github.com/HenrikJoreteg/redux-bundler-worker-example)
+- Reuse of redux-related functionality across applications. (For example, I share an "authBundle" between 3 different apps built on the same API).
+- You can make configurable bundles! You can write higher-level functions that returns a pre-configured bundle. This is _huge_ for reducing boilerplate for things like simple data fetches. See the included `createAsyncResourceBundle` for an example of this.
+- Keep things tidy. Behavior is decoupled from display. Components can focus on what they do best: rendering their current props.
+- It strongly enforces a set of conventions for building redux apps (this is important for larger teams, especially). For example, you have to name your selectors starting with `select`.
+- Supports lazy-loading additional redux bundles even after you've created the store. The new bundles are integrated into the existing redux store. Since, connected components reference things by name instead of directly import functions the the components can be sent in different JS payload than the redux code that will power them because until they're actually used they can reference things that don't yet exist on the store.
+- This lib also includes an integrated approach for how to react to certain state conditions in your app. You can define special selectors that start with `react` instead of `select` that will be evaluated on a regular basis and can return actions to trigger in response. This enables really, really interesting patterns of being able to recover from failure and retrying failed requests, etc. The level of reliability that can be achieved here is _very_ powerful especially for use in PWAs that may well be offline or have really poor network conditions.
+- The fact that you _have to use a selector_ to get state from redux dramatically simplifies refactoring of large redux apps and avoids many performance pitfalls.
+- You can pass an array of selector names you want to subscribe to and get a callback with changes for those particular selectors. By consolidates state diffing into a single spot in the store, `connect()` doesn't have to do any dirty checking, so the binding code becomes very simple.
+- Connected action creators are already pre-bound to the store so you never have to import an action creator and then bind it before using it in your component, which I've found to be really confusing for developers learning redux.
+- It includes a debug bundle you can enable to see nice summary of what's happening for each action that is dispatched.
+- In debug mode (which is enabled by setting `localStorage.debug` to a truthy value) the store instance is bound to `window` allowing console debugging of all your selectors, action creators via the JS console. For example you can type stuff like `store.selectIsLoggedIn()` to see results or `store.doLogout()` to trigger that action creator even if you don't have UI built for that yet.
+- It is uniquely well-suited for running inside a WebWorker. Because so much of your application logic lives in the resulting store, and because it lets you subscribe to changes and get deltas of the state you care about, this whole system is uniquely well suited for being ran off of the main thread. I've put together [an example app that runs entirely in a worker](https://github.com/HenrikJoreteg/redux-bundler-worker-example)
 
 ## What about async stuff?!
 
@@ -247,10 +253,10 @@ Now I have one unified place to see anything that could cause a redirect in my a
 
 ## What next?
 
-* Learn exactly [what bundles can do](/api/bundle.html).
-* Check out the example app here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) to see how to build an app with redux-bundler.
-* Learn about all the functionality available in the [included bundles](/api/included-bundles.html).
-* See the [patterns page](/guides/patterns.html) for tips on how to organize your code, and do things like caching and routing.
+- Learn exactly [what bundles can do](/api/bundle.html).
+- Check out the example app here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) to see how to build an app with redux-bundler.
+- Learn about all the functionality available in the [included bundles](/api/included-bundles.html).
+- See the [patterns page](/guides/patterns.html) for tips on how to organize your code, and do things like caching and routing.
 
 ## license
 
