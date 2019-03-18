@@ -105,12 +105,18 @@ test('resolves selectors appropriately', t => {
   const testBundle1 = {
     name: 'thing',
     reducer: (state = null) => state,
-    selectSomething: createSelector(thingIdentifySelector, id => id)
+    selectSomething: createSelector(
+      thingIdentifySelector,
+      id => id
+    )
   }
 
   const testBundle2 = {
     name: 'other',
-    selectOther: createSelector('selectSomething', something => something)
+    selectOther: createSelector(
+      'selectSomething',
+      something => something
+    )
   }
 
   const store = composeBundlesRaw(testBundle1, testBundle2)({ thing: 'hi' })

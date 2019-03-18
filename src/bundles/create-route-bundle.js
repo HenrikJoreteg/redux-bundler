@@ -13,11 +13,17 @@ export default (routes, spec) => {
     name: 'routes',
     selectRoutes: () => routes,
     selectRouteMatcher: () => routeMatcher,
-    selectRouteInfo: createSelector(routeInfoSelector, routeMatcher),
+    selectRouteInfo: createSelector(
+      routeInfoSelector,
+      routeMatcher
+    ),
     selectRouteParams: createSelector(
       'selectRouteInfo',
       ({ params }) => params
     ),
-    selectRoute: createSelector('selectRouteInfo', ({ page }) => page)
+    selectRoute: createSelector(
+      'selectRouteInfo',
+      ({ page }) => page
+    )
   }
 }

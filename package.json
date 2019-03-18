@@ -7,18 +7,18 @@
     "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
   },
   "devDependencies": {
-    "create-selector": "4.0.1",
+    "create-selector": "4.0.3",
     "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.3.0",
-    "microbundle": "0.8.3",
-    "nodemon": "1.18.8",
-    "prettier-standard": "8.0.0",
+    "microbundle": "0.11.0",
+    "nodemon": "1.18.10",
+    "prettier-standard": "9.1.1",
     "querystringify": "0.0.4",
     "redux": "4.0.0",
     "redux-persist-middleware": "1.0.1",
-    "standard": "10.0.3",
+    "standard": "12.0.1",
     "tap-spec": "5.0.0",
-    "tape": "4.6.0",
+    "tape": "4.10.1",
     "whatwg-url": "6.3.0"
   },
   "files": [
