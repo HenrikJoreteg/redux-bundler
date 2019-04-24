@@ -110,10 +110,12 @@ export const restoreScrollPosition = () => {
   if (state) {
     // we'll force it to our known height since the DOM rendering may
     // be async and the height may not be restored yet.
-    const newStyle = `height: ${state.height}px; width: ${state.width}px;`
-    document.body.setAttribute('style', newStyle)
-    window.scrollTo(state.x, state.y)
-    ric(() => document.body.removeAttribute('style'))
+    setTimeout(() => {
+      const newStyle = `height: ${state.height}px; width: ${state.width}px;`
+      document.body.setAttribute('style', newStyle)
+      window.scrollTo(state.x, state.y)
+      ric(() => document.body.removeAttribute('style'))
+    })
   }
 }
 
