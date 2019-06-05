@@ -4,7 +4,8 @@ const defaults = {
   idleTimeout: 30000,
   idleAction: 'APP_IDLE',
   doneCallback: null,
-  stopWhenTabInactive: true
+  stopWhenTabInactive: true,
+  cancelIdleWhenDone: true
 }
 
 const ricOptions = { timeout: 500 }
@@ -17,14 +18,17 @@ export const getIdleDispatcher = (stopWhenInactive, timeout, fn) =>
 export default spec => ({
   name: 'reactors',
   init: store => {
-    const opts = Object.assign({}, defaults, spec)
-    const { idleAction, idleTimeout } = opts
+    const {
+      idleAction,
+      idleTimeout,
+      cancelIdleWhenDone,
+      doneCallback,
+      stopWhenTabInactive
+    } = Object.assign({}, defaults, spec)
     let idleDispatcher
     if (idleTimeout) {
-      idleDispatcher = getIdleDispatcher(
-        opts.stopWhenTabInactive,
-        idleTimeout,
-        () => store.dispatch({ type: idleAction })
+      idleDispatcher = getIdleDispatcher(stopWhenTabInactive, idleTimeout, () =>
+        store.dispatch({ type: idleAction })
       )
     }
 
@@ -45,7 +49,7 @@ export default spec => ({
         (!store.selectAsyncActive || !store.selectAsyncActive())
       ) {
         idleDispatcher && idleDispatcher.cancel()
-        opts.doneCallback && opts.doneCallback()
+        doneCallback && doneCallback()
       }
     }
 
@@ -78,7 +82,7 @@ export default spec => ({
       dispatchNext()
       if (idleDispatcher) {
         idleDispatcher()
-        cancelIfDone()
+        cancelIdleWhenDone && cancelIfDone()
       }
     }
 

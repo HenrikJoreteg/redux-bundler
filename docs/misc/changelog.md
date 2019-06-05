@@ -1,5 +1,6 @@
 # Change Log
 
+- `23.2.0` Adds option for `cancelIdleWhenDone` to `createReactorBundle`. By default, if redux-bundler is running in node.js and there are no pending reactions, the idle dispatcher stops firing. This is to support normal SSR use-cases where you may want to wait for the store to be "done" doing any remaining work, then fire the done callback. However, for use cases where you're wanting to use redux-bundler as a long-lived state engine in node.js it was problematic to have it stop idling. The default behavior is unchanged, but no if you pass `cancelIdleWhenDone: false` as an option, it will keep running indefinitely.
 - `23.1.2` Adds `setTimeout` to restore scroll position util. This buys UI libs a chance to update the DOM and makes scroll position restoration work in some cases where it wasn't previously.
 - `23.1.1` Updates `create-selector` to `4.0.3` to improve selector resolution perf. Updates a few dev dependencies to latest versions.
 - `23.1.0` Adds `maintainScrollPosition` option to `doUpdateUrl()` (thanks [@abuinitski](https://github.com/abuinitski)). Minor tweak to explicitly check for `null` instead of implied type in order to support storing `0` as the data in `createAsyncResourceBundle()` (thanks [@layflags](https://github.com/layflags)).
