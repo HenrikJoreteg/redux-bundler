@@ -148,6 +148,7 @@ const composeBundles = (...bundles) => {
         {}
       )
       store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
+      store.buildPersistActionMap && store.buildPersistActionMap()
     }
 
     return store

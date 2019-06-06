@@ -1,5 +1,9 @@
 # Change Log
 
+- `24.0.0`
+  - Breaking change to `createCacheBundle`. It now takes an options object as an argument instead of just a cache function. This allows us to pass an `enabled` option to enable its use in node.js (it's still off by default in node). Also adds support for passing a `logger` function as an option. It will be called with a message describing what was persisted and why.
+  - Fixes persist action support for bundles added later with `integrateBundles`. Previously the map of actions to reducers to persist was only created up front. It is now re-generated after other bundles are integrated.
+  - Added, tests to demonstrate these changes.
 - `23.2.0` Adds option for `cancelIdleWhenDone` to `createReactorBundle`. By default, if redux-bundler is running in node.js and there are no pending reactions, the idle dispatcher stops firing. This is to support normal SSR use-cases where you may want to wait for the store to be "done" doing any remaining work, then fire the done callback. However, for use cases where you're wanting to use redux-bundler as a long-lived state engine in node.js it was problematic to have it stop idling. The default behavior is unchanged, but no if you pass `cancelIdleWhenDone: false` as an option, it will keep running indefinitely.
 - `23.1.2` Adds `setTimeout` to restore scroll position util. This buys UI libs a chance to update the DOM and makes scroll position restoration work in some cases where it wasn't previously.
 - `23.1.1` Updates `create-selector` to `4.0.3` to improve selector resolution perf. Updates a few dev dependencies to latest versions.

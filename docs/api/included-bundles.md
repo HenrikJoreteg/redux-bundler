@@ -135,13 +135,30 @@ It works like this:
 
 If an action contains `STARTED` it increments, if it contains `FINISHED` or `FAILED` it decrements. It adds a single selector to the store called `selectAsyncActive`. This is intended to be used to display a global loading indicator in the app. You may have seen these implemented as a thin colored bar across the top of the UI.
 
-## `createCacheBundle(cachingFunction)`
+## `createCacheBundle(optionsObject)`
 
 Adds support for local caching of bundle data to the app. Other bundle can declare caching when this has been added to the app.
 
-This bundle takes a single required option: a function to use to persist data. The function has to take two arguments: the key and the value. The previously mentioned [example app](https://github.com/HenrikJoreteg/redux-bundler-example/blob/master/src/bundles/index.js) shows how to do this using [money-clip](https://github.com/HenrikJoreteg/money-clip).
+This bundle takes _one required option_: `cacheFn` a function to use to persist data. The function has to take two arguments: the key and the value and return a `Promise`. Suggested caching lib: [money-clip](https://github.com/HenrikJoreteg/money-clip).
 
 Once the caching bundle has been added, other bundles can indicate that their contents should be persisted by exporting a `persistActions` array of action types. Any time one of those action types occur, the contents of that bundle's reducer will be persisted lazily. Again, see the example app for usage.
+
+Two other options are supported:
+
+1. `enabled: [Boolean]`: by default, it will be enabled in the browser only. Passing `enabled: [Boolean]` allows explicitly specifying whether it should be enabled or not. So if you're wanting to persist things in node.js, make sure you're passing `true`.
+2. `logger: [Function]`: by default it logs nothing. If you want to log a success message after things have been persisted. Pass a function here, for example: `{ logger: console.log.bind(console), cacheFn: () => { ... } } `
+
+Example usage:
+
+```js
+composeBundles(
+  createCacheBundle({
+    logger: console.log.bind(console),
+    cacheFn: cache.put
+  }),
+  ...yourOtherBundles
+)
+```
 
 ## `createAsyncResourceBundle(optionsObject)`
 
