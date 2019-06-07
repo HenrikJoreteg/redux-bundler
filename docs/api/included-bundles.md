@@ -2,11 +2,18 @@
 
 We take a "batteries included" approach where you don't have to use any of this stuff but where a pretty complete set of tools required for apps is included out of the box.
 
-## `debugBundle`
+## `createDebugBundle([optionsObject])`
 
 This is meant to be leave-in-able in production. It works as follows:
 
 Unless `localStorage.debug` is set to something "truthy" it will do nothing.
+
+It takes the following options (none are required):
+
+- `logSelectors` (default: true): whether or not to log out selectors and their computed value with each action dispatch
+- `logState` (default: true): whether to log state after each dispatch
+- `logIdle` (default: true): whether to log APP_IDLE events (these can get annoying if there's a lot).
+- `enabled` (default: HAS_DEBUG_FLAG): explicitly enable/disable. This is helpful in node.js where there's no localStorage flag.
 
 If enabled:
 

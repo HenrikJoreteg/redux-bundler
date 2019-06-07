@@ -7,18 +7,18 @@
     "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
   },
   "devDependencies": {
-    "create-selector": "4.0.3",
+    "create-selector": "5.0.0",
     "feather-route-matcher": "3.0.0",
     "idb-keyval": "2.3.0",
     "microbundle": "0.11.0",
-    "nodemon": "1.18.10",
+    "nodemon": "1.19.1",
     "prettier-standard": "9.1.1",
-    "querystringify": "0.0.4",
-    "redux": "4.0.0",
+    "querystringify": "2.1.1",
+    "redux": "4.0.1",
     "standard": "12.0.1",
     "tap-spec": "5.0.0",
-    "tape": "4.10.1",
-    "whatwg-url": "6.3.0"
+    "tape": "4.10.2",
+    "whatwg-url": "7.0.0"
   },
   "files": [
     "dist"
@@ -45,12 +45,13 @@
     "build": "microbundle --no-compress --no-sourcemap",
     "dev": "microbundle watch --no-compress",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
-    "prepublish": "npm run lint && npm run build",
+    "prepublish": "npm run full-test",
     "test": "tape test/*.js | tap-spec",
     "full-test": "npm run build && npm run test && npm run lint"
   },
   "standard": {
     "globals": [
+      "localStorage",
       "window",
       "self",
       "URL",

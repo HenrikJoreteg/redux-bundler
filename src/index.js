@@ -9,7 +9,7 @@ import reactors, {
   getIdleDispatcher as idle
 } from './bundles/create-reactor-bundle'
 import url from './bundles/create-url-bundle'
-import debug from './bundles/debug'
+import createDebug from './bundles/create-debug-bundle'
 import online from './bundles/online'
 export { createSelector, resolveSelectors } from 'create-selector'
 export * from './utils'
@@ -24,7 +24,7 @@ export const createReactorBundle = reactors
 export const getIdleDispatcher = idle
 export const onlineBundle = online
 export const createUrlBundle = url
-export const debugBundle = debug
+export const createDebugBundle = createDebug
 export const composeBundlesRaw = compose
 export const createGeolocationBundle = geolocation
 export const composeBundles = (...userBundles) => {
@@ -35,7 +35,7 @@ export const composeBundles = (...userBundles) => {
     online,
     url(),
     reactors(),
-    debug,
+    createDebug(),
     ...userBundles
   ]
   return compose(...bundles)

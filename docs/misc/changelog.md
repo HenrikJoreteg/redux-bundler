@@ -1,5 +1,12 @@
 # Change Log
 
+- `25.0.0`
+  - Re-worked debug bundle. It is now created programmatically so it can be configured: `createDebugBundle()`
+    - Now works in node.js ([#31](https://github.com/HenrikJoreteg/redux-bundler/issues/31))
+    - Big thanks to [@aulneau](https://github.com/HenrikJoreteg/redux-bundler/pull/32) for general idea. Unfortunately wasn't quite able to merge his PR as it was and wanted to do some other related changes as well. But credit is due, for sure. Thanks!
+    - Fix logging difference when activated later: ([#24](https://github.com/HenrikJoreteg/redux-bundler/issues/24))
+  - Updates `querystringify` and `create-selector` to `2.1.1` ([#55](https://github.com/HenrikJoreteg/redux-bundler/issues/24))
+  - Fixes annoying "missing sourcemap" warning when building with parcel.
 - `24.0.0`
   - Breaking change to `createCacheBundle`. It now takes an options object as an argument instead of just a cache function. This allows us to pass an `enabled` option to enable its use in node.js (it's still off by default in node). Also adds support for passing a `logger` function as an option. It will be called with a message describing what was persisted and why.
   - Fixes persist action support for bundles added later with `integrateBundles`. Previously the map of actions to reducers to persist was only created up front. It is now re-generated after other bundles are integrated.
