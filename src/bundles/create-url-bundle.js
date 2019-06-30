@@ -129,17 +129,18 @@ export default opts => {
         initScrollPosition()
       }
 
-      window.addEventListener('popstate', () => {
+      const popStateFn = () => {
         store.doUpdateUrl({
           pathname: loc.pathname,
           hash: loc.hash,
           query: loc.search
         })
-      })
+      }
+      window.addEventListener('popstate', popStateFn)
 
       let lastState = store.selectUrlRaw()
 
-      store.subscribe(() => {
+      const unsubscribe = store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
         if (lastState !== newState && newUrl !== loc.href) {
@@ -161,6 +162,11 @@ export default opts => {
         }
         lastState = newState
       })
+
+      return () => {
+        window.removeEventListener('popstate', popStateFn)
+        unsubscribe()
+      }
     },
     getReducer: () => {
       const initialState = {

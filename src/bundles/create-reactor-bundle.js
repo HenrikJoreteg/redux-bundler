@@ -86,7 +86,9 @@ export default spec => ({
       }
     }
 
-    store.subscribe(callback)
+    const unsubscribe = store.subscribe(callback)
     callback()
+
+    return () => unsubscribe()
   }
 })
