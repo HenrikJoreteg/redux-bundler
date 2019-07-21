@@ -126,9 +126,22 @@ export const initScrollPosition = () => {
   if (history.scrollRestoration) {
     history.scrollRestoration = 'manual'
   }
-  addGlobalListener('popstate', restoreScrollPosition)
-  addGlobalListener('scroll', debounce(saveScrollPosition, 300), {
-    passive: true
-  })
+  const removePopstateListener = addGlobalListener(
+    'popstate',
+    restoreScrollPosition
+  )
+  const removeScrollListener = addGlobalListener(
+    'scroll',
+    debounce(saveScrollPosition, 300),
+    {
+      passive: true
+    }
+  )
+
   restoreScrollPosition()
+
+  return () => {
+    removePopstateListener()
+    removeScrollListener()
+  }
 }

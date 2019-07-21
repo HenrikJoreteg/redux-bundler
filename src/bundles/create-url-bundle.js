@@ -121,28 +121,25 @@ export default opts => {
   return {
     name: config.name,
     init: store => {
-      if (config.inert) {
-        return
-      }
+      if (config.inert) return
 
-      if (config.handleScrollRestoration) {
-        initScrollPosition()
-      }
+      const removeScrollPosition = config.handleScrollRestoration
+        ? initScrollPosition()
+        : null
 
-      const popStateFn = () => {
+      const removePopstateListener = addGlobalListener('popstate', () => {
         store.doUpdateUrl({
           pathname: loc.pathname,
           hash: loc.hash,
           query: loc.search
         })
-      }
-      window.addEventListener('popstate', popStateFn)
+      })
 
       let lastState = store.selectUrlRaw()
-
       const unsubscribe = store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
+
         if (lastState !== newState && newUrl !== loc.href) {
           try {
             window.history[newState.replace ? 'replaceState' : 'pushState'](
@@ -160,11 +157,13 @@ export default opts => {
             console.error(e)
           }
         }
+
         lastState = newState
       })
 
       return () => {
-        window.removeEventListener('popstate', popStateFn)
+        if (removeScrollPosition) removeScrollPosition()
+        removePopstateListener()
         unsubscribe()
       }
     },
