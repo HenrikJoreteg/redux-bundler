@@ -1,6 +1,11 @@
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import { HAS_WINDOW, initScrollPosition, saveScrollPosition } from '../utils'
+import {
+  addGlobalListener,
+  HAS_WINDOW,
+  initScrollPosition,
+  saveScrollPosition
+} from '../utils'
 
 export const isString = obj =>
   Object.prototype.toString.call(obj) === '[object String]'

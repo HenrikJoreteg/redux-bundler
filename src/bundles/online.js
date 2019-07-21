@@ -7,7 +7,7 @@ export default {
   name: 'online',
   selectIsOnline: state => state.online,
 
-  getReducer() {
+  getReducer () {
     const initialState = IS_BROWSER ? navigator.onLine : true
 
     return (state = initialState, { type }) => {
@@ -18,7 +18,7 @@ export default {
     }
   },
 
-  init(store) {
+  init (store) {
     const removeOnlineListener = addGlobalListener('online', () =>
       store.dispatch({ type: ONLINE })
     )

@@ -16,7 +16,7 @@ test('makes destroy available to store', t => {
 test('calls destroy with store', t => {
   const store = composeBundlesRaw({
     ...countBundle,
-    destroy(store) {
+    destroy (store) {
       store.destroyed = true
     }
   })()
@@ -33,7 +33,7 @@ test('calls return of init as the destroy of store', t => {
   let count = 0
   const store = composeBundlesRaw({
     ...countBundle,
-    init(store) {
+    init (store) {
       // being explicit here for documentation purposes
       const unsubscribe = store.subscribe(() => {
         count++
