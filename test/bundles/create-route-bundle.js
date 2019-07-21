@@ -5,7 +5,7 @@ const {
   composeBundlesRaw,
   createRouteBundle,
   createUrlBundle
-} = require('../dist/redux-bundler')
+} = require('../../dist/redux-bundler')
 
 test('create-route-bundle', t => {
   const startUrl = 'http://subdomain.something.com:3030/something#hi=there'
