@@ -89,6 +89,9 @@ export default spec => ({
     const unsubscribe = store.subscribe(callback)
     callback()
 
-    return () => unsubscribe()
+    return () => {
+      idleDispatcher && idleDispatcher.cancel()
+      unsubscribe()
+    }
   }
 })
