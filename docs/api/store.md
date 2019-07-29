@@ -53,6 +53,10 @@ Lets you dispatch an action creator by name. Give it the name of the action crea
 
 This utility exists to simplify support for propagating actions from main thread to web worker or vice versa.
 
+## `store.destroy()`
+
+Lets you remove event listeners, cleanup state and unsubscribe from store listeners. This calls the destroy implementation for every bundle. It is a 1-way function and the store cannot be re-initialized afterwards. Handy if you want to programmatically unmount an app.
+
 ## Special `BATCH_ACTIONS` action type
 
 If you dispatch an action that looks like this `{type: 'BATCH_ACTIONS', actions: [array of other actions]}` it will dispatch them all in one update cycle. Rather than calling all callbacks at once, it will process all actions through all reducers then call the functions. These should be prepared "simple" action objects, not async actions that return a thunk function.
