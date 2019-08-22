@@ -3,7 +3,7 @@ const { composeBundles, composeBundlesRaw } = require('../dist/redux-bundler')
 
 const countBundle = {
   name: 'count',
-  selectDestroyable: state => state.destroyable,
+  selectCount: state => state.count,
   reducer: (state = 0, { type }) => (type === 'INC' ? state + 1 : state)
 }
 
@@ -48,13 +48,13 @@ test('calls return of init as the destroy of store', t => {
   t.equal(count, 0)
 
   store.dispatch({ type: 'INC' })
-  t.equal(store.getState().count, 1)
+  t.equal(store.selectCount(), 1)
   t.equal(count, 1)
 
   store.destroy()
 
   store.dispatch({ type: 'INC' })
-  t.equal(store.getState().count, 2)
+  t.equal(store.selectCount(), 2)
   t.equal(count, 1, 'destroy should have unsubscribed')
 
   t.end()
