@@ -14,6 +14,7 @@ It takes the following options (none are required):
 - `logState` (default: true): whether to log state after each dispatch
 - `logIdle` (default: true): whether to log APP_IDLE events (these can get annoying if there's a lot).
 - `enabled` (default: HAS_DEBUG_FLAG): explicitly enable/disable. This is helpful in node.js where there's no localStorage flag.
+- `ignoreActions` (default: []): an array of actions to ignore when logging.
 
 If enabled:
 
