@@ -18,7 +18,8 @@ export default spec => {
     logSelectors: true,
     logState: true,
     logIdle: true,
-    enabled: HAS_DEBUG_FLAG
+    enabled: HAS_DEBUG_FLAG,
+    ignoreActions: []
   }
 
   const opts = Object.assign({}, defaultOpts, spec)
@@ -52,7 +53,11 @@ export default spec => {
     },
     selectIsDebug: state => state.debug,
     getMiddleware: () => store => next => action => {
-      if (!opts.logIdle && action.type === 'APP_IDLE') {
+      if (!opts.logIdle) {
+        opts.ignoreActions.push('APP_IDLE')
+      }
+
+      if (opts.ignoreActions.includes(action.type)) {
         return next(action)
       }
 
