@@ -1,6 +1,11 @@
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import { HAS_WINDOW, initScrollPosition, saveScrollPosition } from '../utils'
+import {
+  addGlobalListener,
+  HAS_WINDOW,
+  initScrollPosition,
+  saveScrollPosition
+} from '../utils'
 
 export const isString = obj =>
   Object.prototype.toString.call(obj) === '[object String]'
@@ -121,15 +126,13 @@ export default opts => {
   return {
     name: config.name,
     init: store => {
-      if (config.inert) {
-        return
-      }
+      if (config.inert) return
 
-      if (config.handleScrollRestoration) {
-        initScrollPosition()
-      }
+      const removeScrollPosition = config.handleScrollRestoration
+        ? initScrollPosition()
+        : null
 
-      window.addEventListener('popstate', () => {
+      const removePopstateListener = addGlobalListener('popstate', () => {
         store.doUpdateUrl({
           pathname: loc.pathname,
           hash: loc.hash,
@@ -138,10 +141,10 @@ export default opts => {
       })
 
       let lastState = store.selectUrlRaw()
-
-      store.subscribe(() => {
+      const unsubscribe = store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
+
         if (lastState !== newState && newUrl !== loc.href) {
           try {
             window.history[newState.replace ? 'replaceState' : 'pushState'](
@@ -159,8 +162,15 @@ export default opts => {
             console.error(e)
           }
         }
+
         lastState = newState
       })
+
+      return () => {
+        if (removeScrollPosition) removeScrollPosition()
+        removePopstateListener()
+        unsubscribe()
+      }
     },
     getReducer: () => {
       const initialState = {

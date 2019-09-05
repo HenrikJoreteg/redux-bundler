@@ -2,7 +2,7 @@ const test = require('tape')
 const {
   composeBundlesRaw,
   createReactorBundle
-} = require('../dist/redux-bundler')
+} = require('../../dist/redux-bundler')
 
 const ACTION_0 = 'ACTION_0'
 const ACTION_1 = 'ACTION_1'

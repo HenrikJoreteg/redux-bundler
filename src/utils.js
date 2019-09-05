@@ -58,17 +58,17 @@ export const addGlobalListener = (
   handler,
   opts = { passive: false }
 ) => {
-  if (IS_BROWSER) {
-    if (opts.passive) {
-      if (PASSIVE_EVENTS_SUPPORTED) {
-        self.addEventListener(eventName, handler, { passive: true })
-      } else {
-        self.addEventListener(eventName, debounce(handler, 200), false)
-      }
-    } else {
-      self.addEventListener(eventName, handler)
-    }
-  }
+  if (!IS_BROWSER) return () => undefined
+
+  const args = opts.passive
+    ? PASSIVE_EVENTS_SUPPORTED
+      ? [eventName, handler, { passive: true }]
+      : [eventName, debounce(handler, 200), false]
+    : [eventName, handler]
+
+  self.addEventListener(...args)
+
+  return () => self.removeEventListener(...args)
 }
 
 export const selectorNameToValueName = name => {
@@ -126,9 +126,22 @@ export const initScrollPosition = () => {
   if (history.scrollRestoration) {
     history.scrollRestoration = 'manual'
   }
-  addGlobalListener('popstate', restoreScrollPosition)
-  addGlobalListener('scroll', debounce(saveScrollPosition, 300), {
-    passive: true
-  })
+  const removePopstateListener = addGlobalListener(
+    'popstate',
+    restoreScrollPosition
+  )
+  const removeScrollListener = addGlobalListener(
+    'scroll',
+    debounce(saveScrollPosition, 300),
+    {
+      passive: true
+    }
+  )
+
   restoreScrollPosition()
+
+  return () => {
+    removePopstateListener()
+    removeScrollListener()
+  }
 }
