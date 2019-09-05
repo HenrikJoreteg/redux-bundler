@@ -17,9 +17,8 @@ export default spec => {
   const defaultOpts = {
     logSelectors: true,
     logState: true,
-    logIdle: true,
     enabled: HAS_DEBUG_FLAG,
-    ignoreActions: []
+    actionFilter: null
   }
 
   const opts = Object.assign({}, defaultOpts, spec)
@@ -53,29 +52,21 @@ export default spec => {
     },
     selectIsDebug: state => state.debug,
     getMiddleware: () => store => next => action => {
-      if (!opts.logIdle) {
-        opts.ignoreActions.push('APP_IDLE')
-      }
+      const isDebug = store.getState().debug
 
-      if (opts.ignoreActions.includes(action.type)) {
+      if (!isDebug || (opts.actionFilter && !opts.actionFilter(action))) {
         return next(action)
       }
 
-      const isDebug = store.getState().debug
-
-      if (isDebug) {
-        console.group(action.type)
-        console.info('action:', action)
-      }
+      console.group(action.type)
+      console.info('action:', action)
 
       const result = next(action)
 
-      if (isDebug) {
-        opts.logState && console.debug('state:', store.getState())
-        opts.logSelectors && store.doLogSelectors()
-        store.doLogNextReaction && store.doLogNextReaction()
-        console.groupEnd(action.type)
-      }
+      opts.logState && console.debug('state:', store.getState())
+      opts.logSelectors && store.doLogSelectors()
+      store.doLogNextReaction && store.doLogNextReaction()
+      console.groupEnd(action.type)
 
       return result
     },
@@ -114,9 +105,9 @@ export default spec => {
     doLogNextReaction: () => ({ store }) => {
       const { nextReaction, activeReactor } = store
       if (nextReaction) {
-        log(activeReactor, {
+        log(nextReaction, {
           color: colorOrange,
-          label: `next reaction: ${nextReaction}`
+          label: `next reaction ${activeReactor}:`
         })
       }
     },
