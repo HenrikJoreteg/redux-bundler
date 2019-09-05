@@ -1,5 +1,8 @@
 # Change Log
 
+- `26.0.0`
+  - Removed `logIdle` option from `createDebugBundle` and added support for `actionFilter` function instead. Thanks to [@malbonesi](https://github.com/HenrikJoreteg/redux-bundler/pull/59) for the idea of making this more flexible.
+  - Added `store.destroy()` method. Bundle `.init()` methods can optionally return a "cleanup" function. This means you can have an architecture that loads/unloads entire apps within the same document and lets you do cleanup like removing event listeners, etc. Thanks to [@rudionrails](https://github.com/HenrikJoreteg/redux-bundler/pull/57)
 - `25.0.0`
   - Re-worked debug bundle. It is now created programmatically so it can be configured: `createDebugBundle()`
     - Now works in node.js ([#31](https://github.com/HenrikJoreteg/redux-bundler/issues/31))

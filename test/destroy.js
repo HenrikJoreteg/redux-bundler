@@ -13,22 +13,6 @@ test('makes destroy available to store', t => {
   t.end()
 })
 
-test('calls destroy with store', t => {
-  const store = composeBundlesRaw({
-    ...countBundle,
-    destroy (store) {
-      store.destroyed = true
-    }
-  })()
-  t.equal(store.destroyed, undefined)
-
-  store.destroy()
-
-  t.equal(store.destroyed, true)
-
-  t.end()
-})
-
 test('calls return of init as the destroy of store', t => {
   let count = 0
   const store = composeBundlesRaw({

@@ -51,43 +51,20 @@ This will be run _once_ as a last step before the store is returned. It will be 
 
 For example, you may want redux to track current viewport width so that other selectors can change behavior based on viewport size. You could create a `viewport` bundle and register a debounced event listener for the `resize` event on window, and then dispatch a `WINDOW_RESIZED` action with the new width/height and add a `selectIsMobileViewport` selector to make it available to other bundles.
 
-Additionally, you can return a function that behaves the same as `bundle.destroy()` in order to cleanup state, remove event listeners, etc.
+You probably won't need this, but if you return a function from init, that function will be called if you call `store.destroy()`. This can be useful if you're building a micro-frontends or portal system and need to load/unload whole apps in the same webpage.
 
 ```js
-export const onlineBundle = {
-  // ...
-
-  init(store) {
+  ...
+  init: (store) {
     const handleOnline = () => store.dispatch({ type: 'ONLINE' })
-    const handleOffline = () => store.dispatch({ type: 'OFFLINE' })
 
     window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
 
     return () => {
       window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
     }
   }
-
-  // ...
-}
-```
-
-## `bundle.destroy`
-
-Same as returning a function from `bundle.init`, you may explicitly declare a destroy function.
-
-```js
-export const resetStoreBundle = {
-  // ...
-
-  destroy(store) {
-    store.dispatch({ type: 'REPLACE_STATE', payload: null })
-  }
-
-  // ...
-}
+  ...
 ```
 
 ## `bundle.persistActions`

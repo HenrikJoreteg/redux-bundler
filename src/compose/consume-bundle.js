@@ -8,7 +8,6 @@ export const normalizeBundle = bundle => {
     reducer:
       bundle.reducer || (bundle.getReducer && bundle.getReducer()) || null,
     init: bundle.init || null,
-    destroy: bundle.destroy || null,
     extraArgCreators: bundle.getExtraArgs || null,
     middlewareCreators: bundle.getMiddleware,
     actionCreators: null,
@@ -57,7 +56,6 @@ export const createChunk = rawBundles => {
       Object.assign(result.reducers, { [bundle.name]: bundle.reducer })
     }
     if (bundle.init) result.initMethods.push(bundle.init)
-    if (bundle.destroy) result.destroyMethods.push(bundle.destroy)
     if (bundle.middlewareCreators) {
       result.middlewareCreators.push(bundle.middlewareCreators)
     }

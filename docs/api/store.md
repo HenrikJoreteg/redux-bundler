@@ -55,7 +55,7 @@ This utility exists to simplify support for propagating actions from main thread
 
 ## `store.destroy()`
 
-Lets you remove event listeners, cleanup state and unsubscribe from store listeners. This calls the destroy implementation for every bundle. It is a 1-way function and the store cannot be re-initialized afterwards. Handy if you want to programmatically unmount an app.
+Lets you remove event listeners, cleanup state and unsubscribe from store listeners. This calls the destroy implementation for every bundle. It is a 1-way function and the store cannot be re-initialized afterwards. You probably won't need this, but it can be handy if you're building a micro-frontends or portal system and you're loading/unloading whole apps in the same webpage.
 
 ## Special `BATCH_ACTIONS` action type
 

@@ -58,7 +58,7 @@ export const addGlobalListener = (
   handler,
   opts = { passive: false }
 ) => {
-  if (!IS_BROWSER) return () => undefined
+  if (!IS_BROWSER) return () => {}
 
   const args = opts.passive
     ? PASSIVE_EVENTS_SUPPORTED
