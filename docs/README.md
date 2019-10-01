@@ -111,6 +111,7 @@ Now you can efficiently connect components with way less boilerplate:
 
 ```js
 import React from 'react'
+import { connect } from 'redux-bundler-react'
 
 // pass as many names of selectors or action creators as you want
 // in any order. Functionality is implied from the name so `doX`
