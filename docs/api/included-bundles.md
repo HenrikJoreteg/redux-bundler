@@ -123,6 +123,21 @@ Selectors:
 `selectRoute()`: returns whatever the value was in the routes object for the current matched route.
 `selectRouteInfo()`: returns the key that was passed to the route matcher. By default this is the value of `selectPathname` as defined by the `createUrlBundle` above.
 
+## `createReactorBundle(optionsObject)`
+
+This is the functionality that allows for the `reactX` pattern in your bundles. Manual configuration here is entirely optional.
+
+This bundle is included by default when you use `composeBundles`. If you want to pass it custom options you'll have to use `composeBundlesRaw` instead.
+
+Available options:
+
+* `idleTimeout`: Number (default `30000`). Idle timeout is time to fire an `APP_IDLE` event.
+* `idleAction`: String (default `'APP_IDLE'`). Action type to dispatch on idle.
+* `cancelIdleWhenDone`: Boolean (default `true`). In certain cases this can be useful. For example, if you're using reactors in a node process and you want it to be able to exit when there's no pending reactions. In browsers, this will be ignored.
+* `doneCallback`: Function (default `null`). If you want to pass a callback to call when there are no more pending reactions, you can do so.
+* `stopWhenTabInactive`: Boolean (default `true`). By default if a given tab is in the background we don't want to keep wasting cycles. But, in certain cases you don't want it to stop just because its in the background. Gives you that option. Note: this is implemented by taking advantage of behavior of `requestAnimationFrame`. So it relies on the browser for this logic.
+* `reactorPermissionCheck`: Function (default: null). This function, if passed, will be given the name of the reactor, and the result of having called it that would normally have lead to a reaction being queued. If you return `false` from this function the reactor will not be queued. This allows you to implement rate limiting, etc. It also makes it possible to build in safe-guards for infinite reaction loops or other development tools.
+
 ## `appTimeBundle`
 
 This simply tracks an `appTime` timestamp that gets set any time an action is fired. This is useful for writing deterministic selectors and eliminates the need for setting timers throughout the app. Any selector that uses `selectAppTime` will get this time as an argument. It's ridiculously tiny at only 5 lines of code, but is a nice pattern. Just be careful to not do expensive work in reaction to this changing, as it changes _with each action_.
