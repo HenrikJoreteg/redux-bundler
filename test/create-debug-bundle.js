@@ -2,7 +2,7 @@ const test = require('tape')
 const {
   composeBundlesRaw,
   createDebugBundle
-} = require('../../dist/redux-bundler')
+} = require('../dist/redux-bundler')
 
 test('create debug bundle basics', t => {
   const store = composeBundlesRaw(createDebugBundle(), {

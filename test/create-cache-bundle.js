@@ -2,7 +2,7 @@ const test = require('tape')
 const {
   composeBundlesRaw,
   createCacheBundle
-} = require('../../dist/redux-bundler')
+} = require('../dist/redux-bundler')
 
 const getTestBundle = (number, startingState = {}, persistActions) => ({
   name: `test${number}`,

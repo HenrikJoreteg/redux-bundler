@@ -2,7 +2,7 @@ const test = require('tape')
 const {
   composeBundlesRaw,
   createReactorBundle
-} = require('../../dist/redux-bundler')
+} = require('../dist/redux-bundler')
 
 const ACTION_0 = 'ACTION_0'
 const ACTION_1 = 'ACTION_1'
@@ -65,4 +65,72 @@ test('createReactorBundle', t => {
       t.end()
     }, 0)
   }, 0)
+})
+
+test('ability to disable reactors', t => {
+  let hasRunOnce = false
+
+  const bundle = {
+    name: 'reactionary',
+    reducer: (state = { started: false, timesRan: 0 }, action) => {
+      if (action.type === 'START') {
+        return Object.assign({}, state, { started: true })
+      }
+      if (action.type === 'THE_ACTION') {
+        return Object.assign({}, state, { timesRan: state.timesRan + 1 })
+      }
+      return state
+    },
+    doAction: () => ({ type: 'THE_ACTION' }),
+    reactShouldReact: state => {
+      if (state.reactionary.started) {
+        return { actionCreator: 'doAction' }
+      }
+    }
+  }
+
+  const store = composeBundlesRaw(
+    bundle,
+    createReactorBundle({
+      reactorPermissionCheck: (name, result) => {
+        if (name === 'reactShouldReact') {
+          if (hasRunOnce) {
+            return false
+          }
+          hasRunOnce = true
+          return true
+        }
+        return true
+      }
+    })
+  )()
+
+  const shouldMatch = ({ started, timesRan }) => {
+    t.deepEqual(store.getState().reactionary, {
+      started,
+      timesRan
+    })
+  }
+
+  t.ok(!store.nextReaction)
+
+  shouldMatch({ started: false, timesRan: 0 })
+
+  // dispatch thing that should start reactor
+  store.dispatch({ type: 'START' })
+  // make sure we have reactor
+  t.ok(store.nextReaction)
+  shouldMatch({ started: true, timesRan: 0 })
+
+  // give reactors a chance to run
+  setTimeout(() => {
+    shouldMatch({ started: true, timesRan: 1 })
+    store.dispatch({ type: 'START' })
+    // make sure we no longer have pending reactor
+    t.ok(!store.nextReaction)
+    setTimeout(() => {
+      shouldMatch({ started: true, timesRan: 1 })
+      t.end()
+    })
+  })
 })

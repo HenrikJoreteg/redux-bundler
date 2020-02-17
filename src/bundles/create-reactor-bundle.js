@@ -5,7 +5,8 @@ const defaults = {
   idleAction: 'APP_IDLE',
   doneCallback: null,
   stopWhenTabInactive: true,
-  cancelIdleWhenDone: true
+  cancelIdleWhenDone: true,
+  reactorPermissionCheck: null
 }
 
 const ricOptions = { timeout: 500 }
@@ -23,7 +24,8 @@ export default spec => ({
       idleTimeout,
       cancelIdleWhenDone,
       doneCallback,
-      stopWhenTabInactive
+      stopWhenTabInactive,
+      reactorPermissionCheck
     } = Object.assign({}, defaults, spec)
     let idleDispatcher
     if (idleTimeout) {
@@ -62,10 +64,14 @@ export default spec => ({
       store.meta.reactorNames.some(name => {
         const result = store[name]()
         if (result) {
+          // enable passing a fn to check whether a given reactor should be allowed
+          if (reactorPermissionCheck && !reactorPermissionCheck(name, result)) {
+            return
+          }
           store.activeReactor = name
           store.nextReaction = result
+          return result
         }
-        return result
       })
       if (store.nextReaction) {
         // let browser chill

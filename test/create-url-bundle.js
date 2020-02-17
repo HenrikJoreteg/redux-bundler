@@ -1,10 +1,7 @@
 // polyfill URL for node
 global.URL = require('whatwg-url').URL
 const test = require('tape')
-const {
-  composeBundlesRaw,
-  createUrlBundle
-} = require('../../dist/redux-bundler')
+const { composeBundlesRaw, createUrlBundle } = require('../dist/redux-bundler')
 
 test('url-bundle selectors', t => {
   const startUrl = 'http://subdomain.something.com:3030/something#hi=there'

@@ -1,5 +1,6 @@
 # Change Log
 
+- `26.0.1` Added `reactorPermissionCheck` option to `createReactorBundle` to better support building rate-limiting or developer tools for reactors. Also, added better docs for `createReactorBundle` options.
 - `26.0.0`
   - Removed `logIdle` option from `createDebugBundle` and added support for `actionFilter` function instead. Thanks to [@malbonesi](https://github.com/HenrikJoreteg/redux-bundler/pull/59) for the idea of making this more flexible.
   - Added `store.destroy()` method. Bundle `.init()` methods can optionally return a "cleanup" function. This means you can have an architecture that loads/unloads entire apps within the same document and lets you do cleanup like removing event listeners, etc. Thanks to [@rudionrails](https://github.com/HenrikJoreteg/redux-bundler/pull/57)

@@ -5,7 +5,7 @@ const {
   createReactorBundle,
   composeBundlesRaw,
   onlineBundle
-} = require('../../dist/redux-bundler')
+} = require('../dist/redux-bundler')
 
 const getAsyncBundleStore = (result, bundleOptions) =>
   composeBundlesRaw(
