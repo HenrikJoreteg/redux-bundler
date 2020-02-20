@@ -142,14 +142,6 @@ Available options:
 
 This simply tracks an `appTime` timestamp that gets set any time an action is fired. This is useful for writing deterministic selectors and eliminates the need for setting timers throughout the app. Any selector that uses `selectAppTime` will get this time as an argument. It's ridiculously tiny at only 5 lines of code, but is a nice pattern. Just be careful to not do expensive work in reaction to this changing, as it changes _with each action_.
 
-## `onlineBundle`
-
-Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
-
-Exports a single selector:
-
-`selectIsOnline`: Returns current state.
-
 ## `asyncCountBundle`
 
 This bundle takes no options, simply add it as is. It uses action naming conventions to track how many outstanding async actions are occurring.
@@ -184,6 +176,8 @@ composeBundles(
 ```
 
 ## `createAsyncResourceBundle(optionsObject)`
+
+Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/create-async-resource-bundle'`
 
 Returns a pre-configured bundle for fetching a remote resource (like some data from an API) and provides a high-level abstraction for declaring when this data should be considered stale, what conditions should cause it to fetch, and when it should expire, etc.
 
@@ -269,3 +263,13 @@ bundle.reactHoneyBadgerFetch = createSelector(
 
 export default bundle
 ```
+
+## `onlineBundle`
+
+Not in main index, be imported directly: `import onlineBundle from 'redux-bundler/online-bundle'`
+
+Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
+
+Exports a single selector:
+
+`selectIsOnline`: Returns current state.

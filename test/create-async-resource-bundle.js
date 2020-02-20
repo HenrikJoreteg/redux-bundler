@@ -1,11 +1,21 @@
 const test = require('tape')
+const moduleAlias = require('module-alias')
+const path = require('path')
+moduleAlias.addAlias(
+  'redux-bundler',
+  path.join(__dirname, '/../dist/redux-bundler')
+)
+moduleAlias.addAlias(
+  'redux-bundler',
+  path.join(__dirname, '/../dist/redux-bundler')
+)
+const onlineBundle = require('../dist/online-bundle')
 const {
   createSelector,
-  createAsyncResourceBundle,
   createReactorBundle,
-  composeBundlesRaw,
-  onlineBundle
+  composeBundlesRaw
 } = require('../dist/redux-bundler')
+const createAsyncResourceBundle = require('../dist/create-async-resource-bundle')
 
 const getAsyncBundleStore = (result, bundleOptions) =>
   composeBundlesRaw(

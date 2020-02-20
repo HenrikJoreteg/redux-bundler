@@ -27,7 +27,6 @@ export const composeBundles = (...userBundles) => {
   const bundles = [
     appTime,
     asyncCount,
-    online,
     url(),
     reactors(),
     createDebug(),

@@ -1,4 +1,4 @@
-import { addGlobalListener, IS_BROWSER } from '../utils'
+import { addGlobalListener, IS_BROWSER } from 'redux-bundler'
 
 const OFFLINE = 'OFFLINE'
 const ONLINE = 'ONLINE'
