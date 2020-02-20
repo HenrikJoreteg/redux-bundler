@@ -1,6 +1,6 @@
 # Change Log
 
-- `27.0.0` Separated a few non-core items into their own exports must be imported independently: `redux-bundler/create-async-resource-bundle`, `redux-bundler/create-geolocation-bundle`, `redux-bundler/online-bundle`. This just removes stuff that is often unused from main build.
+- `27.0.0` Separated a few non-core items into their own exports must be imported independently: `redux-bundler/dist/create-async-resource-bundle`, `redux-bundler/dist/create-geolocation-bundle`, `redux-bundler/dist/online-bundle`. This just removes stuff that is often unused from main build.
 - `26.1.0` Added `reactorPermissionCheck` option to `createReactorBundle` to better support building rate-limiting or developer tools for reactors. Also, added better docs for `createReactorBundle` options.
 - `26.0.0`
   - Removed `logIdle` option from `createDebugBundle` and added support for `actionFilter` function instead. Thanks to [@malbonesi](https://github.com/HenrikJoreteg/redux-bundler/pull/59) for the idea of making this more flexible.

@@ -177,7 +177,7 @@ composeBundles(
 
 ## `createAsyncResourceBundle(optionsObject)`
 
-Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/create-async-resource-bundle'` (note, this requires inclusion of `redux-bundler/online-bundle` in your app as well).
+Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/dist/create-async-resource-bundle'` (note, this requires inclusion of `redux-bundler/dist/online-bundle` in your app as well).
 
 Returns a pre-configured bundle for fetching a remote resource (like some data from an API) and provides a high-level abstraction for declaring when this data should be considered stale, what conditions should cause it to fetch, and when it should expire, etc.
 
@@ -266,7 +266,7 @@ export default bundle
 
 ## `onlineBundle`
 
-Not in main index, be imported directly: `import onlineBundle from 'redux-bundler/online-bundle'`
+Not in main index, be imported directly: `import onlineBundle from 'redux-bundler/dist/online-bundle'`
 
 Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
 
