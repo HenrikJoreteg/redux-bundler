@@ -28,10 +28,7 @@ const getStore = composeBundlesRaw(
       return state
     },
     selectNumber: state => state.numberBundle,
-    selectIsPositive: createSelector(
-      'selectNumber',
-      number => number > 0
-    )
+    selectIsPositive: createSelector('selectNumber', number => number > 0)
   }
 )
 

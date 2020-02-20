@@ -136,10 +136,7 @@ export default spec => {
       return state
     },
     [inputSelectorName]: state => state[name],
-    [dataSelectorName]: createSelector(
-      inputSelectorName,
-      root => root.data
-    ),
+    [dataSelectorName]: createSelector(inputSelectorName, root => root.data),
     [isStaleSelectorName]: createSelector(
       inputSelectorName,
       lastSuccessSelectorName,

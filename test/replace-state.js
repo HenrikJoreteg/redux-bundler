@@ -13,7 +13,10 @@ test('replace state', t => {
     selectOther: state => state.other
   }
 
-  const store = composeBundlesRaw(stuffBundle, otherBundle)({
+  const store = composeBundlesRaw(
+    stuffBundle,
+    otherBundle
+  )({
     stuff: 'startingStuff'
   })
 

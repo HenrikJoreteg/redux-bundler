@@ -162,7 +162,7 @@ test('createAsyncResourceBundle handles waiting when failed properly', t => {
 })
 
 test('createAsyncResourceBundle doClear', t => {
-  let store = getAsyncBundleStore({ name: 'henrik' })()
+  const store = getAsyncBundleStore({ name: 'henrik' })()
 
   t.deepEqual(store.selectUser(), null)
   store.doFetchUser()

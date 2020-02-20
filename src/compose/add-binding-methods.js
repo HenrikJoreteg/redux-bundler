@@ -11,7 +11,7 @@ export default store => {
     watchedSelectors[selectorName] = (watchedSelectors[selectorName] || 0) + 1
   }
   const unwatch = selectorName => {
-    let count = watchedSelectors[selectorName] - 1
+    const count = watchedSelectors[selectorName] - 1
     if (count === 0) {
       delete watchedSelectors[selectorName]
     } else {
@@ -46,7 +46,7 @@ export default store => {
         hasChanged = !!Object.keys(relevantChanges).length
       } else {
         subscription.names.forEach(name => {
-          if (changed.hasOwnProperty(name)) {
+          if (Object.prototype.hasOwnProperty.call(changed, name)) {
             relevantChanges[name] = changed[name]
             hasChanged = true
           }

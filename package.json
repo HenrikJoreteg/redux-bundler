@@ -8,18 +8,18 @@
   },
   "devDependencies": {
     "create-selector": "5.0.0",
-    "feather-route-matcher": "3.0.0",
-    "idb-keyval": "2.3.0",
+    "feather-route-matcher": "3.1.0",
+    "idb-keyval": "3.2.0",
     "microbundle": "0.11.0",
     "module-alias": "2.2.2",
-    "nodemon": "1.19.1",
-    "prettier-standard": "9.1.1",
+    "nodemon": "2.0.2",
+    "prettier-standard": "16.1.0",
     "querystringify": "2.1.1",
     "redux": "4.0.1",
-    "standard": "12.0.1",
+    "standard": "14.3.1",
     "tap-spec": "5.0.0",
-    "tape": "4.10.2",
-    "whatwg-url": "7.0.0"
+    "tape": "4.13.0",
+    "whatwg-url": "8.0.0"
   },
   "files": [
     "dist"

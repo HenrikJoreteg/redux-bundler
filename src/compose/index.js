@@ -97,10 +97,7 @@ const enableReplaceState = reducer => (state, action) => {
   return reducer(state, action)
 }
 
-const enhanceReducer = compose(
-  enableBatchDispatch,
-  enableReplaceState
-)
+const enhanceReducer = compose(enableBatchDispatch, enableReplaceState)
 
 const devTools = () =>
   HAS_WINDOW &&

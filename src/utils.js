@@ -46,7 +46,7 @@ export const flattenExtractedToObject = extracted => {
 }
 
 export const flattenExtractedToArray = extracted => {
-  let accum = []
+  const accum = []
   for (const appName in extracted) {
     accum.push(...extracted[appName])
   }
@@ -79,8 +79,8 @@ export const selectorNameToValueName = name => {
 export const debounce = (fn, wait) => {
   let timeout
   const debounced = function () {
-    let ctx = this
-    let args = arguments
+    const ctx = this
+    const args = arguments
     clearTimeout(timeout)
     timeout = setTimeout(() => {
       fn.apply(ctx, args)

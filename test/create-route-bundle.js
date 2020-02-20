@@ -16,9 +16,10 @@ test('create-route-bundle', t => {
     '/something': 'something'
   }
 
-  const store = composeBundlesRaw(createUrlBundle(), createRouteBundle(routes))(
-    { url: startUrl }
-  )
+  const store = composeBundlesRaw(
+    createUrlBundle(),
+    createRouteBundle(routes)
+  )({ url: startUrl })
   t.equal(store.selectRoute(), 'something')
   const routeMatcher = store.selectRouteMatcher()
   t.equal(

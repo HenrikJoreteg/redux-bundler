@@ -56,37 +56,29 @@ export default opts => {
   const actionType = config.actionType
 
   const selectUrlRaw = state => state[config.name]
-  const selectUrlObject = createSelector(
-    selectUrlRaw,
-    urlState => makeSerializable(new URL(urlState.url))
+  const selectUrlObject = createSelector(selectUrlRaw, urlState =>
+    makeSerializable(new URL(urlState.url))
   )
-  const selectQueryObject = createSelector(
-    selectUrlObject,
-    urlObj => qs.parse(urlObj.search)
+  const selectQueryObject = createSelector(selectUrlObject, urlObj =>
+    qs.parse(urlObj.search)
   )
-  const selectQueryString = createSelector(
-    selectQueryObject,
-    queryObj => qs.stringify(queryObj)
+  const selectQueryString = createSelector(selectQueryObject, queryObj =>
+    qs.stringify(queryObj)
   )
   const selectPathname = createSelector(
     selectUrlObject,
     urlObj => urlObj.pathname
   )
-  const selectHash = createSelector(
-    selectUrlObject,
-    urlObj => removeLeading('#', urlObj.hash)
+  const selectHash = createSelector(selectUrlObject, urlObj =>
+    removeLeading('#', urlObj.hash)
   )
-  const selectHashObject = createSelector(
-    selectHash,
-    hash => qs.parse(hash)
-  )
+  const selectHashObject = createSelector(selectHash, hash => qs.parse(hash))
   const selectHostname = createSelector(
     selectUrlObject,
     urlObj => urlObj.hostname
   )
-  const selectSubdomains = createSelector(
-    selectHostname,
-    hostname => parseSubdomains(hostname)
+  const selectSubdomains = createSelector(selectHostname, hostname =>
+    parseSubdomains(hostname)
   )
 
   const doUpdateUrl = (
