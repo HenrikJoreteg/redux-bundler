@@ -177,7 +177,7 @@ composeBundles(
 
 ## `createAsyncResourceBundle(optionsObject)`
 
-Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/create-async-resource-bundle'`
+Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/create-async-resource-bundle'` (note, this requires inclusion of `redux-bundler/online-bundle` in your app as well).
 
 Returns a pre-configured bundle for fetching a remote resource (like some data from an API) and provides a high-level abstraction for declaring when this data should be considered stale, what conditions should cause it to fetch, and when it should expire, etc.
 
