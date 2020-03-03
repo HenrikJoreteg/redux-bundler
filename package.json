@@ -46,7 +46,7 @@
     "dev": "microbundle watch --no-compress",
     "full-test": "npm run build && npm run test && npm run lint",
     "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
-    "postbuild": "microbundle --no-compress -no-sourcemap -i src/extras/create-async-resource-bundle.js -i src/extras/create-geolocation-bundle.js -i src/extras/online-bundle.js --external create-selector,redux-bundler -o='dist/'",
+    "postbuild": "microbundle --no-compress -no-sourcemap -i src/extras/create-async-resource-bundle.js -i src/extras/create-geolocation-bundle.js -i src/extras/online-bundle.js --external redux-bundler -o='dist/'",
     "prebuild": "rm -rf dist",
     "prepublish": "npm run full-test",
     "test": "tape test/*.js | tap-spec"
