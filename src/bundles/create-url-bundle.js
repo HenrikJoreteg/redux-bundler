@@ -1,6 +1,11 @@
 import qs from 'querystringify'
 import { createSelector } from 'create-selector'
-import { HAS_WINDOW, initScrollPosition, saveScrollPosition } from '../utils'
+import {
+  addGlobalListener,
+  HAS_WINDOW,
+  initScrollPosition,
+  saveScrollPosition
+} from '../utils'
 
 export const isString = obj =>
   Object.prototype.toString.call(obj) === '[object String]'
@@ -76,10 +81,10 @@ export default opts => {
     parseSubdomains(hostname)
   )
 
-  const doUpdateUrl = (newState, opts = { replace: false }) => ({
-    dispatch,
-    getState
-  }) => {
+  const doUpdateUrl = (
+    newState,
+    opts = { replace: false, maintainScrollPosition: false }
+  ) => ({ dispatch, getState }) => {
     let state = newState
     if (typeof newState === 'string') {
       const parsed = new URL(
@@ -97,7 +102,11 @@ export default opts => {
     if (isDefined(state.query)) url.search = ensureString(state.query)
     dispatch({
       type: actionType,
-      payload: { url: url.href, replace: opts.replace }
+      payload: {
+        url: url.href,
+        replace: opts.replace,
+        maintainScrollPosition: opts.maintainScrollPosition
+      }
     })
   }
   const doReplaceUrl = url => doUpdateUrl(url, { replace: true })
@@ -109,13 +118,13 @@ export default opts => {
   return {
     name: config.name,
     init: store => {
-      if (config.inert) {
-        return
-      }
+      if (config.inert) return
 
-      if (config.handleScrollRestoration) initScrollPosition()
+      const removeScrollPosition = config.handleScrollRestoration
+        ? initScrollPosition()
+        : null
 
-      window.addEventListener('popstate', () => {
+      const removePopstateListener = addGlobalListener('popstate', () => {
         store.doUpdateUrl({
           pathname: loc.pathname,
           hash: loc.hash,
@@ -124,10 +133,10 @@ export default opts => {
       })
 
       let lastState = store.selectUrlRaw()
-
-      store.subscribe(() => {
+      const unsubscribe = store.subscribe(() => {
         const newState = store.selectUrlRaw()
         const newUrl = newState.url
+
         if (lastState !== newState && newUrl !== loc.href) {
           try {
             window.history[newState.replace ? 'replaceState' : 'pushState'](
@@ -135,33 +144,46 @@ export default opts => {
               null,
               newState.url
             )
-            if (config.handleScrollRestoration) saveScrollPosition()
-            document.body.scrollTop = 0
-            document.body.scrollLeft = 0
+            if (config.handleScrollRestoration) {
+              saveScrollPosition()
+            }
+            if (!newState.maintainScrollPosition) {
+              window.scrollTo(0, 0)
+            }
           } catch (e) {
             console.error(e)
           }
         }
+
         lastState = newState
       })
+
+      return () => {
+        if (removeScrollPosition) removeScrollPosition()
+        removePopstateListener()
+        unsubscribe()
+      }
     },
     getReducer: () => {
       const initialState = {
         url: !config.inert && HAS_WINDOW ? loc.href : '/',
-        replace: false
+        replace: false,
+        maintainScrollPosition: false
       }
 
       return (state = initialState, { type, payload }) => {
-        if (type === '@@redux/INIT' && typeof state === 'string') {
+        if (typeof state === 'string') {
           return {
             url: state,
-            replace: false
+            replace: false,
+            maintainScrollPosition: false
           }
         }
         if (type === actionType) {
           return Object.assign({
             url: payload.url || payload,
-            replace: !!payload.replace
+            replace: !!payload.replace,
+            maintainScrollPosition: !!payload.maintainScrollPosition
           })
         }
         return state

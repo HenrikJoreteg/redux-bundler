@@ -43,6 +43,7 @@ export const createChunk = rawBundles => {
     rawBundles: [],
     processedBundles: [],
     initMethods: [],
+    destroyMethods: [],
     middlewareCreators: [],
     extraArgCreators: [],
     reactorNames: []

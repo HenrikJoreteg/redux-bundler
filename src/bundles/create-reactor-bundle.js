@@ -4,7 +4,9 @@ const defaults = {
   idleTimeout: 30000,
   idleAction: 'APP_IDLE',
   doneCallback: null,
-  stopWhenTabInactive: true
+  stopWhenTabInactive: true,
+  cancelIdleWhenDone: true,
+  reactorPermissionCheck: null
 }
 
 const ricOptions = { timeout: 500 }
@@ -17,14 +19,18 @@ export const getIdleDispatcher = (stopWhenInactive, timeout, fn) =>
 export default spec => ({
   name: 'reactors',
   init: store => {
-    const opts = Object.assign({}, defaults, spec)
-    const { idleAction, idleTimeout } = opts
+    const {
+      idleAction,
+      idleTimeout,
+      cancelIdleWhenDone,
+      doneCallback,
+      stopWhenTabInactive,
+      reactorPermissionCheck
+    } = Object.assign({}, defaults, spec)
     let idleDispatcher
     if (idleTimeout) {
-      idleDispatcher = getIdleDispatcher(
-        opts.stopWhenTabInactive,
-        idleTimeout,
-        () => store.dispatch({ type: idleAction })
+      idleDispatcher = getIdleDispatcher(stopWhenTabInactive, idleTimeout, () =>
+        store.dispatch({ type: idleAction })
       )
     }
 
@@ -45,7 +51,7 @@ export default spec => ({
         (!store.selectAsyncActive || !store.selectAsyncActive())
       ) {
         idleDispatcher && idleDispatcher.cancel()
-        opts.doneCallback && opts.doneCallback()
+        doneCallback && doneCallback()
       }
     }
 
@@ -58,10 +64,14 @@ export default spec => ({
       store.meta.reactorNames.some(name => {
         const result = store[name]()
         if (result) {
+          // enable passing a fn to check whether a given reactor should be allowed
+          if (reactorPermissionCheck && !reactorPermissionCheck(name, result)) {
+            return
+          }
           store.activeReactor = name
           store.nextReaction = result
+          return result
         }
-        return result
       })
       if (store.nextReaction) {
         // let browser chill
@@ -78,11 +88,16 @@ export default spec => ({
       dispatchNext()
       if (idleDispatcher) {
         idleDispatcher()
-        cancelIfDone()
+        cancelIdleWhenDone && cancelIfDone()
       }
     }
 
-    store.subscribe(callback)
+    const unsubscribe = store.subscribe(callback)
     callback()
+
+    return () => {
+      idleDispatcher && idleDispatcher.cancel()
+      unsubscribe()
+    }
   }
 })

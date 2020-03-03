@@ -32,7 +32,8 @@ const decorateStore = (store, processed) => {
       chunks: [],
       unboundSelectors: {},
       unboundActionCreators: {},
-      reactorNames: []
+      reactorNames: [],
+      destroyMethods: []
     }
   }
 
@@ -68,8 +69,18 @@ const decorateStore = (store, processed) => {
     bindActionCreators(processed.actionCreators, store.dispatch)
   )
 
-  // run any new init methods
-  processed.initMethods.forEach(fn => fn(store))
+  // build list of destroy methods
+  meta.destroyMethods = meta.destroyMethods.concat(processed.destroyMethods)
+
+  // run any new init methods. Use their return function as potential
+  // destroy methods.
+  processed.initMethods.forEach(init => {
+    const destroy = init(store)
+
+    if (typeof destroy === 'function') {
+      meta.destroyMethods = meta.destroyMethods.concat(destroy)
+    }
+  })
 }
 
 const enableBatchDispatch = reducer => (state, action) => {
@@ -78,6 +89,15 @@ const enableBatchDispatch = reducer => (state, action) => {
   }
   return reducer(state, action)
 }
+
+const enableReplaceState = reducer => (state, action) => {
+  if (action.type === 'REPLACE_STATE') {
+    return reducer(action.payload, action)
+  }
+  return reducer(state, action)
+}
+
+const enhanceReducer = compose(enableBatchDispatch, enableReplaceState)
 
 const devTools = () =>
   HAS_WINDOW &&
@@ -93,7 +113,7 @@ const composeBundles = (...bundles) => {
   return data => {
     // actually init our store
     const store = createStore(
-      enableBatchDispatch(combineReducers(firstChunk.reducers)),
+      enhanceReducer(combineReducers(firstChunk.reducers)),
       data,
       compose(
         customApplyMiddleware(
@@ -128,6 +148,10 @@ const composeBundles = (...bundles) => {
     // add all the gathered bundle data into the store
     decorateStore(store, firstChunk)
 
+    // add support for destroying the store (to remove event listeners, etc)
+    store.destroy = () =>
+      store.meta.destroyMethods.forEach(destroy => destroy(store))
+
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
       decorateStore(store, createChunk(bundlesToIntegrate))
@@ -135,7 +159,8 @@ const composeBundles = (...bundles) => {
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}
       )
-      store.replaceReducer(enableBatchDispatch(combineReducers(allReducers)))
+      store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
+      store.buildPersistActionMap && store.buildPersistActionMap()
     }
 
     return store

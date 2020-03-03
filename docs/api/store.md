@@ -4,9 +4,9 @@ First, all `selectX` and `doX` action creators from the bundles of course.
 
 Most of these exist in order to simplify writing code that binds state to a view library. These are used heavily by tools like:
 
-* [redux-bundler-preact](https://github.com/HenrikJoreteg/redux-bundler-preact)
-* [redux-bundler-react](https://github.com/HenrikJoreteg/redux-bundler-react)
-* [redux-bundler-worker](https://github.com/HenrikJoreteg/redux-bundler-worker)
+- [redux-bundler-preact](https://github.com/HenrikJoreteg/redux-bundler-preact)
+- [redux-bundler-react](https://github.com/HenrikJoreteg/redux-bundler-react)
+- [redux-bundler-worker](https://github.com/HenrikJoreteg/redux-bundler-worker)
 
 ## `store.select(arrayOfSelectorNames)`
 
@@ -53,6 +53,16 @@ Lets you dispatch an action creator by name. Give it the name of the action crea
 
 This utility exists to simplify support for propagating actions from main thread to web worker or vice versa.
 
+## `store.destroy()`
+
+Lets you remove event listeners, cleanup state and unsubscribe from store listeners. This calls the destroy implementation for every bundle. It is a 1-way function and the store cannot be re-initialized afterwards. You probably won't need this, but it can be handy if you're building a micro-frontends or portal system and you're loading/unloading whole apps in the same webpage.
+
 ## Special `BATCH_ACTIONS` action type
 
 If you dispatch an action that looks like this `{type: 'BATCH_ACTIONS', actions: [array of other actions]}` it will dispatch them all in one update cycle. Rather than calling all callbacks at once, it will process all actions through all reducers then call the functions. These should be prepared "simple" action objects, not async actions that return a thunk function.
+
+## Special `REPLACE_STATE` action type
+
+If you dispatch an action like: `{type: 'REPLACE_STATE, payload: newState}` it will be as if your store got `newState` as initial state when the store was first created.
+
+This lets you replace the entire state of your redux store. This can be handy for building tooling. Say, for example, you're building a remote PDF rendering service built with puppeteer. You could use `REPLACE_STATE` to post state from your app to the rendering service and use puppeteer to run your app, but inject the state you passed to it to produce a PDF with your app state.

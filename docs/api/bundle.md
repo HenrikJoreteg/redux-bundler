@@ -51,6 +51,22 @@ This will be run _once_ as a last step before the store is returned. It will be 
 
 For example, you may want redux to track current viewport width so that other selectors can change behavior based on viewport size. You could create a `viewport` bundle and register a debounced event listener for the `resize` event on window, and then dispatch a `WINDOW_RESIZED` action with the new width/height and add a `selectIsMobileViewport` selector to make it available to other bundles.
 
+You probably won't need this, but if you return a function from init, that function will be called if you call `store.destroy()`. This can be useful if you're building a micro-frontends or portal system and need to load/unload whole apps in the same webpage.
+
+```js
+  ...
+  init: (store) {
+    const handleOnline = () => store.dispatch({ type: 'ONLINE' })
+
+    window.addEventListener('online', handleOnline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+    }
+  }
+  ...
+```
+
 ## `bundle.persistActions`
 
 If the caching bundle is configured it will look for this property from other bundles. It should contain an array of action types that should cause contents of this bundle's reducer to be persisted to cache. These action types will be used by some generated redux middleware to lazily persist the contents of the reducer any time these actions occur.

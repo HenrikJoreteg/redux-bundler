@@ -1,11 +1,21 @@
 const test = require('tape')
+const moduleAlias = require('module-alias')
+const path = require('path')
+moduleAlias.addAlias(
+  'redux-bundler',
+  path.join(__dirname, '/../dist/redux-bundler')
+)
+moduleAlias.addAlias(
+  'redux-bundler',
+  path.join(__dirname, '/../dist/redux-bundler')
+)
+const onlineBundle = require('../dist/online-bundle')
 const {
   createSelector,
-  createAsyncResourceBundle,
   createReactorBundle,
-  composeBundlesRaw,
-  onlineBundle
+  composeBundlesRaw
 } = require('../dist/redux-bundler')
+const createAsyncResourceBundle = require('../dist/create-async-resource-bundle')
 
 const getAsyncBundleStore = (result, bundleOptions) =>
   composeBundlesRaw(
@@ -61,6 +71,24 @@ test('createAsyncResourceBundle action creator success dispatches', t => {
 
   // this will allow second dispatch to occur
   setTimeout(() => {
+    t.end()
+  }, 0)
+})
+
+test('createAsyncResourceBundle should update selector', t => {
+  const store = getAsyncBundleStore(0)() // <- e.g. user id 0
+  t.equal(store.selectUser(), null, "shouldn't have data")
+  t.equal(store.selectUserShouldUpdate(), true, 'should update w/o data')
+  store.doFetchUser()
+
+  // wait for fetch to finish
+  setTimeout(() => {
+    t.equal(store.selectUser(), 0, 'should have data')
+    t.equal(
+      store.selectUserShouldUpdate(),
+      false,
+      "shouldn't update with fresh data"
+    )
     t.end()
   }, 0)
 })
@@ -134,7 +162,7 @@ test('createAsyncResourceBundle handles waiting when failed properly', t => {
 })
 
 test('createAsyncResourceBundle doClear', t => {
-  let store = getAsyncBundleStore({ name: 'henrik' })()
+  const store = getAsyncBundleStore({ name: 'henrik' })()
 
   t.deepEqual(store.selectUser(), null)
   store.doFetchUser()

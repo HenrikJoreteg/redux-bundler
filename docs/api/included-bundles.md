@@ -2,11 +2,19 @@
 
 We take a "batteries included" approach where you don't have to use any of this stuff but where a pretty complete set of tools required for apps is included out of the box.
 
-## `debugBundle`
+## `createDebugBundle([optionsObject])`
 
 This is meant to be leave-in-able in production. It works as follows:
 
 Unless `localStorage.debug` is set to something "truthy" it will do nothing.
+
+It takes the following options (none are required):
+
+- `logSelectors` (default: true): whether or not to log out selectors and their computed value with each action dispatch
+- `logState` (default: true): whether to log state after each dispatch
+- `actionFilter` (default: null): a function to call that determines whether or not to log an action (if debug is enabled). For example, if you want hide the `APP_IDLE` actions pass this: `(action) => action.type !== 'APP_IDLE'`
+- `enabled` (default: HAS_DEBUG_FLAG): explicitly enable/disable. This is helpful in node.js where there's no localStorage flag.
+- `ignoreActions` (default: []): an array of actions to ignore when logging.
 
 If enabled:
 
@@ -57,8 +65,8 @@ Options object:
 
 Action creators:
 
-* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`.
-  `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
+* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`. Additionally, you can pass `{ maintainScrollPosition: true }` for cases when you do not expect window scroll position to be reset to top as a result of route transition.
+* `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
 * `doUpdateQuery(queryString | queryObject, [options])`: can be used to update query string in place. Either pass in new query string or an object. It does a replaceState by default but you can pass `{replace: false}` if you want to do a push.
 * `doUpdateHash(string | object, [options])`: for updating hash value, does a push by default, but can do replace if passed `{replace: true}`.
 
@@ -110,20 +118,29 @@ export default createRouteBundle({
 Selectors:
 
 `selectRouteParams()`: returns an object of any route params extracted based on current route and current URL. In the example above `/users/:userId` would return `{userId: 'valueExtractedFromURL'}`.
+`selectRouteMatcher()`: returns the route matcher function used. Can be useful for seeing what result a URL would return before actually setting that URL.
+`selectRoutes()`: returns the routes object originally passed in. Can be useful for static sites where you want to pre-render all available pages at build time.
 `selectRoute()`: returns whatever the value was in the routes object for the current matched route.
 `selectRouteInfo()`: returns the key that was passed to the route matcher. By default this is the value of `selectPathname` as defined by the `createUrlBundle` above.
+
+## `createReactorBundle(optionsObject)`
+
+This is the functionality that allows for the `reactX` pattern in your bundles. Manual configuration here is entirely optional.
+
+This bundle is included by default when you use `composeBundles`. If you want to pass it custom options you'll have to use `composeBundlesRaw` instead.
+
+Available options:
+
+* `idleTimeout`: Number (default `30000`). Idle timeout is time to fire an `APP_IDLE` event.
+* `idleAction`: String (default `'APP_IDLE'`). Action type to dispatch on idle.
+* `cancelIdleWhenDone`: Boolean (default `true`). In certain cases this can be useful. For example, if you're using reactors in a node process and you want it to be able to exit when there's no pending reactions. In browsers, this will be ignored.
+* `doneCallback`: Function (default `null`). If you want to pass a callback to call when there are no more pending reactions, you can do so.
+* `stopWhenTabInactive`: Boolean (default `true`). By default if a given tab is in the background we don't want to keep wasting cycles. But, in certain cases you don't want it to stop just because its in the background. Gives you that option. Note: this is implemented by taking advantage of behavior of `requestAnimationFrame`. So it relies on the browser for this logic.
+* `reactorPermissionCheck`: Function (default: null). This function, if passed, will be given the name of the reactor, and the result of having called it that would normally have lead to a reaction being queued. If you return `false` from this function the reactor will not be queued. This allows you to implement rate limiting, etc. It also makes it possible to build in safe-guards for infinite reaction loops or other development tools.
 
 ## `appTimeBundle`
 
 This simply tracks an `appTime` timestamp that gets set any time an action is fired. This is useful for writing deterministic selectors and eliminates the need for setting timers throughout the app. Any selector that uses `selectAppTime` will get this time as an argument. It's ridiculously tiny at only 5 lines of code, but is a nice pattern. Just be careful to not do expensive work in reaction to this changing, as it changes _with each action_.
-
-## `onlineBundle`
-
-Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
-
-Exports a single selector:
-
-`selectIsOnline`: Returns current state.
 
 ## `asyncCountBundle`
 
@@ -133,15 +150,34 @@ It works like this:
 
 If an action contains `STARTED` it increments, if it contains `FINISHED` or `FAILED` it decrements. It adds a single selector to the store called `selectAsyncActive`. This is intended to be used to display a global loading indicator in the app. You may have seen these implemented as a thin colored bar across the top of the UI.
 
-## `createCacheBundle(cachingFunction)`
+## `createCacheBundle(optionsObject)`
 
 Adds support for local caching of bundle data to the app. Other bundle can declare caching when this has been added to the app.
 
-This bundle takes a single required option: a function to use to persist data. The function has to take two arguments: the key and the value. The previously mentioned [example app](https://github.com/HenrikJoreteg/redux-bundler-example/blob/master/src/bundles/index.js) shows how to do this using [money-clip](https://github.com/HenrikJoreteg/money-clip).
+This bundle takes _one required option_: `cacheFn` a function to use to persist data. The function has to take two arguments: the key and the value and return a `Promise`. Suggested caching lib: [money-clip](https://github.com/HenrikJoreteg/money-clip).
 
 Once the caching bundle has been added, other bundles can indicate that their contents should be persisted by exporting a `persistActions` array of action types. Any time one of those action types occur, the contents of that bundle's reducer will be persisted lazily. Again, see the example app for usage.
 
+Two other options are supported:
+
+1. `enabled: [Boolean]`: by default, it will be enabled in the browser only. Passing `enabled: [Boolean]` allows explicitly specifying whether it should be enabled or not. So if you're wanting to persist things in node.js, make sure you're passing `true`.
+2. `logger: [Function]`: by default it logs nothing. If you want to log a success message after things have been persisted. Pass a function here, for example: `{ logger: console.log.bind(console), cacheFn: () => { ... } } `
+
+Example usage:
+
+```js
+composeBundles(
+  createCacheBundle({
+    logger: console.log.bind(console),
+    cacheFn: cache.put
+  }),
+  ...yourOtherBundles
+)
+```
+
 ## `createAsyncResourceBundle(optionsObject)`
+
+Not in main index, be imported directly: `import createAsyncResourceBundle from 'redux-bundler/dist/create-async-resource-bundle'` (note, this requires inclusion of `redux-bundler/dist/online-bundle` in your app as well).
 
 Returns a pre-configured bundle for fetching a remote resource (like some data from an API) and provides a high-level abstraction for declaring when this data should be considered stale, what conditions should cause it to fetch, and when it should expire, etc.
 
@@ -227,3 +263,13 @@ bundle.reactHoneyBadgerFetch = createSelector(
 
 export default bundle
 ```
+
+## `onlineBundle`
+
+Not in main index, be imported directly: `import onlineBundle from 'redux-bundler/dist/online-bundle'`
+
+Tiny little (18 line) bundle that listens for `online` and `offline` events from the browser and reflects these in redux. Note that browsers will not detect "lie-fi" situations well. But these events will be fired for things like airplane mode. This can be used to suspend network requests when you know they're going to fail anyway.
+
+Exports a single selector:
+
+`selectIsOnline`: Returns current state.

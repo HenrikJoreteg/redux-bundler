@@ -1,33 +1,63 @@
 # Change Log
 
-* `21.2.2` - Fixed `staleAge` -> `staleAfter` bug in geolocation bundle and fix starting state from online bundle should come from `navigator.onLine` (thanks [@layflags](https://github.com/layflags)!). Minor docs update (thanks [@JayChetty](https://github.com/JayChetty)).
-* `21.2.1` - Super minor tweak to `appTimeBundle` to make it possible to overwrite `Date.now()` after the app has started which can be useful to enable speeding up time for automated testing.
-* `21.2.0` - Added support for hash-based routing by passing in options object to `createRouteBundle` (thanks [@olizilla]!).
-* `21.1.0` - Added support for Redux Dev Tools (thanks [@aulneau](https://github.com/aulneau)!). Added CI. Added some notes for React Native users to docs (thanks [@quarkcore](https://github.com/quarkcore)).
-* `21.0.3` - Fix for bug in required options check in createAsyncResourceBundle (thanks [@greggb](https://github.com/greggb)). Minor simplification/cleanup of `custom-apply-middleware.js`. (this was supposed to be `21.0.2` but accidentally got published as `21.0.3` :facepalm:)
-* `21.0.1` - Build with compress=false to avoid redux console warning and improve debugging experience.
-* `21.0.0` - Adding scroll restoration handling. (many browsers already handle this well by default, but not FF or IE 11). This handles scroll position internally in the url bundle if used, it also exports the scroll restoration helper functions so that they can be used directly as well.
-* `20.0.0` - Adding documentation site, wrote lots of docs and made mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
+- `27.0.0` Separated a few non-core items into their own exports must be imported independently: `redux-bundler/dist/create-async-resource-bundle`, `redux-bundler/dist/create-geolocation-bundle`, `redux-bundler/dist/online-bundle`. This just removes stuff that is often unused from main build.
+- `26.1.0` Added `reactorPermissionCheck` option to `createReactorBundle` to better support building rate-limiting or developer tools for reactors. Also, added better docs for `createReactorBundle` options.
+- `26.0.0`
+  - Removed `logIdle` option from `createDebugBundle` and added support for `actionFilter` function instead. Thanks to [@malbonesi](https://github.com/HenrikJoreteg/redux-bundler/pull/59) for the idea of making this more flexible.
+  - Added `store.destroy()` method. Bundle `.init()` methods can optionally return a "cleanup" function. This means you can have an architecture that loads/unloads entire apps within the same document and lets you do cleanup like removing event listeners, etc. Thanks to [@rudionrails](https://github.com/HenrikJoreteg/redux-bundler/pull/57)
+- `25.0.0`
+  - Re-worked debug bundle. It is now created programmatically so it can be configured: `createDebugBundle()`
+    - Now works in node.js ([#31](https://github.com/HenrikJoreteg/redux-bundler/issues/31))
+    - Big thanks to [@aulneau](https://github.com/HenrikJoreteg/redux-bundler/pull/32) for general idea. Unfortunately wasn't quite able to merge his PR as it was and wanted to do some other related changes as well. But credit is due, for sure. Thanks!
+    - Fix logging difference when activated later: ([#24](https://github.com/HenrikJoreteg/redux-bundler/issues/24))
+  - Updates `querystringify` and `create-selector` to `2.1.1` ([#55](https://github.com/HenrikJoreteg/redux-bundler/issues/24))
+  - Fixes annoying "missing sourcemap" warning when building with parcel.
+- `24.0.0`
+  - Breaking change to `createCacheBundle`. It now takes an options object as an argument instead of just a cache function. This allows us to pass an `enabled` option to enable its use in node.js (it's still off by default in node). Also adds support for passing a `logger` function as an option. It will be called with a message describing what was persisted and why.
+  - Fixes persist action support for bundles added later with `integrateBundles`. Previously the map of actions to reducers to persist was only created up front. It is now re-generated after other bundles are integrated.
+  - Added, tests to demonstrate these changes.
+- `23.2.0` Adds option for `cancelIdleWhenDone` to `createReactorBundle`. By default, if redux-bundler is running in node.js and there are no pending reactions, the idle dispatcher stops firing. This is to support normal SSR use-cases where you may want to wait for the store to be "done" doing any remaining work, then fire the done callback. However, for use cases where you're wanting to use redux-bundler as a long-lived state engine in node.js it was problematic to have it stop idling. The default behavior is unchanged, but no if you pass `cancelIdleWhenDone: false` as an option, it will keep running indefinitely.
+- `23.1.2` Adds `setTimeout` to restore scroll position util. This buys UI libs a chance to update the DOM and makes scroll position restoration work in some cases where it wasn't previously.
+- `23.1.1` Updates `create-selector` to `4.0.3` to improve selector resolution perf. Updates a few dev dependencies to latest versions.
+- `23.1.0` Adds `maintainScrollPosition` option to `doUpdateUrl()` (thanks [@abuinitski](https://github.com/abuinitski)). Minor tweak to explicitly check for `null` instead of implied type in order to support storing `0` as the data in `createAsyncResourceBundle()` (thanks [@layflags](https://github.com/layflags)).
+- `23.0.2` Fixes issues with scroll restoration not working in all cases when using the url bundle.
+- `23.0.1` Use `--no-compress` instead of `--compress=false`. It was not being parsed properly by the updated version of microbundle.
+- `23.0.0`
+  - Added support for passing a `REPLACE_STATE` action to replace entire state of store. Because this could be a breaking change if you already have such an action type, I'm doing a major version bump for this.
+  - Updated npm deps to mitigate security advisories.
+- `22.2.0`
+  - Added `selectRoutes` to enable retrieving the entire routes object.
+  - Merged refactored `createAsyncResourceBundle` (thanks [@aaronmccall](https://github.com/aaronmccall)) to enable better bundle composition.
+- `22.1.0` - Added `selectRouteMatcher` to enable retrieving the function used to match urls to routes.
+- `22.0.0` - Upgraded to redux v4.0.0.
+- `21.2.2` - Fixed `staleAge` -> `staleAfter` bug in geolocation bundle and fix starting state from online bundle should come from `navigator.onLine` (thanks [@layflags](https://github.com/layflags)!). Minor docs update (thanks [@JayChetty](https://github.com/JayChetty)).
+- `21.2.1` - Super minor tweak to `appTimeBundle` to make it possible to overwrite `Date.now()` after the app has started which can be useful to enable speeding up time for automated testing.
+- `21.2.0` - Added support for hash-based routing by passing in options object to `createRouteBundle` (thanks [@olizilla]!).
+- `21.1.0` - Added support for Redux Dev Tools (thanks [@aulneau](https://github.com/aulneau)!). Added CI. Added some notes for React Native users to docs (thanks [@quarkcore](https://github.com/quarkcore)).
+- `21.0.3` - Fix for bug in required options check in createAsyncResourceBundle (thanks [@greggb](https://github.com/greggb)). Minor simplification/cleanup of `custom-apply-middleware.js`. (this was supposed to be `21.0.2` but accidentally got published as `21.0.3` :facepalm:)
+- `21.0.1` - Build with compress=false to avoid redux console warning and improve debugging experience.
+- `21.0.0` - Adding scroll restoration handling. (many browsers already handle this well by default, but not FF or IE 11). This handles scroll position internally in the url bundle if used, it also exports the scroll restoration helper functions so that they can be used directly as well.
+- `20.0.0` - Adding documentation site, wrote lots of docs and made mostly internal changes and bug fixes, can cause breakage if depending on action type names, or if using `composeBundlesRaw()` to handpick what's included.
 
-  * Changed all action types to be past-tense (so they don't sound like RPC calls). Action types should describe things that happened, not sound like they're causing things to happen. So in asyncCount instead of `START`, `SUCCESS`, `ERROR` it's now `STARTED`, `FINISHED`, `FAILED`. In URL bundle `UPDATE_URL` -> `URL_UPDATED`. In geolocation bundle `REQUEST_GEOLOCATION_X` -> `GEOLOCATION_REQUEST_X`.
-  * All included bundles that require instantiation with a config are now named `createXBundle` for consistency. This includes `createGeolocationBundle`, `createReactorBundle`, `createCacheBundle`.
-  * Added lots of documentation to readme several of the included bundles.
-  * Significant changes to `createAsyncResourceBundle`:
-    * `actionBaseType` is now the noun, such as `USER`, from this we build `FETCH_USER_STARTED`, `USER_EXPIRED`, etc.
-    * `doMarkXAsStale` is now `doMarkXAsOutdated`.
-    * Action type names updated to be past tense: `MAKE_STALE` -> `X_INVALIDATED`
-    * Added `doClearX` action creator and reducer case.
-    * Now takes 3 time-related settings: `staleAfter`, `retryAfter`, and `expireAfter`.
-    * Support for `expireAfter` was added, the `X_EXPIRED` action will be dispatched clearing the state.
-  * Removed wonky batch dispatch quasi-middleware.
+  - Changed all action types to be past-tense (so they don't sound like RPC calls). Action types should describe things that happened, not sound like they're causing things to happen. So in asyncCount instead of `START`, `SUCCESS`, `ERROR` it's now `STARTED`, `FINISHED`, `FAILED`. In URL bundle `UPDATE_URL` -> `URL_UPDATED`. In geolocation bundle `REQUEST_GEOLOCATION_X` -> `GEOLOCATION_REQUEST_X`.
+  - All included bundles that require instantiation with a config are now named `createXBundle` for consistency. This includes `createGeolocationBundle`, `createReactorBundle`, `createCacheBundle`.
+  - Added lots of documentation to readme several of the included bundles.
+  - Significant changes to `createAsyncResourceBundle`:
+    - `actionBaseType` is now the noun, such as `USER`, from this we build `FETCH_USER_STARTED`, `USER_EXPIRED`, etc.
+    - `doMarkXAsStale` is now `doMarkXAsOutdated`.
+    - Action type names updated to be past tense: `MAKE_STALE` -> `X_INVALIDATED`
+    - Added `doClearX` action creator and reducer case.
+    - Now takes 3 time-related settings: `staleAfter`, `retryAfter`, and `expireAfter`.
+    - Support for `expireAfter` was added, the `X_EXPIRED` action will be dispatched clearing the state.
+  - Removed wonky batch dispatch quasi-middleware.
 
-* `19.0.1` - Minor fix for WebWorkers (updating redux-persist-middleware dep).
-* `19.0.0` - Externalized caching lib as its own library called [money-clip](https://github.com/HenrikJoreteg/money-clip) and the caching bundle now uses [redux-persist-middleware](https://github.com/HenrikJoreteg/redux-persist-middleware) to generate it's persistance middleware. Nothing huge changes other than importing caching lib from outside of bundler. I've updated [redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) for sample usage of caching bundle with money-clip. Renamed `cacheBundle` -> `createCacheBundle` since it needs to be configured to be used. Removed unused `npm-watch` dev dependency.
-* `18.0.0` - Renamed `selectCurrentComponent` -> `selectRoute` in create route bundle.
-* `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
-* `17.1.0` - Export `*` from redux in index.
-* `17.0.1` - Fix to ensure publishing/mapping to correct build files :facepalm:.
-* `17.0.0` - Switched to build with microbundle. Should address issues #5, #8. No longer pulling in redux-bundler version into build.
-* `16.1.1` - Ensure all output from selectors of included bundles is serializable. `selectUrlObject()` in the url bundle was returning a `URL` object instance. Now it just returns a plain object with all string properties from the URL object. Did this as bug fix release because it was always intended this way. In theory it could could be a breaking change, but odds are miniscule. Only if someone were doing `selectUrlObject` then treating its resulting `searchParams` prop as a `URLSearchParams` object and calling its methods instead of using one of the selectors that already exist for accessing query params.
-* `16.1.0` - Added `.action()` method to store for calling an action creator by name (useful when wanting to proxy all actions to another object, such as a web worker)
-* `16.0.0` - First public release
+- `19.0.1` - Minor fix for WebWorkers (updating redux-persist-middleware dep).
+- `19.0.0` - Externalized caching lib as its own library called [money-clip](https://github.com/HenrikJoreteg/money-clip) and the caching bundle now uses [redux-persist-middleware](https://github.com/HenrikJoreteg/redux-persist-middleware) to generate it's persistance middleware. Nothing huge changes other than importing caching lib from outside of bundler. I've updated [redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) for sample usage of caching bundle with money-clip. Renamed `cacheBundle` -> `createCacheBundle` since it needs to be configured to be used. Removed unused `npm-watch` dev dependency.
+- `18.0.0` - Renamed `selectCurrentComponent` -> `selectRoute` in create route bundle.
+- `17.1.1` - Fix bug where `requestAnimationFrame` was expected to exist when running inside a worker.
+- `17.1.0` - Export `*` from redux in index.
+- `17.0.1` - Fix to ensure publishing/mapping to correct build files :facepalm:.
+- `17.0.0` - Switched to build with microbundle. Should address issues #5, #8. No longer pulling in redux-bundler version into build.
+- `16.1.1` - Ensure all output from selectors of included bundles is serializable. `selectUrlObject()` in the url bundle was returning a `URL` object instance. Now it just returns a plain object with all string properties from the URL object. Did this as bug fix release because it was always intended this way. In theory it could could be a breaking change, but odds are miniscule. Only if someone were doing `selectUrlObject` then treating its resulting `searchParams` prop as a `URLSearchParams` object and calling its methods instead of using one of the selectors that already exist for accessing query params.
+- `16.1.0` - Added `.action()` method to store for calling an action creator by name (useful when wanting to proxy all actions to another object, such as a web worker)
+- `16.0.0` - First public release

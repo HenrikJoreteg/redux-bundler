@@ -6,9 +6,8 @@ export const HAS_DEBUG_FLAG = debug || false
 export const HAS_WINDOW = typeof window !== 'undefined'
 export const IS_BROWSER = HAS_WINDOW || typeof self !== 'undefined'
 export const IS_PROD = process.env.NODE_ENV === 'production'
-const fallback = func => {
-  setTimeout(func, 0)
-}
+const fallback = func => setTimeout(func, 0)
+
 export const raf =
   IS_BROWSER && self.requestAnimationFrame
     ? self.requestAnimationFrame
@@ -47,7 +46,7 @@ export const flattenExtractedToObject = extracted => {
 }
 
 export const flattenExtractedToArray = extracted => {
-  let accum = []
+  const accum = []
   for (const appName in extracted) {
     accum.push(...extracted[appName])
   }
@@ -59,17 +58,17 @@ export const addGlobalListener = (
   handler,
   opts = { passive: false }
 ) => {
-  if (IS_BROWSER) {
-    if (opts.passive) {
-      if (PASSIVE_EVENTS_SUPPORTED) {
-        self.addEventListener(eventName, handler, { passive: true })
-      } else {
-        self.addEventListener(eventName, debounce(handler, 200), false)
-      }
-    } else {
-      self.addEventListener(eventName, handler)
-    }
-  }
+  if (!IS_BROWSER) return () => {}
+
+  const args = opts.passive
+    ? PASSIVE_EVENTS_SUPPORTED
+      ? [eventName, handler, { passive: true }]
+      : [eventName, debounce(handler, 200), false]
+    : [eventName, handler]
+
+  self.addEventListener(...args)
+
+  return () => self.removeEventListener(...args)
 }
 
 export const selectorNameToValueName = name => {
@@ -80,8 +79,8 @@ export const selectorNameToValueName = name => {
 export const debounce = (fn, wait) => {
   let timeout
   const debounced = function () {
-    let ctx = this
-    let args = arguments
+    const ctx = this
+    const args = arguments
     clearTimeout(timeout)
     timeout = setTimeout(() => {
       fn.apply(ctx, args)
@@ -96,10 +95,10 @@ export const debounce = (fn, wait) => {
 export const saveScrollPosition = () => {
   history.replaceState(
     {
-      height: document.body.offsetHeight,
-      width: document.body.offsetWidth,
-      y: document.body.scrollTop,
-      x: document.body.scrollLeft
+      height: window.innerHeight,
+      width: window.innerWidth,
+      y: window.scrollY,
+      x: window.scrollX
     },
     ''
   )
@@ -110,10 +109,12 @@ export const restoreScrollPosition = () => {
   if (state) {
     // we'll force it to our known height since the DOM rendering may
     // be async and the height may not be restored yet.
-    const newStyle = `height: ${state.height}px; width: ${state.width}px;`
-    document.body.setAttribute('style', newStyle)
-    window.scrollTo(state.x, state.y)
-    ric(() => document.body.removeAttribute('style'))
+    setTimeout(() => {
+      const newStyle = `height: ${state.height}px; width: ${state.width}px;`
+      document.body.setAttribute('style', newStyle)
+      window.scrollTo(state.x, state.y)
+      ric(() => document.body.removeAttribute('style'))
+    })
   }
 }
 
@@ -125,9 +126,22 @@ export const initScrollPosition = () => {
   if (history.scrollRestoration) {
     history.scrollRestoration = 'manual'
   }
-  addGlobalListener('popstate', restoreScrollPosition)
-  addGlobalListener('scroll', debounce(saveScrollPosition, 300), {
-    passive: true
-  })
+  const removePopstateListener = addGlobalListener(
+    'popstate',
+    restoreScrollPosition
+  )
+  const removeScrollListener = addGlobalListener(
+    'scroll',
+    debounce(saveScrollPosition, 300),
+    {
+      passive: true
+    }
+  )
+
   restoreScrollPosition()
+
+  return () => {
+    removePopstateListener()
+    removeScrollListener()
+  }
 }

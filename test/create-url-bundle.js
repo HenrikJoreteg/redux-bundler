@@ -8,7 +8,7 @@ test('url-bundle selectors', t => {
   const store = composeBundlesRaw(createUrlBundle())({ url: startUrl })
   t.deepEqual(
     store.selectUrlRaw(),
-    { url: startUrl, replace: false },
+    { url: startUrl, replace: false, maintainScrollPosition: false },
     'returns basic start'
   )
   // make sure object will be serializable
@@ -33,7 +33,11 @@ test('url-bundle selectors', t => {
   )
 
   const store2 = composeBundlesRaw(createUrlBundle())()
-  t.deepEqual(store2.selectUrlRaw(), { url: '/', replace: false })
+  t.deepEqual(store2.selectUrlRaw(), {
+    url: '/',
+    replace: false,
+    maintainScrollPosition: false
+  })
   t.end()
 })
 
@@ -48,35 +52,40 @@ test('url-bundle actionCreators', t => {
   store.doUpdateUrl('/')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/',
-    replace: false
+    replace: false,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doUpdateUrl('/', { replace: true })
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/',
-    replace: true
+    replace: true,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doReplaceUrl('/hi')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/hi',
-    replace: true
+    replace: true,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doUpdateQuery({ ok: 'hi' })
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/something?ok=hi',
-    replace: true
+    replace: true,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doUpdateQuery('ok=hi')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/something?ok=hi',
-    replace: true
+    replace: true,
+    maintainScrollPosition: false
   })
   t.deepEqual(store.selectQueryObject(), { ok: 'hi' })
 
@@ -84,19 +93,25 @@ test('url-bundle actionCreators', t => {
   store.doUpdateHash({ ok: 'hi' })
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/something#ok=hi',
-    replace: false
+    replace: false,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doUpdateUrl('/hi?there=you#something')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/hi?there=you#something',
-    replace: false
+    replace: false,
+    maintainScrollPosition: false
   })
   store.doUpdateUrl('/boo')
   t.deepEqual(
     store.selectUrlRaw(),
-    { url: 'http://something.com/boo', replace: false },
+    {
+      url: 'http://something.com/boo',
+      replace: false,
+      maintainScrollPosition: false
+    },
     'clears existing when passing full string'
   )
 
@@ -104,14 +119,24 @@ test('url-bundle actionCreators', t => {
   store.doUpdateUrl('/hi?there=you')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/hi?there=you',
-    replace: false
+    replace: false,
+    maintainScrollPosition: false
   })
 
   resetStore()
   store.doUpdateUrl('/hi#something')
   t.deepEqual(store.selectUrlRaw(), {
     url: 'http://something.com/hi#something',
-    replace: false
+    replace: false,
+    maintainScrollPosition: false
+  })
+
+  resetStore()
+  store.doUpdateUrl('/hi', { maintainScrollPosition: true })
+  t.deepEqual(store.selectUrlRaw(), {
+    url: 'http://something.com/hi',
+    replace: false,
+    maintainScrollPosition: true
   })
 
   t.end()
