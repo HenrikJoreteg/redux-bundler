@@ -1,4 +1,4 @@
-import createAsyncResourceBundle from 'redux-bundler/extras/create-async-resource-bundle'
+import createAsyncResourceBundle from 'redux-bundler/dist/create-async-resource-bundle'
 import { IS_BROWSER } from 'redux-bundler'
 
 const getError = (message, permanent = false) => {

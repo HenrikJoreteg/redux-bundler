@@ -1,5 +1,6 @@
 # Change Log
 
+- `27.0.1` Fix build issue for newly extracted "extra" bundles.
 - `27.0.0` Separated a few non-core items into their own exports must be imported independently: `redux-bundler/dist/create-async-resource-bundle`, `redux-bundler/dist/create-geolocation-bundle`, `redux-bundler/dist/online-bundle`. This just removes stuff that is often unused from main build.
 - `26.1.0` Added `reactorPermissionCheck` option to `createReactorBundle` to better support building rate-limiting or developer tools for reactors. Also, added better docs for `createReactorBundle` options.
 - `26.0.0`

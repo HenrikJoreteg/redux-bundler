@@ -1,4 +1,4 @@
-import { createSelector } from 'create-selector'
+import { createSelector } from 'redux-bundler'
 
 const defaultOpts = {
   actionBaseType: null,
