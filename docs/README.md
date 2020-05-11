@@ -33,9 +33,12 @@ export default {
   // the Redux reducer function
   reducer: (state = [], action) => {
     // ...
+    
+    // state here is the "users" slice of full state object
     return state
   },
   // anything that starts with `select` is treated as a selector
+  // selectors get full state object so they can use state from other bundles
   selectActiveUsers: state => state.users.filter(user => user.isActive),
   // anything that starts with `do` is treated as an action creator
   doUpdateUser: (userId, attrs) => ({ dispatch, apiFetch }) =>
