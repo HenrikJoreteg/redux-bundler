@@ -1,6 +1,6 @@
 # Change Log
 
-- `27.0.2` Fixed handling of `selectRoute` if there was no match. Previously, this would error, now it returns `null`. Previously `selectRouteParams` would also error, now it returns `{}`. Updated dependencies to eliminated npm audit security warnings. Updated doc table of contents to fix broken links (due to change in gitbook). Removed `standard` and `prettier-standard` in lieu of vanilla eslint. Removed a couple of unused deps (oops).
+- `27.0.2` Fixed handling of `selectRoute` if there was no match. Previously, this would error, now it returns `null`. Previously `selectRouteParams` would also error, now it returns `{}`. Updated dependencies to eliminate some npm audit security warnings. Updated doc table of contents to fix broken links (due to change in gitbook). Removed `standard` and `prettier-standard` in lieu of vanilla eslint. Removed a couple of unused deps (oops).
 - `27.0.1` Fix build issue for newly extracted "extra" bundles.
 - `27.0.0` Separated a few non-core items into their own exports must be imported independently: `redux-bundler/dist/create-async-resource-bundle`, `redux-bundler/dist/create-geolocation-bundle`, `redux-bundler/dist/online-bundle`. This just removes stuff that is often unused from main build.
 - `26.1.0` Added `reactorPermissionCheck` option to `createReactorBundle` to better support building rate-limiting or developer tools for reactors. Also, added better docs for `createReactorBundle` options.
