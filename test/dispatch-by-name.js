@@ -9,7 +9,7 @@ test('.action() same as doAction', t => {
     selectState: state => state,
     doThing: payload => ({ type: 'DO_THING', payload }),
     doSomething: () => ({ type: 'DO_SOMETHING' }),
-    getMiddleware: () => ({ getState }) => next => action => {
+    getMiddleware: () => () => next => action => {
       count++
       if (count === 1) {
         t.deepEqual(action, { type: 'DO_THING', payload: 1 })

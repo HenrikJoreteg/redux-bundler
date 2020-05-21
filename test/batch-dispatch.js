@@ -4,7 +4,7 @@ const { composeBundles } = require('../dist/redux-bundler')
 test('batch dispatch', t => {
   const bundle = {
     name: 'batch',
-    reducer: (state = {}, { type, payload }) => {
+    reducer: (state = {}, { type }) => {
       if (type === 'ACTION1') {
         return Object.assign({}, state, { no1: true })
       }

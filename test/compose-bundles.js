@@ -33,9 +33,7 @@ test('composeBundlesRaw', t => {
 
 test('ensure dispatch returns what the thunk function returns', t => {
   const store = composeBundles()()
-  const result = store.dispatch(({ dispatch }) => {
-    return true
-  })
+  const result = store.dispatch(() => true)
   t.equal(result, true, 'should return true')
   t.end()
 })

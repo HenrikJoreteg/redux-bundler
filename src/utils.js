@@ -20,9 +20,11 @@ export const isPassiveSupported = () => {
   let passiveSupported = false
   try {
     var options = Object.defineProperty({}, 'passive', {
+      /* eslint-disable getter-return */
       get: function () {
         passiveSupported = true
       }
+      /* eslint-enable getter-return */
     })
     window.addEventListener('test', options, options)
     window.removeEventListener('test', options, options)

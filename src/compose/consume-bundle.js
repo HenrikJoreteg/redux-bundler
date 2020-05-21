@@ -17,16 +17,16 @@ export const normalizeBundle = bundle => {
   }
   Object.keys(bundle).forEach(key => {
     if (startsWith(key, 'do')) {
-      ;(result.actionCreators || (result.actionCreators = {}))[key] =
+      (result.actionCreators || (result.actionCreators = {}))[key] =
         bundle[key]
       return
     }
     const isSelector = startsWith(key, 'select')
     const isReactor = startsWith(key, 'react')
     if (isSelector || isReactor) {
-      ;(result.selectors || (result.selectors = {}))[key] = bundle[key]
+      (result.selectors || (result.selectors = {}))[key] = bundle[key]
       if (isReactor) {
-        ;(result.reactorNames || (result.reactorNames = [])).push(key)
+        (result.reactorNames || (result.reactorNames = [])).push(key)
       }
     }
   })

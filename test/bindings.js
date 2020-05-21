@@ -5,7 +5,7 @@ const { createSelector } = require('create-selector')
 const getStore = composeBundlesRaw(
   {
     name: 'trueBundle',
-    reducer: (state = true, { type, payload }) => {
+    reducer: (state = true, { type }) => {
       if (type === 'MAKE_FALSE') {
         return false
       }
@@ -18,7 +18,7 @@ const getStore = composeBundlesRaw(
   },
   {
     name: 'numberBundle',
-    reducer: (state = 0, { type, payload }) => {
+    reducer: (state = 0, { type }) => {
       if (type === 'INCREMENT') {
         return state + 1
       }
@@ -54,7 +54,6 @@ test('bindings basic functionality', t => {
       { isPositive: true },
       'there should only be this one change'
     )
-    t.end()
   })
   t.deepEqual(store.subscriptions.watchedValues, {
     isPositive: false,
@@ -66,6 +65,7 @@ test('bindings basic functionality', t => {
     isTrue: true
   })
   t.equal(store.selectIsPositive(), true, 'now it is positive')
+  t.end()
 })
 
 test('bindings select all functionality', t => {

@@ -92,7 +92,7 @@ test('ability to disable reactors', t => {
   const store = composeBundlesRaw(
     bundle,
     createReactorBundle({
-      reactorPermissionCheck: (name, result) => {
+      reactorPermissionCheck: name => {
         if (name === 'reactShouldReact') {
           if (hasRunOnce) {
             return false

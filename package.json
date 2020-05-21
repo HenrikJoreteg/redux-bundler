@@ -8,18 +8,15 @@
   },
   "devDependencies": {
     "create-selector": "5.0.0",
-    "feather-route-matcher": "3.1.0",
-    "idb-keyval": "3.2.0",
+    "eslint": "7.0.0",
+    "feather-route-matcher": "4.0.0",
     "microbundle": "0.11.0",
     "module-alias": "2.2.2",
-    "nodemon": "2.0.2",
-    "prettier-standard": "16.1.0",
     "querystringify": "2.1.1",
-    "redux": "4.0.1",
-    "standard": "14.3.1",
+    "redux": "4.0.5",
     "tap-spec": "5.0.0",
-    "tape": "4.13.0",
-    "whatwg-url": "8.0.0"
+    "tape": "5.0.0",
+    "whatwg-url": "8.1.0"
   },
   "files": [
     "dist"
@@ -35,7 +32,9 @@
   "module": "dist/redux-bundler.m.js",
   "prettier": {
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
   },
   "repository": {
     "type": "git",
@@ -45,20 +44,11 @@
     "build": "microbundle --no-compress --no-sourcemap",
     "dev": "microbundle watch --no-compress",
     "full-test": "npm run build && npm run test && npm run lint",
-    "lint": "prettier-standard 'src/**/*.js' 'test/**/*.js' && standard",
+    "lint": "eslint --fix 'src/**/*.js' 'test/**/*.js'",
     "postbuild": "microbundle --no-compress -no-sourcemap -i src/extras/create-async-resource-bundle.js -i src/extras/create-geolocation-bundle.js -i src/extras/online-bundle.js --external redux-bundler -o='dist/'",
     "prebuild": "rm -rf dist",
     "prepublish": "npm run full-test",
     "test": "tape test/*.js | tap-spec"
   },
-  "source": "src/index.js",
-  "standard": {
-    "globals": [
-      "localStorage",
-      "window",
-      "self",
-      "URL",
-      "history"
-    ]
-  }
+  "source": "src/index.js"
 }
