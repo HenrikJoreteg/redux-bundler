@@ -33,7 +33,7 @@ export default {
   // the Redux reducer function
   reducer: (state = [], action) => {
     // ...
-    
+
     // state here is the "users" slice of full state object
     return state
   },
@@ -257,10 +257,10 @@ Now I have one unified place to see anything that could cause a redirect in my a
 
 ## What next?
 
-- Learn exactly [what bundles can do](/api/bundle.html).
+- Learn exactly [what bundles can do](/api-reference/bundle).
 - Check out the example app here: [https://github.com/HenrikJoreteg/redux-bundler-example](https://github.com/HenrikJoreteg/redux-bundler-example) to see how to build an app with redux-bundler.
-- Learn about all the functionality available in the [included bundles](/api/included-bundles.html).
-- See the [patterns page](/guides/patterns.html) for tips on how to organize your code, and do things like caching and routing.
+- Learn about all the functionality available in the [included bundles](/api-reference/included-bundles).
+- See the [patterns page](/guides/patterns) for tips on how to organize your code, and do things like caching and routing.
 
 ## license
 
