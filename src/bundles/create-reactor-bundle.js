@@ -34,6 +34,24 @@ export default spec => ({
       )
     }
 
+    store.getNextReaction = (skipPermissionCheck = false) => {
+      for (let i = 0, l = store.meta.reactorNames.length; i < l; i++) {
+        const name = store.meta.reactorNames[i]
+        const result = store[name]()
+        if (result) {
+          // enable passing a fn to check whether a given reactor should be allowed
+          if (
+            !skipPermissionCheck &&
+            reactorPermissionCheck &&
+            !reactorPermissionCheck(name, result)
+          ) {
+            continue
+          }
+          return { name, result }
+        }
+      }
+    }
+
     if (process.env.NODE_ENV !== 'production') {
       store.meta.reactorNames.forEach(name => {
         if (!store[name]) {
@@ -55,32 +73,27 @@ export default spec => ({
       }
     }
 
+    const dispatchNextReaction = () => {
+      // make sure it's still relevant and store it
+      // this time don't verify permission, we already
+      // did once.
+      store.nextReaction = store.getNextReaction(true)
+      if (store.nextReaction) {
+        const { nextReaction } = store
+        store.nextReaction = null
+        store.dispatch(nextReaction.result)
+      }
+    }
+
     const dispatchNext = () => {
       // one at a time
       if (store.nextReaction) {
         return
       }
-      // look for the next one
-      store.meta.reactorNames.some(name => {
-        const result = store[name]()
-        if (result) {
-          // enable passing a fn to check whether a given reactor should be allowed
-          if (reactorPermissionCheck && !reactorPermissionCheck(name, result)) {
-            return
-          }
-          store.activeReactor = name
-          store.nextReaction = result
-          return result
-        }
-      })
+      // store next reaction for reference
+      store.nextReaction = store.getNextReaction()
       if (store.nextReaction) {
-        // let browser chill
-        ric(() => {
-          const { nextReaction } = store
-          store.activeReactor = null
-          store.nextReaction = null
-          store.dispatch(nextReaction)
-        }, ricOptions)
+        ric(dispatchNextReaction, ricOptions)
       }
     }
 

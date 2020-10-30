@@ -103,11 +103,12 @@ export default spec => {
       log(store.meta.reactorNames, { label: 'reactors:', color: colorOrange })
     },
     doLogNextReaction: () => ({ store }) => {
-      const { nextReaction, activeReactor } = store
+      const { nextReaction } = store
       if (nextReaction) {
-        log(nextReaction, {
+        const { name, result } = nextReaction
+        log(result, {
           color: colorOrange,
-          label: `next reaction ${activeReactor}:`
+          label: `next reaction ${name}:`
         })
       }
     },

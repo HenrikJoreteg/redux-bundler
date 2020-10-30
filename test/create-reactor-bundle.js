@@ -8,7 +8,7 @@ const ACTION_0 = 'ACTION_0'
 const ACTION_1 = 'ACTION_1'
 
 const bundleWithReactors = {
-  name: 'reactionary',
+  name: 'reactionaryBundle',
   reducer: (state = { started: false, a0: false, a1: false }, action) => {
     if (action.type === 'START') {
       return Object.assign({}, state, { started: true })
@@ -23,55 +23,58 @@ const bundleWithReactors = {
   },
   doAction1: () => ({ type: ACTION_1 }),
   reactShouldReact0: state => {
-    if (state.reactionary.started && !state.reactionary.a0) {
+    if (state.reactionaryBundle.started && !state.reactionaryBundle.a0) {
       return { type: ACTION_0 }
     }
   },
   reactShouldReact1: state => {
-    if (state.reactionary.started && !state.reactionary.a1) {
+    if (state.reactionaryBundle.started && !state.reactionaryBundle.a1) {
       return { actionCreator: 'doAction1' }
     }
   }
 }
 
 test('createReactorBundle', t => {
-  const store = composeBundlesRaw(bundleWithReactors, createReactorBundle())()
-  store.subscribe(() => {
-    count++
-  })
-  let count = 0
-  t.equal(count, 0)
+  const store = composeBundlesRaw(bundleWithReactors, createReactorBundle(), {
+    name: 'testObserver',
+    getMiddleware: () => {
+      let count = 0
+      return store => next => action => {
+        count++
+        if (count === 1) {
+          t.deepEqual(action, { type: 'START' }, 'first action should be start')
+          return next(action)
+        }
+        if (count === 2) {
+          t.deepEqual(action, { type: 'ACTION_0' })
+          return next(action)
+        }
+        if (count === 3) {
+          t.deepEqual(action, { type: 'ACTION_1' })
+          const result = next(action)
+          t.deepEqual(
+            store.getState().reactionaryBundle,
+            { started: true, a0: true, a1: true },
+            'all state changes should have occured'
+          )
+          t.end()
+          return result
+        }
+        if (count > 3) {
+          t.fail('should not get here')
+        }
+      }
+    }
+  })()
+
   store.dispatch({ type: 'START' })
-  t.deepEqual(store.getState().reactionary, {
-    started: true,
-    a0: false,
-    a1: false
-  })
-  t.equal(count, 1)
-  setTimeout(() => {
-    t.equal(count, 2, 'should now have ran twice')
-    t.deepEqual(
-      store.getState().reactionary,
-      { started: true, a0: true, a1: false },
-      'more state changes should have occured'
-    )
-    setTimeout(() => {
-      t.equal(count, 3, 'should now have ran thrice')
-      t.deepEqual(
-        store.getState().reactionary,
-        { started: true, a0: true, a1: true },
-        'all state changes should have occured'
-      )
-      t.end()
-    }, 0)
-  }, 0)
 })
 
 test('ability to disable reactors', t => {
   let hasRunOnce = false
 
   const bundle = {
-    name: 'reactionary',
+    name: 'reactionaryBundle',
     reducer: (state = { started: false, timesRan: 0 }, action) => {
       if (action.type === 'START') {
         return Object.assign({}, state, { started: true })
@@ -83,7 +86,7 @@ test('ability to disable reactors', t => {
     },
     doAction: () => ({ type: 'THE_ACTION' }),
     reactShouldReact: state => {
-      if (state.reactionary.started) {
+      if (state.reactionaryBundle.started) {
         return { actionCreator: 'doAction' }
       }
     }
@@ -105,16 +108,20 @@ test('ability to disable reactors', t => {
     })
   )()
 
-  const shouldMatch = ({ started, timesRan }) => {
-    t.deepEqual(store.getState().reactionary, {
-      started,
-      timesRan
-    })
+  const shouldMatch = ({ started, timesRan }, message) => {
+    t.deepEqual(
+      store.getState().reactionaryBundle,
+      {
+        started,
+        timesRan
+      },
+      message
+    )
   }
 
   t.ok(!store.nextReaction)
 
-  shouldMatch({ started: false, timesRan: 0 })
+  shouldMatch({ started: false, timesRan: 0 }, 'should not have ran yet')
 
   // dispatch thing that should start reactor
   store.dispatch({ type: 'START' })
@@ -122,11 +129,22 @@ test('ability to disable reactors', t => {
   t.ok(store.nextReaction)
   shouldMatch({ started: true, timesRan: 0 })
 
+  const waitForNoPendingReactor = () =>
+    new Promise(resolve => {
+      const check = () => {
+        if (store.nextReaction) {
+          setTimeout(check, 10)
+        } else {
+          resolve()
+        }
+      }
+      check()
+    })
   // give reactors a chance to run
-  setTimeout(() => {
-    shouldMatch({ started: true, timesRan: 1 })
+  waitForNoPendingReactor().then(() => {
+    shouldMatch({ started: true, timesRan: 1 }, 'should have ran once')
+
     store.dispatch({ type: 'START' })
-    // make sure we no longer have pending reactor
     t.ok(!store.nextReaction)
     setTimeout(() => {
       shouldMatch({ started: true, timesRan: 1 })
