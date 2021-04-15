@@ -47,7 +47,7 @@
     "lint": "eslint --fix 'src/**/*.js' 'test/**/*.js'",
     "postbuild": "microbundle --no-compress -no-sourcemap -i src/extras/create-async-resource-bundle.js -i src/extras/create-geolocation-bundle.js -i src/extras/online-bundle.js --external redux-bundler -o='dist/'",
     "prebuild": "rm -rf dist",
-    "prepublish": "npm run full-test",
+    "prepublishOnly": "npm run full-test",
     "test": "tape test/*.js | tap-spec"
   },
   "source": "src/index.js"
