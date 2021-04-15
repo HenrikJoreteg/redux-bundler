@@ -10,10 +10,12 @@ const fallback = func => setTimeout(func, 0)
 
 export const raf =
   IS_BROWSER && self.requestAnimationFrame
-    ? self.requestAnimationFrame
+    ? (...args) => self.requestAnimationFrame(...args)
     : fallback
 export const ric =
-  IS_BROWSER && self.requestIdleCallback ? self.requestIdleCallback : fallback
+  IS_BROWSER && self.requestIdleCallback
+    ? (...args) => self.requestIdleCallback(...args)
+    : fallback
 
 // can dump this once IE 11 support is no longer necessary
 export const isPassiveSupported = () => {

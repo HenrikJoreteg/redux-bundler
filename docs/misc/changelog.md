@@ -1,5 +1,6 @@
 # Change Log
 
+- `28.0.1` Super minor fix. Some bundlers will remove context for `requestIdleCallback` and `requestAnimationFrame` so they end up being called as a method of the main redux-bundler export. This can cause "ILLEGAL invocation" errors when using them. This change simply wraps them in a fn so they're always called on `self`.
 - `28.0.0` No API changes, just internal change to how reactors are dispatched. Due to potential behavioral impact to apps this is a major version bump. Details: to keep perf good we fire reactors on a `requestIdleCallback` we were firing the result even if by the time it fired, state had changed. The changes in this release should make that scenario impossible.
 - `27.0.2` Fixed handling of `selectRoute` if there was no match. Previously, this would error, now it returns `null`. Previously `selectRouteParams` would also error, now it returns `{}`. Updated dependencies to eliminate some npm audit security warnings. Updated doc table of contents to fix broken links (due to change in gitbook). Removed `standard` and `prettier-standard` in lieu of vanilla eslint. Removed a couple of unused deps (oops).
 - `27.0.1` Fix build issue for newly extracted "extra" bundles.
