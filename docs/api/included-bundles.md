@@ -93,7 +93,7 @@ export default createRouteBundle({
   '/': Home,
   '/users': UserList,
   '/users/:userId': UserDetail,
-  '*': NotFound
+  '/*': NotFound
 })
 ```
 
