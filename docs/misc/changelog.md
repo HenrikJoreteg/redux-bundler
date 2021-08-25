@@ -1,5 +1,9 @@
 # Change Log
 
+- `28.0.3` No API changes.
+  - Replaces all uses of `self` with `globalThis`.
+  - Explicitly pre-binds `raf` and `ric` to `globalThis` to prevents bug otherwise caused by Parcel 2 compiler optimization.
+  - Adds `prettier` and `fixpack` as cleanup steps.
 - `28.0.2` npm 7 deprecated prepublish, so last publish didn't build first. This fixes that.
 - `28.0.1` Super minor fix. Some bundlers will remove context for `requestIdleCallback` and `requestAnimationFrame` so they end up being called as a method of the main redux-bundler export. This can cause "ILLEGAL invocation" errors when using them. This change simply wraps them in a fn so they're always called on `self`.
 - `28.0.0` No API changes, just internal change to how reactors are dispatched. Due to potential behavioral impact to apps this is a major version bump. Details: to keep perf good we fire reactors on a `requestIdleCallback` we were firing the result even if by the time it fired, state had changed. The changes in this release should make that scenario impossible.

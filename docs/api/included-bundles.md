@@ -18,13 +18,13 @@ It takes the following options (none are required):
 
 If enabled:
 
-* The store is bound to `window.store` for easy access to _all selectors and action creators_ since they're all bound to the store. This is super helpful for debugging state issues, or running action creators even if you don't have UI built for it yet.
-* On boot, it logs out list of all installed bundles
-* On each action it logs out:
-  * action object that was dispatched
-  * the current state in its entirety
-  * the result of all selectors after that state change
-  * if there's a reactor that will be triggered as as result, it will log that out too as `next reaction`
+- The store is bound to `window.store` for easy access to _all selectors and action creators_ since they're all bound to the store. This is super helpful for debugging state issues, or running action creators even if you don't have UI built for it yet.
+- On boot, it logs out list of all installed bundles
+- On each action it logs out:
+  - action object that was dispatched
+  - the current state in its entirety
+  - the result of all selectors after that state change
+  - if there's a reactor that will be triggered as as result, it will log that out too as `next reaction`
 
 ![logger screenshot](https://cldup.com/bHBHBqkW0B-3000x3000.png)
 
@@ -60,27 +60,27 @@ export default connect(
 
 Options object:
 
-* `inert`: Boolean whether or not to bind to the browser. If you make it `inert` it will simply maintain state in Redux without trying to update the browser, or listen for `popstate`
-* `handleScrollRestoration`: Boolean (default `true`). Whether or not to handle scroll position restoration on document.body. Some browsers handle this for you with the notable exception of FF and IE 11. If you leave this as `true` it should work in latest version of all browsers.
+- `inert`: Boolean whether or not to bind to the browser. If you make it `inert` it will simply maintain state in Redux without trying to update the browser, or listen for `popstate`
+- `handleScrollRestoration`: Boolean (default `true`). Whether or not to handle scroll position restoration on document.body. Some browsers handle this for you with the notable exception of FF and IE 11. If you leave this as `true` it should work in latest version of all browsers.
 
 Action creators:
 
-* `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`. Additionally, you can pass `{ maintainScrollPosition: true }` for cases when you do not expect window scroll position to be reset to top as a result of route transition.
-* `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
-* `doUpdateQuery(queryString | queryObject, [options])`: can be used to update query string in place. Either pass in new query string or an object. It does a replaceState by default but you can pass `{replace: false}` if you want to do a push.
-* `doUpdateHash(string | object, [options])`: for updating hash value, does a push by default, but can do replace if passed `{replace: true}`.
+- `doUpdateUrl(pathname | {pathname,query,hash}, [options])`: Generic URL updating action creator. You can pass it any pathname string or an object with `pathname`, `query`, and `hash` keys. ex: `doUpdateUrl('/new-path')`, `doUpdateUrl('/new-path?some=value#hash')`. You can pass `{replace: true}` as an option to trigger `replaceState` instead of `pushState`. Additionally, you can pass `{ maintainScrollPosition: true }` for cases when you do not expect window scroll position to be reset to top as a result of route transition.
+- `doReplaceUrl(pathname | {pathname,query,hash})`: just like `doUpdateUrl` but replace is prefilled to replace current URL.
+- `doUpdateQuery(queryString | queryObject, [options])`: can be used to update query string in place. Either pass in new query string or an object. It does a replaceState by default but you can pass `{replace: false}` if you want to do a push.
+- `doUpdateHash(string | object, [options])`: for updating hash value, does a push by default, but can do replace if passed `{replace: true}`.
 
 Selectors:
 
-* `selectUrlRaw()`: returns contents of reducer.
-* `selectUrlObject()`: returns an object like what would come from `new URL()` but as a plain object.
-* `selectQueryObject()`: returns query string as an object
-* `selectQueryString()`: returns query string as a string
-* `selectPathname()`: returns pathname, without hash or query
-* `selectHash()`: returns hash value as string
-* `selectHashObject()`: returns hash value as object (if relevant)
-* `selectHostname()`: returns hostname as string.
-* `selectSubdomains()`: returns array of subdomains, if relevant.
+- `selectUrlRaw()`: returns contents of reducer.
+- `selectUrlObject()`: returns an object like what would come from `new URL()` but as a plain object.
+- `selectQueryObject()`: returns query string as an object
+- `selectQueryString()`: returns query string as a string
+- `selectPathname()`: returns pathname, without hash or query
+- `selectHash()`: returns hash value as string
+- `selectHashObject()`: returns hash value as object (if relevant)
+- `selectHostname()`: returns hostname as string.
+- `selectSubdomains()`: returns array of subdomains, if relevant.
 
 ## `createRouteBundle(routesObject, optionsObject)`
 
@@ -103,16 +103,19 @@ Then in your root component in your app you'd simply `selectRoute()` to retrieve
 
 Options object:
 
-* `routeInfoSelector`: String (default: `'selectPathname'`) used to configure the key that is used for matching the current route on. Set it to `'selectHash'` to enable hash-based routing. **Note**: Currently you need entries for both '' and '/' if you rely on hash-based routing.
+- `routeInfoSelector`: String (default: `'selectPathname'`) used to configure the key that is used for matching the current route on. Set it to `'selectHash'` to enable hash-based routing. **Note**: Currently you need entries for both '' and '/' if you rely on hash-based routing.
 
 ```js
-export default createRouteBundle({
-  '': Home,
-  '/': Home,
-  '/users': UserList,
-}, {
-  routeInfoSelector: 'selectHash'
-})
+export default createRouteBundle(
+  {
+    '': Home,
+    '/': Home,
+    '/users': UserList
+  },
+  {
+    routeInfoSelector: 'selectHash'
+  }
+)
 ```
 
 Selectors:
@@ -131,12 +134,12 @@ This bundle is included by default when you use `composeBundles`. If you want to
 
 Available options:
 
-* `idleTimeout`: Number (default `30000`). Idle timeout is time to fire an `APP_IDLE` event.
-* `idleAction`: String (default `'APP_IDLE'`). Action type to dispatch on idle.
-* `cancelIdleWhenDone`: Boolean (default `true`). In certain cases this can be useful. For example, if you're using reactors in a node process and you want it to be able to exit when there's no pending reactions. In browsers, this will be ignored.
-* `doneCallback`: Function (default `null`). If you want to pass a callback to call when there are no more pending reactions, you can do so.
-* `stopWhenTabInactive`: Boolean (default `true`). By default if a given tab is in the background we don't want to keep wasting cycles. But, in certain cases you don't want it to stop just because its in the background. Gives you that option. Note: this is implemented by taking advantage of behavior of `requestAnimationFrame`. So it relies on the browser for this logic.
-* `reactorPermissionCheck`: Function (default: null). This function, if passed, will be given the name of the reactor, and the result of having called it that would normally have lead to a reaction being queued. If you return `false` from this function the reactor will not be queued. This allows you to implement rate limiting, etc. It also makes it possible to build in safe-guards for infinite reaction loops or other development tools.
+- `idleTimeout`: Number (default `30000`). Idle timeout is time to fire an `APP_IDLE` event.
+- `idleAction`: String (default `'APP_IDLE'`). Action type to dispatch on idle.
+- `cancelIdleWhenDone`: Boolean (default `true`). In certain cases this can be useful. For example, if you're using reactors in a node process and you want it to be able to exit when there's no pending reactions. In browsers, this will be ignored.
+- `doneCallback`: Function (default `null`). If you want to pass a callback to call when there are no more pending reactions, you can do so.
+- `stopWhenTabInactive`: Boolean (default `true`). By default if a given tab is in the background we don't want to keep wasting cycles. But, in certain cases you don't want it to stop just because its in the background. Gives you that option. Note: this is implemented by taking advantage of behavior of `requestAnimationFrame`. So it relies on the browser for this logic.
+- `reactorPermissionCheck`: Function (default: null). This function, if passed, will be given the name of the reactor, and the result of having called it that would normally have lead to a reaction being queued. If you return `false` from this function the reactor will not be queued. This allows you to implement rate limiting, etc. It also makes it possible to build in safe-guards for infinite reaction loops or other development tools.
 
 ## `appTimeBundle`
 
@@ -185,35 +188,35 @@ This bundle requires `appTimeBundle` and `onlineBundle` to be added as well (ord
 
 Options:
 
-* `name` (required): name of reducer. Also used in action creator names and selector names. For example if the name is `users` you'll end up with a selector named: `selectUsers()`.
-* `getPromise` (required): A function that should return a Promise that gets the data. If this throws, it will automatically be retried. If you want to consider it a permanent error that should not be retried throw an error object with a `error.permanent = true` property. **note:** this function will be called with the same arguments as you get when writing a thunk action creator: `({dispatch, getState, store, ...extraArgs }) => {}`
-* `actionBaseType` (optional): This is used to build action types. So if you pass `USERS`, it will use action types like `USERS_FETCH_STARTED` and `USERS_EXPIRED`. Default: `name.toUpperCase()`.
-* `staleAfter` (optional): Length of time in milliseconds after which the data should be considered stale and needing to be re-fetched. Default: 15 minutes.
-* `retryAfter` (optional): Length of time in milliseconds after which a failed fetch should be re-tried after the last failure. Default: 1 minute.
-* `expireAfter` (optional): Length of time in milliseconds after which data should be automatically purged because it is expired. Default: `Infinity`.
-* `checkIfOnline` (optional): Whether or not to stop fetching if we know we're offline. This is imperfect because it's listens for the global `offline` and `online` events from the browser which are good for things like airplane mode, but not for "lie-fi" situations. Default: `true`
-* `persist` (optional): Whether or not to include the `persistActions` required to cache this reducers content. Simply setting this to `true` doesn't mean it will be cached. You still have to make sure caching is setup using `createCachingBundle()` and a persistance mechanism [like money-clip](https://github.com/HenrikJoreteg/money-clip). Default `true`
+- `name` (required): name of reducer. Also used in action creator names and selector names. For example if the name is `users` you'll end up with a selector named: `selectUsers()`.
+- `getPromise` (required): A function that should return a Promise that gets the data. If this throws, it will automatically be retried. If you want to consider it a permanent error that should not be retried throw an error object with a `error.permanent = true` property. **note:** this function will be called with the same arguments as you get when writing a thunk action creator: `({dispatch, getState, store, ...extraArgs }) => {}`
+- `actionBaseType` (optional): This is used to build action types. So if you pass `USERS`, it will use action types like `USERS_FETCH_STARTED` and `USERS_EXPIRED`. Default: `name.toUpperCase()`.
+- `staleAfter` (optional): Length of time in milliseconds after which the data should be considered stale and needing to be re-fetched. Default: 15 minutes.
+- `retryAfter` (optional): Length of time in milliseconds after which a failed fetch should be re-tried after the last failure. Default: 1 minute.
+- `expireAfter` (optional): Length of time in milliseconds after which data should be automatically purged because it is expired. Default: `Infinity`.
+- `checkIfOnline` (optional): Whether or not to stop fetching if we know we're offline. This is imperfect because it's listens for the global `offline` and `online` events from the browser which are good for things like airplane mode, but not for "lie-fi" situations. Default: `true`
+- `persist` (optional): Whether or not to include the `persistActions` required to cache this reducers content. Simply setting this to `true` doesn't mean it will be cached. You still have to make sure caching is setup using `createCachingBundle()` and a persistance mechanism [like money-clip](https://github.com/HenrikJoreteg/money-clip). Default `true`
 
 Action creators:
 
 Names are built dynamically using the `name` of the bundle with first letter upper-cased:
 
-* `doFetch{Name}`: what is used internally to trigger fetches, but you can trigger it manually too.
-* `doMark{Name}AsOutdated`: used to forcibly mark contents as stale, which will not clear anything, but will cause it to be re-fetched as if it's too old.
-* `doClear{Name}`: clears and resets the reducer to initial state.
-* `doExpire{Name}`: should mostly likely not be used directly, but it used internally when items expire. This is a bit like `doClear{Name}` except it does not clear errors and explicitly denotes that the contents are expired. So, if an app is offline and the content was wiped because it expired, your UI can show a relevant message.
+- `doFetch{Name}`: what is used internally to trigger fetches, but you can trigger it manually too.
+- `doMark{Name}AsOutdated`: used to forcibly mark contents as stale, which will not clear anything, but will cause it to be re-fetched as if it's too old.
+- `doClear{Name}`: clears and resets the reducer to initial state.
+- `doExpire{Name}`: should mostly likely not be used directly, but it used internally when items expire. This is a bit like `doClear{Name}` except it does not clear errors and explicitly denotes that the contents are expired. So, if an app is offline and the content was wiped because it expired, your UI can show a relevant message.
 
 Selectors:
 
-* `select{Name}Raw`: get entire contents of reducer.
-* `select{Name}`: get `data` portion of reducer (or `null`).
-* `select{Name}IsStale`: Boolean. Is data stale?
-* `select{Name}IsExpired`: Boolean. Is it expired?
-* `select{Name}LastError`: Timestamp in milliseconds of last error or `null`
-* `select{Name}IsWaitingToRetry`: Boolean. If there was an error and it's in the period where it's waiting to retry.
-* `select{Name}IsLoading`: Boolean. Is it currently trying to fetch.
-* `select{Name}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
-* `select{Name}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
+- `select{Name}Raw`: get entire contents of reducer.
+- `select{Name}`: get `data` portion of reducer (or `null`).
+- `select{Name}IsStale`: Boolean. Is data stale?
+- `select{Name}IsExpired`: Boolean. Is it expired?
+- `select{Name}LastError`: Timestamp in milliseconds of last error or `null`
+- `select{Name}IsWaitingToRetry`: Boolean. If there was an error and it's in the period where it's waiting to retry.
+- `select{Name}IsLoading`: Boolean. Is it currently trying to fetch.
+- `select{Name}FailedPermanently`: Boolean. Was a `error.permanent = true` error thrown? (if so, it will stop trying to fetch).
+- `select{Name}ShouldUpdate`: Boolean. Based on last successful fetch, errors, loading state, should the content be updated?
 
 Defining the state that should trigger the fetch:
 

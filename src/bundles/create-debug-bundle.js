@@ -34,22 +34,26 @@ export default spec => {
       }
       return state
     },
-    doEnableDebug: () => ({ dispatch }) => {
-      if (IS_BROWSER) {
-        try {
-          localStorage.debug = true
-        } catch (e) {}
-      }
-      dispatch({ type: ENABLE })
-    },
-    doDisableDebug: () => ({ dispatch }) => {
-      if (IS_BROWSER) {
-        try {
-          delete localStorage.debug
-        } catch (e) {}
-      }
-      dispatch({ type: DISABLE })
-    },
+    doEnableDebug:
+      () =>
+      ({ dispatch }) => {
+        if (IS_BROWSER) {
+          try {
+            localStorage.debug = true
+          } catch (e) {}
+        }
+        dispatch({ type: ENABLE })
+      },
+    doDisableDebug:
+      () =>
+      ({ dispatch }) => {
+        if (IS_BROWSER) {
+          try {
+            delete localStorage.debug
+          } catch (e) {}
+        }
+        dispatch({ type: DISABLE })
+      },
     selectIsDebug: state => state.debug,
     getMiddleware: () => store => next => action => {
       const isDebug = store.getState().debug
@@ -70,59 +74,71 @@ export default spec => {
 
       return result
     },
-    doLogBundles: () => ({ store }) => {
-      log(
-        store.meta.chunks.reduce((result, chunk) => {
-          result.push(...chunk.bundleNames)
-          return result
-        }, []),
-        { label: 'installed bundles:', color: colorBlue }
-      )
-    },
-    doLogSelectors: () => ({ store }) => {
-      log(
-        Object.keys(store.meta.unboundSelectors)
-          .sort()
-          .reduce((res, name) => {
-            res[name] = store[name]()
-            return res
-          }, {}),
-        {
-          label: 'selectors:',
-          color: colorGreen
-        }
-      )
-    },
-    doLogActionCreators: () => ({ store }) => {
-      log(Object.keys(store.meta.unboundActionCreators).sort(), {
-        label: 'action creators:',
-        color: colorOrange
-      })
-    },
-    doLogReactors: () => ({ store }) => {
-      log(store.meta.reactorNames, { label: 'reactors:', color: colorOrange })
-    },
-    doLogNextReaction: () => ({ store }) => {
-      const { nextReaction } = store
-      if (nextReaction) {
-        const { name, result } = nextReaction
-        log(result, {
-          color: colorOrange,
-          label: `next reaction ${name}:`
+    doLogBundles:
+      () =>
+      ({ store }) => {
+        log(
+          store.meta.chunks.reduce((result, chunk) => {
+            result.push(...chunk.bundleNames)
+            return result
+          }, []),
+          { label: 'installed bundles:', color: colorBlue }
+        )
+      },
+    doLogSelectors:
+      () =>
+      ({ store }) => {
+        log(
+          Object.keys(store.meta.unboundSelectors)
+            .sort()
+            .reduce((res, name) => {
+              res[name] = store[name]()
+              return res
+            }, {}),
+          {
+            label: 'selectors:',
+            color: colorGreen
+          }
+        )
+      },
+    doLogActionCreators:
+      () =>
+      ({ store }) => {
+        log(Object.keys(store.meta.unboundActionCreators).sort(), {
+          label: 'action creators:',
+          color: colorOrange
         })
-      }
-    },
-    doLogDebugSummary: () => ({ store }) => {
-      store.doLogBundles()
-      store.doLogSelectors()
-      store.doLogActionCreators()
-      store.doLogReactors()
-      store.doLogNextReaction()
-    },
+      },
+    doLogReactors:
+      () =>
+      ({ store }) => {
+        log(store.meta.reactorNames, { label: 'reactors:', color: colorOrange })
+      },
+    doLogNextReaction:
+      () =>
+      ({ store }) => {
+        const { nextReaction } = store
+        if (nextReaction) {
+          const { name, result } = nextReaction
+          log(result, {
+            color: colorOrange,
+            label: `next reaction ${name}:`
+          })
+        }
+      },
+    doLogDebugSummary:
+      () =>
+      ({ store }) => {
+        store.doLogBundles()
+        store.doLogSelectors()
+        store.doLogActionCreators()
+        store.doLogReactors()
+        store.doLogNextReaction()
+      },
     init: store => {
       if (store.selectIsDebug()) {
         if (IS_BROWSER) {
-          self.store = store
+          globalThis.store = store
           console.groupCollapsed(`%credux bundler v${version}`, colorBlue)
           store.doLogDebugSummary()
           console.groupEnd()

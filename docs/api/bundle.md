@@ -23,8 +23,10 @@ These will be bound to dispatch for you and attached to the store. So you can ca
 **important**: a slightly modified thunk middleware is included by default. So you always have access to `dispatch`, `getState`, and `store` within action creators as follows.
 
 ```js
-const doSomething = value => ({ dispatch }) =>
-  dispatch({ type: 'something', payload: value })
+const doSomething =
+  value =>
+  ({ dispatch }) =>
+    dispatch({ type: 'something', payload: value })
 ```
 
 Note that unlike standard thunk that uses positional arguments, this passes just one object containing `dispatch`, `getState`, and any other items included by bundles that define `getExtraArgs`.

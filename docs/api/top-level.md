@@ -6,12 +6,12 @@ Returns a function that will return a fully configured store composed of all the
 
 Included bundles:
 
-* `appTimeBundle`
-* `asyncCountBundle`
-* `onlineBundle`
-* `createUrlBundle()`
-* `createReactorBundle()`
-* `debugBundle`
+- `appTimeBundle`
+- `asyncCountBundle`
+- `onlineBundle`
+- `createUrlBundle()`
+- `createReactorBundle()`
+- `debugBundle`
 
 ## `composeBundlesRaw(...bundles)`
 

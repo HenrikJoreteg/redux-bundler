@@ -17,7 +17,7 @@ test('calls return of init as the destroy of store', t => {
   let count = 0
   const store = composeBundlesRaw({
     ...countBundle,
-    init (store) {
+    init(store) {
       // being explicit here for documentation purposes
       const unsubscribe = store.subscribe(() => {
         count++

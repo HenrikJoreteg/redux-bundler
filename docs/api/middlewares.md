@@ -9,16 +9,18 @@ Works like `redux-thunk` except that everything is passed as a single argument a
 This lets you write action creators that don't care about argument position:
 
 ```js
-export const doCoolStuff = () => ({ dispatch, myApiWrapper }) => {
-  dispatch({ type: 'USER_FETCH_STARTED' })
-  return myApiWrapper('/some-resource')
-    .then(payload => {
-      dispatch({ type: 'USER_FETCH_FINISHED', payload })
-    })
-    .catch(() => {
-      dispatch({ type: 'USER_FETCH_FAILED' })
-    })
-}
+export const doCoolStuff =
+  () =>
+  ({ dispatch, myApiWrapper }) => {
+    dispatch({ type: 'USER_FETCH_STARTED' })
+    return myApiWrapper('/some-resource')
+      .then(payload => {
+        dispatch({ type: 'USER_FETCH_FINISHED', payload })
+      })
+      .catch(() => {
+        dispatch({ type: 'USER_FETCH_FAILED' })
+      })
+  }
 ```
 
 ## Debug Middleware

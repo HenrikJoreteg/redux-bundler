@@ -3,18 +3,18 @@ try {
   debug = !!window.localStorage.debug
 } catch (e) {}
 export const HAS_DEBUG_FLAG = debug || false
-export const HAS_WINDOW = typeof window !== 'undefined'
-export const IS_BROWSER = HAS_WINDOW || typeof self !== 'undefined'
+export const HAS_WINDOW = !!globalThis.window
+export const IS_BROWSER = HAS_WINDOW || !!globalThis.navigator
 export const IS_PROD = process.env.NODE_ENV === 'production'
 const fallback = func => setTimeout(func, 0)
 
 export const raf =
-  IS_BROWSER && self.requestAnimationFrame
-    ? (...args) => self.requestAnimationFrame(...args)
+  IS_BROWSER && globalThis.requestAnimationFrame
+    ? globalThis.requestAnimationFrame.bind(globalThis)
     : fallback
 export const ric =
-  IS_BROWSER && self.requestIdleCallback
-    ? (...args) => self.requestIdleCallback(...args)
+  IS_BROWSER && globalThis.requestIdleCallback
+    ? globalThis.requestIdleCallback.bind(globalThis)
     : fallback
 
 // can dump this once IE 11 support is no longer necessary
@@ -28,8 +28,8 @@ export const isPassiveSupported = () => {
       }
       /* eslint-enable getter-return */
     })
-    window.addEventListener('test', options, options)
-    window.removeEventListener('test', options, options)
+    globalThis.addEventListener('test', options, options)
+    globalThis.removeEventListener('test', options, options)
   } catch (err) {
     passiveSupported = false
   }
@@ -70,9 +70,9 @@ export const addGlobalListener = (
       : [eventName, debounce(handler, 200), false]
     : [eventName, handler]
 
-  self.addEventListener(...args)
+  globalThis.addEventListener(...args)
 
-  return () => self.removeEventListener(...args)
+  return () => globalThis.removeEventListener(...args)
 }
 
 export const selectorNameToValueName = name => {

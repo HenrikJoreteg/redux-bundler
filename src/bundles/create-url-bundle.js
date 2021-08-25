@@ -81,34 +81,35 @@ export default opts => {
     parseSubdomains(hostname)
   )
 
-  const doUpdateUrl = (
-    newState,
-    opts = { replace: false, maintainScrollPosition: false }
-  ) => ({ dispatch, getState }) => {
-    let state = newState
-    if (typeof newState === 'string') {
-      const parsed = new URL(
-        newState.charAt(0) === '/' ? 'http://example.com' + newState : newState
-      )
-      state = {
-        pathname: parsed.pathname,
-        query: parsed.search || '',
-        hash: parsed.hash || ''
+  const doUpdateUrl =
+    (newState, opts = { replace: false, maintainScrollPosition: false }) =>
+    ({ dispatch, getState }) => {
+      let state = newState
+      if (typeof newState === 'string') {
+        const parsed = new URL(
+          newState.charAt(0) === '/'
+            ? 'http://example.com' + newState
+            : newState
+        )
+        state = {
+          pathname: parsed.pathname,
+          query: parsed.search || '',
+          hash: parsed.hash || ''
+        }
       }
+      const url = new URL(selectUrlRaw(getState()).url)
+      if (isDefined(state.pathname)) url.pathname = state.pathname
+      if (isDefined(state.hash)) url.hash = ensureString(state.hash)
+      if (isDefined(state.query)) url.search = ensureString(state.query)
+      dispatch({
+        type: actionType,
+        payload: {
+          url: url.href,
+          replace: opts.replace,
+          maintainScrollPosition: opts.maintainScrollPosition
+        }
+      })
     }
-    const url = new URL(selectUrlRaw(getState()).url)
-    if (isDefined(state.pathname)) url.pathname = state.pathname
-    if (isDefined(state.hash)) url.hash = ensureString(state.hash)
-    if (isDefined(state.query)) url.search = ensureString(state.query)
-    dispatch({
-      type: actionType,
-      payload: {
-        url: url.href,
-        replace: opts.replace,
-        maintainScrollPosition: opts.maintainScrollPosition
-      }
-    })
-  }
   const doReplaceUrl = url => doUpdateUrl(url, { replace: true })
   const doUpdateQuery = (query, opts = { replace: true }) =>
     doUpdateUrl({ query: ensureString(query) }, opts)

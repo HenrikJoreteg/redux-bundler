@@ -10,8 +10,10 @@
     "create-selector": "5.0.0",
     "eslint": "7.0.0",
     "feather-route-matcher": "4.0.0",
+    "fixpack": "4.0.0",
     "microbundle": "0.11.0",
     "module-alias": "2.2.2",
+    "prettier": "2.3.2",
     "querystringify": "2.1.1",
     "redux": "4.0.5",
     "tap-spec": "5.0.0",
@@ -43,11 +45,13 @@
   "scripts": {
     "build": "microbundle --no-compress --no-sourcemap",
     "dev": "microbundle watch --no-compress",
-    "full-test": "npm run build && npm run test && npm run lint",
+    "format": "prettier --write .",
+    "full-test": "npm run static && npm run build",
     "lint": "eslint --fix 'src/**/*.js' 'test/**/*.js'",
     "postbuild": "microbundle --no-compress -no-sourcemap -i src/extras/create-async-resource-bundle.js -i src/extras/create-geolocation-bundle.js -i src/extras/online-bundle.js --external redux-bundler -o='dist/'",
     "prebuild": "rm -rf dist",
     "prepublishOnly": "npm run full-test",
+    "static": "fixpack && npm run format && npm run lint && npm test",
     "test": "tape test/*.js | tap-spec"
   },
   "source": "src/index.js"
