@@ -1,5 +1,6 @@
 # Change Log
 
+- `28.1.0` Minor non-breaking enhancement to `createRouteBundle` to more easily allow dynamic replacement of routes. Adding `doReplaceRoutes` action creator and explicitly storing cached routes and routeMatcher in a reducer so they can be easily replaced.
 - `28.0.3` No API changes.
   - Replaces all uses of `self` with `globalThis`.
   - Explicitly pre-binds `raf` and `ric` to `globalThis` to prevents bug otherwise caused by Parcel 2 compiler optimization.
