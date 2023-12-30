@@ -126,6 +126,10 @@ Selectors:
 `selectRoute()`: returns whatever the value was in the routes object for the current matched route.
 `selectRouteInfo()`: returns the key that was passed to the route matcher. By default this is the value of `selectPathname` as defined by the `createUrlBundle` above.
 
+Action creators:
+
+`doReplaceRoutes()`: takes new set of routes. This can be useful if you're using placeholder routes and want to dynamically load and replace them with real ones if you're doing extensive code splitting or using "sub app" type architectures. Note that calling this will trigger a `ROUTE_MATCHER_REPLACED` action with a `payload` property of `{routes: newRoutes, routeMatcher: newRouteMatcher}`. If you really want a different name for the action that is triggered, you can add `{replaceAction: "OTHER_ACTION_NAME"}` to the options passed when calling `createRouteBundle`.
+
 ## `createReactorBundle(optionsObject)`
 
 This is the functionality that allows for the `reactX` pattern in your bundles. Manual configuration here is entirely optional.

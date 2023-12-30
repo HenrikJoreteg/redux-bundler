@@ -41,5 +41,22 @@ test('create-route-bundle', t => {
     'selectRouteParams() returns empty object if no matches'
   )
 
+  t.equal(routeMatcher, store.selectRouteMatcher(), 'route matcher is cached')
+  store.doReplaceRoutes({
+    '/': 'updated',
+    '/new': 'detail'
+  })
+
+  const newRouteMatcher = store.selectRouteMatcher()
+  t.notEqual(newRouteMatcher, routeMatcher, 'route matcher is replaced')
+  t.deepEqual(
+    store.selectRoutes(),
+    {
+      '/': 'updated',
+      '/new': 'detail'
+    },
+    'routes are completely replaced'
+  )
+
   t.end()
 })
