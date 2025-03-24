@@ -17,16 +17,21 @@ import {
   selectorNameToValueName
 } from '../utils'
 
-const bindSelectorsToStore = (store, selectors) => {
+const bindSelectorsToStore = (
+  store,
+  selectors,
+  { allowOverwrites = false } = {}
+) => {
   for (const key in selectors) {
     const selector = selectors[key]
-    if (!store[key]) {
-      store[key] = () => selector(store.getState())
+    if (store[key] && !allowOverwrites) {
+      continue
     }
+    store[key] = () => selector(store.getState())
   }
 }
 
-const decorateStore = (store, processed) => {
+const decorateStore = (store, processed, { allowOverwrites = false } = {}) => {
   if (!store.meta) {
     store.meta = {
       chunks: [],
@@ -54,8 +59,8 @@ const decorateStore = (store, processed) => {
   // update collection of resolved selectors
   meta.unboundSelectors = combinedSelectors
 
-  // make sure all selectors are bound (won't overwrite if already bound)
-  bindSelectorsToStore(store, combinedSelectors)
+  // make sure all selectors are bound
+  bindSelectorsToStore(store, combinedSelectors, { allowOverwrites })
 
   // build our list of reactor names
   meta.reactorNames = meta.reactorNames.concat(processed.reactorNames)
@@ -154,7 +159,13 @@ const composeBundles = (...bundles) => {
 
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
-      decorateStore(store, createChunk(bundlesToIntegrate))
+      let options = { allowOverwrites: false }
+      if (Array.isArray(bundlesToIntegrate[0])) {
+        options = bundlesToIntegrate[1]
+        bundlesToIntegrate = bundlesToIntegrate[0]
+      }
+
+      decorateStore(store, createChunk(bundlesToIntegrate), options)
       const allReducers = store.meta.chunks.reduce(
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}

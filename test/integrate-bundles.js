@@ -19,6 +19,56 @@ test('integrateBundles', t => {
   t.end()
 })
 
+test('integrateBundles with overwriting selectors', t => {
+  const bundleA = {
+    name: 'bundleA',
+    selectCommon: () => {
+      return 'foo'
+    },
+    selectDependent: createSelector('selectCommon', common => common + common)
+  }
+
+  const bundleB = {
+    name: 'bundleB',
+    selectCommon: () => {
+      return 'bar'
+    }
+  }
+
+  t.test('does not overwrite selectors by default', t => {
+    const store = composeBundlesRaw(bundleA)()
+    const { selectCommon } = store
+    store.integrateBundles(bundleB)
+    console.log('XXX')
+    console.dir(store.meta.unboundSelectors, { depth: null })
+
+    t.equal(store.selectCommon, selectCommon, 'selectCommon is still the same')
+    t.equal(store.selectCommon(), 'foo', 'selectCommon is still foo')
+    t.equal(
+      store.selectDependent(),
+      'foofoo',
+      'selectDependent is still based on original selector'
+    )
+    t.end()
+  })
+
+  t.test('overwrites selectors when specified', t => {
+    const store = composeBundlesRaw(bundleA)()
+    const { selectCommon } = store
+    store.integrateBundles([bundleB], { allowOverwrites: true })
+    t.notEqual(store.selectCommon, selectCommon, 'selectCommon is different')
+    t.equal(store.selectCommon(), 'bar', 'selectCommon is now bar')
+    t.equal(
+      store.selectDependent(),
+      'barbar',
+      'selectDependent is also updated to new selector'
+    )
+    t.end()
+  })
+
+  t.end()
+})
+
 test('integrateBundles reactors', t => {
   const starterBundle = {
     name: 'starter',
@@ -33,7 +83,8 @@ test('integrateBundles reactors', t => {
     },
     selectIsDone: state => state.starter.done,
     doThing: () => ({ type: 'DO_THING' }),
-    doUndoThing: () => ({ type: 'DO_UNDO_THING' })
+    doUndoThing: () => ({ type: 'DO_UNDO_THING' }),
+    selectCommonSelector: () => 'starterBundle'
   }
 
   const reactorBundle = {
@@ -49,7 +100,8 @@ test('integrateBundles reactors', t => {
       flipped => flipped && { type: 'FLIP', payload: false }
     ),
     doFlipUp: () => ({ type: 'FLIP', payload: true }),
-    selectIsFlippedUp: state => state.reactionary.flipped
+    selectIsFlippedUp: state => state.reactionary.flipped,
+    selectCommonSelector: () => 'reactorBundle'
   }
 
   // first start with a single bundle check basics
@@ -57,7 +109,7 @@ test('integrateBundles reactors', t => {
   t.equal(store.selectIsDone(), false, 'is not done')
 
   // grab instance of doThing for comparison
-  const { doThing } = store
+  const { doThing, selectCommonSelector } = store
   doThing()
   t.equal(store.selectIsDone(), true, 'is done')
 
@@ -89,6 +141,13 @@ test('integrateBundles reactors', t => {
     store.nextReaction.name,
     'reactShouldFlipDown',
     'active reactor should be on store'
+  )
+
+  t.equal(store.selectCommonSelector, selectCommonSelector, 'common selector')
+  t.equal(
+    store.selectCommonSelector,
+    'starterBundle',
+    'common selector is not overwritten by new bundle'
   )
 
   // give the reactor a chance to finish
