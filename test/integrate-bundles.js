@@ -113,8 +113,7 @@ test('integrateBundles reactors', t => {
     },
     selectIsDone: state => state.starter.done,
     doThing: () => ({ type: 'DO_THING' }),
-    doUndoThing: () => ({ type: 'DO_UNDO_THING' }),
-    selectCommonSelector: () => 'starterBundle'
+    doUndoThing: () => ({ type: 'DO_UNDO_THING' })
   }
 
   const reactorBundle = {
@@ -130,8 +129,7 @@ test('integrateBundles reactors', t => {
       flipped => flipped && { type: 'FLIP', payload: false }
     ),
     doFlipUp: () => ({ type: 'FLIP', payload: true }),
-    selectIsFlippedUp: state => state.reactionary.flipped,
-    selectCommonSelector: () => 'reactorBundle'
+    selectIsFlippedUp: state => state.reactionary.flipped
   }
 
   // first start with a single bundle check basics
@@ -139,7 +137,7 @@ test('integrateBundles reactors', t => {
   t.equal(store.selectIsDone(), false, 'is not done')
 
   // grab instance of doThing for comparison
-  const { doThing, selectCommonSelector } = store
+  const { doThing } = store
   doThing()
   t.equal(store.selectIsDone(), true, 'is done')
 
@@ -171,13 +169,6 @@ test('integrateBundles reactors', t => {
     store.nextReaction.name,
     'reactShouldFlipDown',
     'active reactor should be on store'
-  )
-
-  t.equal(store.selectCommonSelector, selectCommonSelector, 'common selector')
-  t.equal(
-    store.selectCommonSelector,
-    'starterBundle',
-    'common selector is not overwritten by new bundle'
   )
 
   // give the reactor a chance to finish
