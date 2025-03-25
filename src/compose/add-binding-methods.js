@@ -67,11 +67,11 @@ export default store => {
   // given an array of selector names, it will call the
   // callback any time those have changed with an object
   // containing only changed values
-  store.subscribeToSelectors = (
-    keys,
-    callback,
-    { allowMissing = false } = {}
-  ) => {
+  store.subscribeToSelectors = (keys, callback, options) => {
+    // If the selectors don't exist yet they will simply be ignored
+    // this allows a later integratedBundle to add the selector
+    const allowMissing = (options && options.allowMissing) || false
+
     const isAll = keys === 'all'
     // re-use loop for double duty
     // extract names, but also ensure

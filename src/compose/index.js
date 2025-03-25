@@ -131,10 +131,10 @@ const composeBundles = (...bundles) => {
     )
 
     // get values from an array of selector names
-    store.select = (selectorNames, { allowMissing = false } = {}) =>
+    store.select = (selectorNames, options) =>
       selectorNames.reduce((obj, name) => {
         if (!store[name]) {
-          if (allowMissing) {
+          if (options && options.allowMissing) {
             return obj
           } else {
             throw Error(`SelectorNotFound ${name}`)
