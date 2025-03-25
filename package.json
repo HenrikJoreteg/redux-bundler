@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/HenrikJoreteg/redux-bundler"
+    "url": "git+https://github.com/HenrikJoreteg/redux-bundler.git"
   },
   "scripts": {
     "build": "microbundle --no-compress --no-sourcemap",
