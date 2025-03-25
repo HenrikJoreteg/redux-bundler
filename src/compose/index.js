@@ -167,11 +167,6 @@ const composeBundles = (...bundles) => {
 
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
-      if (Array.isArray(bundlesToIntegrate[0])) {
-        options = bundlesToIntegrate[1]
-        bundlesToIntegrate = bundlesToIntegrate[0]
-      }
-
       const newChunk = createChunk(bundlesToIntegrate)
 
       // adds the selectors
@@ -181,7 +176,6 @@ const composeBundles = (...bundles) => {
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}
       )
-      Object.assign(allReducers, newChunk.reducers)
       store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
 
       store.buildPersistActionMap && store.buildPersistActionMap()
