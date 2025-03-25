@@ -19,52 +19,82 @@ test('integrateBundles', t => {
   t.end()
 })
 
-test('integrateBundles with overwriting selectors', t => {
+test('integrateBundles should run init after setting up reducers and selectors', t => {
   const bundleA = {
     name: 'bundleA',
-    selectCommon: () => {
-      return 'foo'
+    reducer: (state = true) => state,
+    selectA: () => 1
+  }
+
+  let initBHasRun = false
+
+  const bundleB = {
+    name: 'bundleB',
+    init: store => {
+      store.selectB()
+      initBHasRun = true
     },
-    selectDependent: createSelector('selectCommon', common => common + common)
+    reducer: (state = { b: 2 }) => state,
+    selectB: state => state.bundleB.b
+  }
+
+  const store = composeBundlesRaw(bundleA)()
+
+  store.integrateBundles(bundleB)
+  t.equal(store.selectB(), 2, 'can select b')
+
+  t.ok(initBHasRun, 'initB has run')
+  t.end()
+})
+
+test('subscribeToSelectors can subscribe to not yet loaded selectors', t => {
+  const subscribeCalls = []
+
+  const bundleA = {
+    name: 'bundleA',
+    reducer: (state = 1, { type, payload }) => {
+      if (type === 'updateA') {
+        return payload
+      }
+      return state
+    },
+    selectA: state => state.bundleA,
+    init: store => {
+      store.subscribeToSelectors(
+        ['selectA', 'selectB'],
+        args => {
+          subscribeCalls.push(args)
+        },
+        { allowMissing: true }
+      )
+    }
   }
 
   const bundleB = {
     name: 'bundleB',
-    selectCommon: () => {
-      return 'bar'
-    }
+    reducer: (state = 3) => {
+      return state
+    },
+    selectB: state => state.bundleB
   }
 
-  t.test('does not overwrite selectors by default', t => {
-    const store = composeBundlesRaw(bundleA)()
-    const { selectCommon } = store
-    store.integrateBundles(bundleB)
-    console.log('XXX')
-    console.dir(store.meta.unboundSelectors, { depth: null })
+  const store = composeBundlesRaw(bundleA)()
 
-    t.equal(store.selectCommon, selectCommon, 'selectCommon is still the same')
-    t.equal(store.selectCommon(), 'foo', 'selectCommon is still foo')
-    t.equal(
-      store.selectDependent(),
-      'foofoo',
-      'selectDependent is still based on original selector'
-    )
-    t.end()
-  })
+  t.deepEqual(
+    subscribeCalls,
+    [],
+    'no values received yet as not changed from initial values'
+  )
+  store.dispatch({ type: 'updateA', payload: 2 })
 
-  t.test('overwrites selectors when specified', t => {
-    const store = composeBundlesRaw(bundleA)()
-    const { selectCommon } = store
-    store.integrateBundles([bundleB], { allowOverwrites: true })
-    t.notEqual(store.selectCommon, selectCommon, 'selectCommon is different')
-    t.equal(store.selectCommon(), 'bar', 'selectCommon is now bar')
-    t.equal(
-      store.selectDependent(),
-      'barbar',
-      'selectDependent is also updated to new selector'
-    )
-    t.end()
-  })
+  t.deepEqual(
+    subscribeCalls[0],
+    { a: 2 },
+    'received updated values, ignoring b'
+  )
+
+  store.integrateBundles(bundleB)
+  t.deepEqual(subscribeCalls[1], { b: 3 }, 'received values for b')
 
   t.end()
 })

@@ -23,7 +23,7 @@ export default store => {
   store.subscribe(() => {
     const newValues = watchedSelectors.all
       ? store.selectAll()
-      : store.select(Object.keys(watchedSelectors))
+      : store.select(Object.keys(watchedSelectors), { allowMissing: true })
     const { watchedValues } = store.subscriptions
 
     // the only diffing in the app happens here
@@ -67,7 +67,11 @@ export default store => {
   // given an array of selector names, it will call the
   // callback any time those have changed with an object
   // containing only changed values
-  store.subscribeToSelectors = (keys, callback) => {
+  store.subscribeToSelectors = (
+    keys,
+    callback,
+    { allowMissing = false } = {}
+  ) => {
     const isAll = keys === 'all'
     // re-use loop for double duty
     // extract names, but also ensure
@@ -83,7 +87,7 @@ export default store => {
     // track changes
     Object.assign(
       store.subscriptions.watchedValues,
-      isAll ? store.selectAll() : store.select(keys)
+      isAll ? store.selectAll() : store.select(keys, { allowMissing })
     )
 
     // return function that can be used to unsubscribe

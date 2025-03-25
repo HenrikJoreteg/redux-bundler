@@ -17,21 +17,16 @@ import {
   selectorNameToValueName
 } from '../utils'
 
-const bindSelectorsToStore = (
-  store,
-  selectors,
-  { allowOverwrites = false } = {}
-) => {
+const bindSelectorsToStore = (store, selectors) => {
   for (const key in selectors) {
     const selector = selectors[key]
-    if (store[key] && !allowOverwrites) {
-      continue
+    if (!store[key]) {
+      store[key] = () => selector(store.getState())
     }
-    store[key] = () => selector(store.getState())
   }
 }
 
-const decorateStore = (store, processed, { allowOverwrites = false } = {}) => {
+const decorateStore = (store, processed) => {
   if (!store.meta) {
     store.meta = {
       chunks: [],
@@ -60,7 +55,7 @@ const decorateStore = (store, processed, { allowOverwrites = false } = {}) => {
   meta.unboundSelectors = combinedSelectors
 
   // make sure all selectors are bound
-  bindSelectorsToStore(store, combinedSelectors, { allowOverwrites })
+  bindSelectorsToStore(store, combinedSelectors)
 
   // build our list of reactor names
   meta.reactorNames = meta.reactorNames.concat(processed.reactorNames)
@@ -76,14 +71,17 @@ const decorateStore = (store, processed, { allowOverwrites = false } = {}) => {
 
   // build list of destroy methods
   meta.destroyMethods = meta.destroyMethods.concat(processed.destroyMethods)
+}
 
+// runs the init methods for a processed chunk on the store
+const runChunkInits = (store, processed) => {
   // run any new init methods. Use their return function as potential
   // destroy methods.
   processed.initMethods.forEach(init => {
     const destroy = init(store)
 
     if (typeof destroy === 'function') {
-      meta.destroyMethods = meta.destroyMethods.concat(destroy)
+      store.meta.destroyMethods = store.meta.destroyMethods.concat(destroy)
     }
   })
 }
@@ -133,9 +131,16 @@ const composeBundles = (...bundles) => {
     )
 
     // get values from an array of selector names
-    store.select = selectorNames =>
+    store.select = (selectorNames, { allowMissing = false } = {}) =>
       selectorNames.reduce((obj, name) => {
-        if (!store[name]) throw Error(`SelectorNotFound ${name}`)
+        if (!store[name]) {
+          if (allowMissing) {
+            return obj
+          } else {
+            throw Error(`SelectorNotFound ${name}`)
+          }
+        }
+
         obj[selectorNameToValueName(name)] = store[name]()
         return obj
       }, {})
@@ -153,25 +158,36 @@ const composeBundles = (...bundles) => {
     // add all the gathered bundle data into the store
     decorateStore(store, firstChunk)
 
+    // run any init methods from the first chunk
+    runChunkInits(store, firstChunk)
+
     // add support for destroying the store (to remove event listeners, etc)
     store.destroy = () =>
       store.meta.destroyMethods.forEach(destroy => destroy(store))
 
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
-      let options = { allowOverwrites: false }
       if (Array.isArray(bundlesToIntegrate[0])) {
         options = bundlesToIntegrate[1]
         bundlesToIntegrate = bundlesToIntegrate[0]
       }
 
-      decorateStore(store, createChunk(bundlesToIntegrate), options)
+      const newChunk = createChunk(bundlesToIntegrate)
+
+      // adds the selectors
+      decorateStore(store, newChunk)
+
       const allReducers = store.meta.chunks.reduce(
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}
       )
+      Object.assign(allReducers, newChunk.reducers)
       store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
+
       store.buildPersistActionMap && store.buildPersistActionMap()
+
+      // Run any new init methods now that store is fully integrated
+      runChunkInits(store, newChunk)
     }
 
     return store
