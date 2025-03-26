@@ -23,7 +23,11 @@ export default store => {
   store.subscribe(() => {
     const newValues = watchedSelectors.all
       ? store.selectAll()
-      : store.select(Object.keys(watchedSelectors), { allowMissing: true })
+      : // allowMissing is always true here because we don't need to worry about
+        // the selector being missing on every single change, we can just ignore the
+        // missing selectors. Instead, the check for missing selectors (if we care)
+        // is done in the subscribeToSelectors method when we setup the subscription initially
+        store.select(Object.keys(watchedSelectors), { allowMissing: true })
     const { watchedValues } = store.subscriptions
 
     // the only diffing in the app happens here
