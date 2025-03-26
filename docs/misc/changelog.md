@@ -1,5 +1,9 @@
 # Change Log
 
+- `29.0.0` This release has some changes that are unlikely to be breaking, but for safety releasing as a major bump:
+  - Fixes a bug during `integrateBundles` calls where the new bundles' `init` functions would be called before the store reducer had been replaced; potentially causing the code in the `init` function to throw if it called a selector that depended on the new state. The `init` functions are now called as the final step in `integrateBundles` - this is unlikely to be a breaking but if you are using `integrateBundles` and `init` functions, verifying they are working as expected is advised.
+  - Adds an `allowMissing` option to `subsribeToSelectors`. If passed, you can now subscribe to selectors that don't yet exist without the `subscribeToSelectors` call throwing. If the selector is added later (via `integrateBundles`) then changes to that selector will be emitted to the callback as expected.
+  - Switched CI from circle ci to github actions
 - `28.1.0` Minor non-breaking enhancement to `createRouteBundle` to more easily allow dynamic replacement of routes. Adding `doReplaceRoutes` action creator and explicitly storing cached routes and routeMatcher in a reducer so they can be easily replaced.
 - `28.0.3` No API changes.
   - Replaces all uses of `self` with `globalThis`.

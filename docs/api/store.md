@@ -33,9 +33,14 @@ Shortcut for calling `store.select()` but passing in all known selector names.
 
 Add additional bundles after the fact. This will manage updating redux-bundler and internally using redux's `.replaceReducer` to update the store in place.
 
-## `store.subscribeToSelectors(arrayOfSelectors, callback)`
+Any `init` methods on the bundles will be called after the store is configured.
 
-Given an array of selector names, the callback will be called whenever the resulting values change.
+## `store.subscribeToSelectors(arrayOfSelectors, callback, [options])`
+
+Given an array of selector names, the callback will be called whenever the resulting values change. This will _not_ be called with the initial value/state of the selector.
+
+Passing `{ allowMissing: true }` as `options` will let you pass selectors that don't yet exist on the store without throwing an error. This may be helpful if
+a bundle that gets integrated later via `integrateBundle` will add a selector that you want to listen for. If the initial value of the selector when the new bundle is integrated is anything but `undefined` the callback will be fired with the initial value.
 
 Just like Redux's `subscribe()` it returns a function that can be used to unsubscribe.
 

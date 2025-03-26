@@ -6,6 +6,6 @@ Created for and used by PWAs that value small bundle sizes, network resilience, 
 
 If you pair it with [Preact](https://preactjs.com/) it's ~15kb for an entire app toolkit.
 
-If you want to see an app built with it, check out: [anesthesiacharting.com](https://anesthesiacharting.com).
+If you want to see an app built with it, check out: [xchart.com](https://xchart.com).
 
 See docs site here: https://reduxbundler.com

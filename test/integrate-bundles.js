@@ -19,6 +19,86 @@ test('integrateBundles', t => {
   t.end()
 })
 
+test('integrateBundles should run init after setting up reducers and selectors', t => {
+  const bundleA = {
+    name: 'bundleA',
+    reducer: (state = true) => state,
+    selectA: () => 1
+  }
+
+  let initBHasRun = false
+
+  const bundleB = {
+    name: 'bundleB',
+    init: store => {
+      store.selectB()
+      initBHasRun = true
+    },
+    reducer: (state = { b: 2 }) => state,
+    selectB: state => state.bundleB.b
+  }
+
+  const store = composeBundlesRaw(bundleA)()
+
+  store.integrateBundles(bundleB)
+  t.equal(store.selectB(), 2, 'can select b')
+
+  t.ok(initBHasRun, 'initB has run')
+  t.end()
+})
+
+test('subscribeToSelectors can subscribe to not yet loaded selectors', t => {
+  const subscribeCalls = []
+
+  const bundleA = {
+    name: 'bundleA',
+    reducer: (state = 1, { type, payload }) => {
+      if (type === 'updateA') {
+        return payload
+      }
+      return state
+    },
+    selectA: state => state.bundleA,
+    init: store => {
+      store.subscribeToSelectors(
+        ['selectA', 'selectB'],
+        args => {
+          subscribeCalls.push(args)
+        },
+        { allowMissing: true }
+      )
+    }
+  }
+
+  const bundleB = {
+    name: 'bundleB',
+    reducer: (state = 3) => {
+      return state
+    },
+    selectB: state => state.bundleB
+  }
+
+  const store = composeBundlesRaw(bundleA)()
+
+  t.deepEqual(
+    subscribeCalls,
+    [],
+    'no values received yet as not changed from initial values'
+  )
+  store.dispatch({ type: 'updateA', payload: 2 })
+
+  t.deepEqual(
+    subscribeCalls[0],
+    { a: 2 },
+    'received updated values, ignoring b'
+  )
+
+  store.integrateBundles(bundleB)
+  t.deepEqual(subscribeCalls[1], { b: 3 }, 'received values for b')
+
+  t.end()
+})
+
 test('integrateBundles reactors', t => {
   const starterBundle = {
     name: 'starter',

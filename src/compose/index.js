@@ -54,7 +54,7 @@ const decorateStore = (store, processed) => {
   // update collection of resolved selectors
   meta.unboundSelectors = combinedSelectors
 
-  // make sure all selectors are bound (won't overwrite if already bound)
+  // make sure all selectors are bound
   bindSelectorsToStore(store, combinedSelectors)
 
   // build our list of reactor names
@@ -71,14 +71,17 @@ const decorateStore = (store, processed) => {
 
   // build list of destroy methods
   meta.destroyMethods = meta.destroyMethods.concat(processed.destroyMethods)
+}
 
+// runs the init methods for a processed chunk on the store
+const runChunkInits = (store, processed) => {
   // run any new init methods. Use their return function as potential
   // destroy methods.
   processed.initMethods.forEach(init => {
     const destroy = init(store)
 
     if (typeof destroy === 'function') {
-      meta.destroyMethods = meta.destroyMethods.concat(destroy)
+      store.meta.destroyMethods = store.meta.destroyMethods.concat(destroy)
     }
   })
 }
@@ -128,9 +131,16 @@ const composeBundles = (...bundles) => {
     )
 
     // get values from an array of selector names
-    store.select = selectorNames =>
+    store.select = (selectorNames, options) =>
       selectorNames.reduce((obj, name) => {
-        if (!store[name]) throw Error(`SelectorNotFound ${name}`)
+        if (!store[name]) {
+          if (options && options.allowMissing) {
+            return obj
+          } else {
+            throw Error(`SelectorNotFound ${name}`)
+          }
+        }
+
         obj[selectorNameToValueName(name)] = store[name]()
         return obj
       }, {})
@@ -148,19 +158,30 @@ const composeBundles = (...bundles) => {
     // add all the gathered bundle data into the store
     decorateStore(store, firstChunk)
 
+    // run any init methods from the first chunk
+    runChunkInits(store, firstChunk)
+
     // add support for destroying the store (to remove event listeners, etc)
     store.destroy = () =>
       store.meta.destroyMethods.forEach(destroy => destroy(store))
 
     // defines method for integrating other bundles later
     store.integrateBundles = (...bundlesToIntegrate) => {
-      decorateStore(store, createChunk(bundlesToIntegrate))
+      const newChunk = createChunk(bundlesToIntegrate)
+
+      // adds the selectors
+      decorateStore(store, newChunk)
+
       const allReducers = store.meta.chunks.reduce(
         (accum, chunk) => Object.assign(accum, chunk.reducers),
         {}
       )
       store.replaceReducer(enhanceReducer(combineReducers(allReducers)))
+
       store.buildPersistActionMap && store.buildPersistActionMap()
+
+      // Run any new init methods now that store is fully integrated
+      runChunkInits(store, newChunk)
     }
 
     return store
