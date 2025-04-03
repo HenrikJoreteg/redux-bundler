@@ -87,7 +87,11 @@ export default spec => {
       opts.logState && console.debug('state:', store.getState())
       opts.logSelectors && store.doLogSelectors()
       store.doLogNextReaction && store.doLogNextReaction()
-      opts.logStackTraces && console.trace()
+      if (opts.logStackTraces) {
+        console.groupCollapsed('stack trace')
+        console.trace()
+        console.groupEnd('stack trace')
+      }
       console.groupEnd(action.type)
 
       return result
