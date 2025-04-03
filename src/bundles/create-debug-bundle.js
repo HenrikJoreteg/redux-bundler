@@ -17,11 +17,15 @@ export default spec => {
   const defaultOpts = {
     logSelectors: true,
     logState: true,
+    logStackTraces: true,
     enabled: HAS_DEBUG_FLAG,
-    actionFilter: null
+    actionFilter: null,
+    stackTraceLimit: 100
   }
 
   const opts = Object.assign({}, defaultOpts, spec)
+
+  const initialStackTraceLimit = Error.stackTraceLimit
 
   return {
     name: 'debug',
@@ -42,6 +46,13 @@ export default spec => {
             localStorage.debug = true
           } catch (e) {}
         }
+        if (
+          opts.logStackTraces &&
+          Error.stackTraceLimit === initialStackTraceLimit
+        ) {
+          Error.stackTraceLimit = opts.stackTraceLimit
+        }
+
         dispatch({ type: ENABLE })
       },
     doDisableDebug:
@@ -51,6 +62,12 @@ export default spec => {
           try {
             delete localStorage.debug
           } catch (e) {}
+        }
+        if (
+          opts.logStackTraces &&
+          Error.stackTraceLimit === opts.stackTraceLimit
+        ) {
+          Error.stackTraceLimit = initialStackTraceLimit
         }
         dispatch({ type: DISABLE })
       },
@@ -70,6 +87,11 @@ export default spec => {
       opts.logState && console.debug('state:', store.getState())
       opts.logSelectors && store.doLogSelectors()
       store.doLogNextReaction && store.doLogNextReaction()
+      if (opts.logStackTraces) {
+        console.groupCollapsed('stack trace')
+        console.trace()
+        console.groupEnd('stack trace')
+      }
       console.groupEnd(action.type)
 
       return result

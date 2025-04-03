@@ -12,6 +12,8 @@ It takes the following options (none are required):
 
 - `logSelectors` (default: true): whether or not to log out selectors and their computed value with each action dispatch
 - `logState` (default: true): whether to log state after each dispatch
+- `logStackTraces` (default: true): whether to log stack traces with each dispatch
+- `stackTraceLimit` (default: 100): stack trace limit to set when logging stack traces
 - `actionFilter` (default: null): a function to call that determines whether or not to log an action (if debug is enabled). For example, if you want hide the `APP_IDLE` actions pass this: `(action) => action.type !== 'APP_IDLE'`
 - `enabled` (default: HAS_DEBUG_FLAG): explicitly enable/disable. This is helpful in node.js where there's no localStorage flag.
 - `ignoreActions` (default: []): an array of actions to ignore when logging.
