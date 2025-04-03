@@ -1,7 +1,7 @@
 {
   "name": "redux-bundler",
   "description": "Compose a Redux store out of smaller bundles of functionality.",
-  "version": "29.1.0-rc.1",
+  "version": "29.1.0-rc.2",
   "author": "Henrik Joreteg <henrik@joreteg.com> (joreteg.com)",
   "bugs": {
     "url": "https://github.com/HenrikJoreteg/redux-bundler/issues"
