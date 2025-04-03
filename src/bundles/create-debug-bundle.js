@@ -50,7 +50,6 @@ export default spec => {
           opts.logStackTraces &&
           Error.stackTraceLimit === initialStackTraceLimit
         ) {
-          console.log('ENABLE')
           Error.stackTraceLimit = opts.stackTraceLimit
         }
 
