@@ -1,5 +1,6 @@
 # Change Log
 
+- `29.1.0` Log stacktraces in the debug bundle log output.
 - `29.0.0` This release has some changes that are unlikely to be breaking, but for safety releasing as a major bump:
   - Fixes a bug during `integrateBundles` calls where the new bundles' `init` functions would be called before the store reducer had been replaced; potentially causing the code in the `init` function to throw if it called a selector that depended on the new state. The `init` functions are now called as the final step in `integrateBundles` - this is unlikely to be a breaking but if you are using `integrateBundles` and `init` functions, verifying they are working as expected is advised.
   - Adds an `allowMissing` option to `subsribeToSelectors`. If passed, you can now subscribe to selectors that don't yet exist without the `subscribeToSelectors` call throwing. If the selector is added later (via `integrateBundles`) then changes to that selector will be emitted to the callback as expected.
